@@ -22,19 +22,33 @@
         editor.setTheme("ace/theme/textmate");
         var JavaScriptMode = require("ace/mode/javascript").Mode;
         editor.getSession().setMode(new JavaScriptMode());
+
+        var canon = require("pilot/canon");
+        canon.addCommand({
+          name: "save",
+          bindKey: {
+            win: "Ctrl-S",
+            mac: "Command-S",
+            sender: "editor"
+          },
+          exec: function() {
+            alert(editor.getSelection().selectAll());
+          }
+        });
     }
   </script>
   
 </head>
 <body>
-
+<br/>
 <div id="container">
   <header>
 
   </header>
   <div id="main" role="main">
-    <div id="graphs"></div>
-    <div id="editor">{}</div>
+    <div id="graphs"><img src="http://graphite01.pp.local/render/?&width=800&height=400&areaMode=all&target=stats.counters.production.rails.dashboard.email_dispatched.value"></div>
+    <div id="editor">stats.counters.production.rails.dashboard.email_dispatched.value
+    </div>
   </div>
   <footer>
 

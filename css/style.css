@@ -202,21 +202,21 @@ table { border-collapse: collapse; border-spacing: 0; }
    ========================================================================== */
 
 body {
-  width: 500px;
+  width: 800px;
   margin-left: auto;
   margin-right: auto;
 }
 
 #editor {
   position: absolute;
-  width: 500px;
-  height: 400px;
+  width: 800px;
+  height: 200px;
 }
 
 #graph {
   border: 1px solid #999;
   position: absolute;
-  width: 500px;
+  width: 800px;
   height: 400px;
 }
 
