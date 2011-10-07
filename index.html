@@ -24,6 +24,7 @@
         editor.getSession().setMode(new JavaScriptMode());
 
         var canon = require("pilot/canon");
+
         canon.addCommand({
           name: "save",
           bindKey: {
@@ -32,7 +33,11 @@
             sender: "editor"
           },
           exec: function() {
-            alert(editor.getSelection().selectAll());
+            var addToGraph = editor.getSession().getValue();
+            var graph = new PP.Graphiti(addToGraph);
+            var url = "<img src='"+graph.buildURL()+"'>";
+            console.log(url);
+            $("#graphs").html(url);
           }
         });
     }

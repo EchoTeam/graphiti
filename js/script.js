@@ -26,11 +26,11 @@ PP = window.PP || {};
 
 PP.Graphiti = function(targetsAndOptions){
   var defaults = {
-    width:    640,
-    height:   320,
+    width:    800,
+    height:   400,
     areaMode: "stacked",
     from:     '-6hour',
-    fontSize: "14",
+    fontSize: "10",
     template: 'plain',
     title:    "",
     targets:  []
