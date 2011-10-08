@@ -1,0 +1,3 @@
+require './graphiti'
+
+run Graphiti

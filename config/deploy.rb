@@ -7,6 +7,7 @@ set :scm, :git
 set :repository, "git@github.com:paperlesspost/paperless-graphiti.git"
 set :user, "paperless"
 set :use_sudo, false
+set :normalize_asset_timestamps, false
 
 namespace :deploy do
   task :migrate do
@@ -18,7 +19,7 @@ namespace :deploy do
   task :start do
     puts "    not doing start because not a Rails application."
   end
-  task :stop do 
+  task :stop do
     puts "    not doing stop because not a Rails application."
   end
   task :restart do

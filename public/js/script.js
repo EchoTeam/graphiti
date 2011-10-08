@@ -74,11 +74,11 @@ PP.Graphiti.prototype = {
       for(option in options){
         var key = option;
         var value = options[option];
-         if(key == 'mostDeviant'){
+        if (key == 'mostDeviant'){
           json = JSON.stringify(value);
           target = [key,"(",json,",",target,")"].join("");
         } else {
-          if(value != true){
+          if (value != true){
             json = JSON.stringify(value);
             target = "" + key
               + "(" +
