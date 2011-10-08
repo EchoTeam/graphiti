@@ -1,13 +1,16 @@
-require 'bundler'
-Bundler.setup!
+class Graphiti < Sinatra::Base
 
-require 'sinatra/big_band'
-
-class Graphiti < Sinatra::BigBand
+  VERSION = '0.0.1'
 
   configure do |c|
+    register Sinatra::ConfigFile
+    register Sinatra::Compass
+
     config_file 'settings.yml'
-    config_file "#{c.environment}.settings.yml"
+    env_specific = "#{c.environment}.settings.yml"
+    if File.readable?(env_specific)
+     config_file env_specific
+    end
   end
 
   get '/' do

@@ -1,3 +1,2 @@
----
 port: 3131
 redis: localhost:6739:1/graphiti
