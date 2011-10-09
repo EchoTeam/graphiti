@@ -44,7 +44,7 @@ var app = Sammy('body', function() {
           };
       }
       if (typeof text != 'string') {
-        text = JSON.stringify(text);
+        text = JSON.stringify(text, null, 2);
       }
       $('#editor').text(text).show();
       this.setupEditor();
