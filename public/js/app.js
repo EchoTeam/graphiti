@@ -82,7 +82,7 @@ var app = Sammy('body', function() {
     },
     replaceGraphMetric: function(metric) {
       var json = this.getEditorJSON();
-      json.targets = [metric];
+      json.targets = [[metric]];
       this.graphPreview(json);
       this.setEditorJSON(json);
     }
@@ -116,7 +116,19 @@ var app = Sammy('body', function() {
 
   this.bind('run', function() {
     var ctx = this;
+    $('#editor-pane')
+    .delegate('.edit-group .edit-head', 'click', function(e) {
+      e.preventDefault();
+      var $group = $(this).add($(this).siblings('.edit-body'))
+      Sammy.log($group);
+      if ($group.is('.closed')) {
+        $group.removeClass('closed').addClass('open');
+      } else {
+        $group.addClass('closed').removeClass('open');
+      }
+    });
   });
+
 });
 
 $(function() {

@@ -22,14 +22,24 @@
     #editor-pane{style: 'display:none;'}
       #graph-preview
         %img{src: '/images/loading.gif'}
-      #editor
-        :plain
-      #metrics-list
-        %ul
-          %li
-            %a{href: '', rel: 'add'} +
-            %a{href: '', rel: 'replace'} R
-            %strong &nbsp;
+      .edit-group
+        .edit-head.closed
+          %a Metrics
+        .edit-body.closed
+          #metrics-list
+            %ul
+              %li
+                %a{href: '', rel: 'add'} +
+                %a{href: '', rel: 'replace'} R
+                %strong &nbsp;
+        .clear
+      .edit-group
+        .edit-head.open
+          %a Editor
+        .edit-body.open
+          #editor
+            :plain
+        .clear
 
 
   #footer
