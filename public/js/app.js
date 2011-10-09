@@ -3,10 +3,10 @@ var app = Sammy('body', function() {
 
   this.helpers({
     setupEditor: function() {
-      if (this.editorSetup) return;
+      if (this.app.editor) return;
 
       var ctx = this;
-      var editor = ace.edit("editor");
+      var editor = this.app.editor = ace.edit("editor");
       editor.setTheme("ace/theme/textmate");
       var JSONMode = require("ace/mode/json").Mode;
       var session = editor.getSession();
@@ -25,14 +25,12 @@ var app = Sammy('body', function() {
          },
          exec: function() {
            try {
-             var options = JSON.parse(editor.getSession().getValue());
-             ctx.graphPreview(options);
+             ctx.graphPreview(ctx.getEditorJSON());
             } catch(e) {
               alert(e);
             }
          }
       });
-      this.editorSetup = true;
     },
     showEditor: function(text) {
       $('#editor-pane').show();
@@ -43,12 +41,20 @@ var app = Sammy('body', function() {
             ]
           };
       }
+      this.setupEditor();
+      var text = this.setEditorJSON(text);
+      $('#editor').show();
+      this.graphPreview(JSON.parse(text));
+    },
+    getEditorJSON: function() {
+      return JSON.parse(this.app.editor.getSession().getValue());
+    },
+    setEditorJSON: function(text) {
       if (typeof text != 'string') {
         text = JSON.stringify(text, null, 2);
       }
-      $('#editor').text(text).show();
-      this.setupEditor();
-      this.graphPreview(JSON.parse(text));
+      this.app.editor.getSession().setValue(text);
+      return text;
     },
     graphPreview: function(options) {
       // get width/height from img
@@ -61,6 +67,24 @@ var app = Sammy('body', function() {
         Sammy.log(url);
         $img.attr('src', url);
       });
+    },
+    loadMetricsList: function() {
+      return this.load('/metrics')
+                 .then(function(resp) {
+                   this.next(resp.metrics);
+                  });
+    },
+    addGraphMetric: function(metric) {
+      var json = this.getEditorJSON();
+      json.targets.push([metric]);
+      this.graphPreview(json);
+      this.setEditorJSON(json);
+    },
+    replaceGraphMetric: function(metric) {
+      var json = this.getEditorJSON();
+      json.targets = [metric];
+      this.graphPreview(json);
+      this.setEditorJSON(json);
     }
   });
 
@@ -68,6 +92,26 @@ var app = Sammy('body', function() {
     this.session('lastPreview', function(lastPreview) {
       ctx.showEditor(lastPreview);
     });
+    this.loadMetricsList()
+    .then(function(metrics) {
+      var $list = $('#metrics-list ul');
+      var $li = $list.find('li:first').clone();
+      $list.html('');
+      var i = 0, l = metrics.length;
+      for (; i < l; i++) {
+        $li.clone().find('strong').text(metrics[i]).end().appendTo($list);
+      }
+      // bind delegates only the first time
+      if (!$list.is('.bound')) {
+        $list.delegate('li a', 'click', function(e) {
+          e.preventDefault();
+          var action = $(this).attr('rel'),
+              metric = $(this).siblings('strong').text();
+          Sammy.log('clicked', action, metric);
+          ctx[action + "GraphMetric"](metric);
+        }).addClass('.bound');
+      }
+    })
   });
 
   this.bind('run', function() {

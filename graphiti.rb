@@ -39,7 +39,7 @@ class Graph
     else
       puts "Error fetching #{url}. #{response.inspect}"
     end
-    @metrics
+    @metrics.sort
   end
 end
 
@@ -72,14 +72,12 @@ class Graphiti < Sinatra::Base
   end
 
   get '/metrics' do
-    json :metrics => Graph.metrics
+    json :metrics => Graph.metrics(params[:refresh])
   end
 
   get '/stylesheets/:name.css' do
     content_type 'text/css'
     scss :"stylesheets/#{params[:name]}"
   end
-
-  private
 
 end
