@@ -16,12 +16,12 @@
 
   #container
     #graph-preview
-      %img/
+      %img{src: '/images/loading.gif'}
     #editor
       :plain
         {
-          targets: [
-            'stats.timers.rails.production.controller.total.mean'
+          "targets": [
+            "stats.timers.production.rails.controller.total.mean"
           ]
         }
 
@@ -29,6 +29,6 @@
     Graphiti #{Graphiti::VERSION}
 
   %script{src: '/js/libs/ace/ace.js'}
-  %script{src: '/js/libs/ace/mode-javascript.js'}
+  %script{src: '/js/libs/ace/mode-json.js'}
   %script{src: '/js/libs/ace/theme-textmate.js'}
   %script{src: '/js/default.js'}

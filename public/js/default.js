@@ -10973,6 +10973,21 @@ window.jQuery = window.$ = jQuery;
 
 })(jQuery, window);
 
+(function($) {
+
+  var dimensions = function() {
+    var $this = $(this);
+    return {
+      width: $this.width(),
+      height: $this.height()
+    };
+  };
+
+  $.extend($.fn, {
+    dimensions: dimensions
+  });
+})(jQuery);
+
 /*
 Instantiating a new Graph:
 
@@ -11005,19 +11020,18 @@ Graphiti.Graph = function(targetsAndOptions){
     areaMode: "stacked",
     from:     '-6hour',
     fontSize: "10",
-    template: 'plain',
     title:    "",
     targets:  []
   };
 
   if (targetsAndOptions.options){
-    $.extend(this.options, defaults, targetsAndOptions.options);
+    $.extend(true, this.options, defaults, targetsAndOptions.options);
   } else {
-    $.extend(this.options, defaults, {});
+    $.extend(true, this.options, defaults);
   }
 
   if (targetsAndOptions.targets){
-    var i = 0, l = targetsAndOptions.length;
+    var i = 0, l = targetsAndOptions.targets.length;
     for (; i < l; i++) {
       this.addTarget(targetsAndOptions.targets[i]);
     }
@@ -11090,9 +11104,9 @@ Graphiti.Graph.prototype = {
 $(function() {
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/textmate");
-    var JavaScriptMode = require("ace/mode/javascript").Mode;
+    var JSONMode = require("ace/mode/json").Mode;
     var session = editor.getSession();
-    session.setMode(new JavaScriptMode());
+    session.setMode(new JSONMode());
     session.setUseSoftTabs(true);
     session.setTabSize(2);
 
@@ -11106,11 +11120,16 @@ $(function() {
          sender: "editor"
        },
        exec: function() {
-         var addToGraph = eval(editor.getSession().getValue());
-         var graph = new Graphiti.Graph(addToGraph);
+         var options = JSON.parse(editor.getSession().getValue());
+         // get width/height from img
+         Sammy.log(options);
+         var $img = $("#graph-preview img");
+         options.options = $.extend(true, {}, $img.dimensions(), options.options);
+         Sammy.log(options);
+         var graph = new Graphiti.Graph(options);
          var url = graph.buildURL();
          Sammy.log(url);
-         $("#graph-preview img").attr('src', url);
+         $img.attr('src', url);
        }
      });
 });

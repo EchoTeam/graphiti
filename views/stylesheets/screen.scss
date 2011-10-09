@@ -35,3 +35,11 @@ body.bp {
   position: relative;
   height: 400px;
 }
+
+#graph-preview {
+  @include column($blueprint-grid-columns, true);
+  img {
+    width: 100%;
+    height: 400px;
+  }
+}

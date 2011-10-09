@@ -1,9 +1,9 @@
 $(function() {
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/textmate");
-    var JavaScriptMode = require("ace/mode/javascript").Mode;
+    var JSONMode = require("ace/mode/json").Mode;
     var session = editor.getSession();
-    session.setMode(new JavaScriptMode());
+    session.setMode(new JSONMode());
     session.setUseSoftTabs(true);
     session.setTabSize(2);
 
@@ -17,11 +17,16 @@ $(function() {
          sender: "editor"
        },
        exec: function() {
-         var addToGraph = eval(editor.getSession().getValue());
-         var graph = new Graphiti.Graph(addToGraph);
+         var options = JSON.parse(editor.getSession().getValue());
+         // get width/height from img
+         Sammy.log(options);
+         var $img = $("#graph-preview img");
+         options.options = $.extend(true, {}, $img.dimensions(), options.options);
+         Sammy.log(options);
+         var graph = new Graphiti.Graph(options);
          var url = graph.buildURL();
          Sammy.log(url);
-         $("#graph-preview img").attr('src', url);
+         $img.attr('src', url);
        }
      });
 });

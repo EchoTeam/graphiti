@@ -30,19 +30,18 @@ Graphiti.Graph = function(targetsAndOptions){
     areaMode: "stacked",
     from:     '-6hour',
     fontSize: "10",
-    template: 'plain',
     title:    "",
     targets:  []
   };
 
   if (targetsAndOptions.options){
-    $.extend(this.options, defaults, targetsAndOptions.options);
+    $.extend(true, this.options, defaults, targetsAndOptions.options);
   } else {
-    $.extend(this.options, defaults, {});
+    $.extend(true, this.options, defaults);
   }
 
   if (targetsAndOptions.targets){
-    var i = 0, l = targetsAndOptions.length;
+    var i = 0, l = targetsAndOptions.targets.length;
     for (; i < l; i++) {
       this.addTarget(targetsAndOptions.targets[i]);
     }
