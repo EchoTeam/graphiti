@@ -5,6 +5,7 @@
     "default" : [
       ["jquery", "1.6.4"],
       ["sammy", "0.7.0"],
+      ["sammy.storage", "0.7.1pre"],
       "extensions",
       "graph",
       "app"

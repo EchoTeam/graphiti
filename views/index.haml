@@ -15,15 +15,13 @@
     %h1 Graphiti
 
   #container
-    #graph-preview
-      %img{src: '/images/loading.gif'}
-    #editor
-      :plain
-        {
-          "targets": [
-            "stats.timers.production.rails.controller.total.mean"
-          ]
-        }
+
+    #editor-pane{style: 'display:none;'}
+      #graph-preview
+        %img{src: '/images/loading.gif'}
+      #editor
+        :plain
+
 
   #footer
     Graphiti #{Graphiti::VERSION}

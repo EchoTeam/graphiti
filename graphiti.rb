@@ -29,6 +29,10 @@ class Graphiti < Sinatra::Base
     haml :index
   end
 
+  get '/graphs/new' do
+    haml :index
+  end
+
   get '/stylesheets/:name.css' do
     content_type 'text/css'
     scss :"stylesheets/#{params[:name]}"
