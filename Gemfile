@@ -2,12 +2,12 @@
 source "http://rubygems.org"
 
 gem 'sinatra'
-gem 'sinatra-config-file', '~>0.6.1', :require => 'sinatra/config_file'
-gem 'sinatra-compass', :require => 'sinatra/compass'
+gem 'sinatra-contrib'
 gem 'jim'
 gem 'redis'
 gem 'redis-namespace'
 gem 'compass'
+gem 'haml'
 
 group :development do
   gem 'sinatra-reloader', :require => 'sinatra/reloader'
