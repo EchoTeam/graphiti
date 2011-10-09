@@ -15,7 +15,7 @@ window.onload = function() {
       },
       exec: function() {
         var addToGraph = editor.getSession().getValue();
-        var graph = new PP.Graphiti(addToGraph);
+        var graph = new Graphiti.Graph(addToGraph);
         var url = "<img src='"+graph.buildURL()+"'>";
         console.log(url);
         $("#graphs").html(url);

@@ -1,18 +1,17 @@
 /*
-
 Instantiating a new Graph:
 
 // Pass an Object without options or target attributes to set some options:
-var graph = new PP.Graphiti({width:100,title:"Cool Graph"});
+var graph = new Graphiti.Graph({width:100,title:"Cool Graph"});
 
 // Pass a string to set a Graph target:
-var graph = new PP.Graphiti('stats.beers.consumed');
+var graph = new Graphiti.Graph('stats.beers.consumed');
 
 // Pass an array to set a Graph target with options:
-var graph = new PP.Graphiti(['stats.beers.consumed',{drawAsInfinite:true}]);
+var graph = new Graphiti.Graph(['stats.beers.consumed',{drawAsInfinite:true}]);
 
 // Pass an Object with options or target attribues:
-var graph = new PP.Graphiti({options:{width:1000}, targets:['stats']})
+var graph = new Graphiti.Graph({options:{width:1000}, targets:['stats']})
 
 // Add attribues to the object
 graph.addTarget('stats.times.stumbled);
@@ -22,9 +21,10 @@ graph.addTarget(['stats.times.stumbled',{drawAsInfinite:true}]);
 graph.buildURL();
 
 */
-PP = window.PP || {};
 
-PP.Graphiti = function(targetsAndOptions){
+Graphiti = window.Graphiti || {};
+
+Graphiti.Graph = function(targetsAndOptions){
   var defaults = {
     width:    800,
     height:   400,
@@ -59,7 +59,7 @@ PP.Graphiti = function(targetsAndOptions){
   };
 }
 
-PP.Graphiti.prototype = {
+Graphiti.Graph.prototype = {
   options: {},
   urlBase: "http://graphite01.pp.local/render/?",
 

@@ -1,10 +1,14 @@
 {
-  "bundle_dir": "js/",
-  "vendor_dir": "js/vendor",
+  "bundle_dir": "public/js/",
+  "vendor_dir": "public/js/lib",
   "bundles": {
     "default" : [
-      "jquery",
-      "
+      ["jquery", "1.6.4"],
+      "ace/ace",
+      ["sammy", "0.7.0"],
+      "graph",
+      "app"
+    ]
   }
 }
 

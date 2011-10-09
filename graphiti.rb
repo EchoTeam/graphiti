@@ -21,6 +21,7 @@ class Graphiti < Sinatra::Base
       config.sass_dir = File.join(settings.views, 'stylesheets')
       config.output_style = :compact
     end
+    set :haml, :format => :html5
   end
 
   get '/' do
