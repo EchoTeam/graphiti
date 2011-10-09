@@ -11632,6 +11632,7 @@ var app = Sammy('body', function() {
       }
       $('#editor').text(text).show();
       this.setupEditor();
+      this.graphPreview(JSON.parse(text));
     },
     graphPreview: function(options) {
       // get width/height from img
