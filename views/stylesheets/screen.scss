@@ -30,8 +30,8 @@ body.bp {
   @include container;
 }
 
-#graph-editor {
+#editor {
+  @include column($blueprint-grid-columns, true);
   position: relative;
-  width: 600px;
-  height: 300px;
+  height: 400px;
 }

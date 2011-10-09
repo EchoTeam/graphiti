@@ -19,7 +19,6 @@ graph.addTarget(['stats.times.stumbled',{drawAsInfinite:true}]);
 
 // Build the URL
 graph.buildURL();
-
 */
 
 Graphiti = window.Graphiti || {};
@@ -36,14 +35,17 @@ Graphiti.Graph = function(targetsAndOptions){
     targets:  []
   };
 
-  if(targetsAndOptions.options){
+  if (targetsAndOptions.options){
     $.extend(this.options, defaults, targetsAndOptions.options);
   } else {
     $.extend(this.options, defaults, {});
   }
 
-  if(targetsAndOptions.targets){
-    this.addTarget(targetsAndOptions.targets);
+  if (targetsAndOptions.targets){
+    var i = 0, l = targetsAndOptions.length;
+    for (; i < l; i++) {
+      this.addTarget(targetsAndOptions.targets[i]);
+    }
   };
 
   if(!targetsAndOptions.options && !targetsAndOptions.targets){

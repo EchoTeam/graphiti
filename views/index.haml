@@ -6,22 +6,24 @@
   %title Graphiti
 
   = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
-  = stylesheet('/stylesheets/print.css', media: 'print')
-
   <!--[if lt IE 8]>
   = stylesheet('/stylesheets/ie.css', media: 'screen, projection')
   <![endif]-->
 
-%body
-  %h1 Graphiti
+%body.bp
+  %header
+    %h1 Graphiti
 
-  #graph-editor
-    :plain
-      {
-        targets: [
-          'stats.timers.rails.production.controller.total.mean'
-        ]
-      }
+  #container
+    #graph-preview
+      %img/
+    #editor
+      :plain
+        {
+          targets: [
+            'stats.timers.rails.production.controller.total.mean'
+          ]
+        }
 
   #footer
     Graphiti #{Graphiti::VERSION}
