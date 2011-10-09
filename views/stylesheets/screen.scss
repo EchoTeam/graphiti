@@ -10,7 +10,9 @@
 // Import the non-default scaffolding module.
 @import "blueprint/scaffolding";
 
+@import "compass/utilities";
 @import "compass/css3/transform";
+@import "fancy-buttons";
 
 // To generate css equivalent to the blueprint css but with your
 // configuration applied, uncomment:
@@ -30,6 +32,15 @@ body.bp {
 
 #container {
   @include container;
+}
+#header {
+
+  ul {
+    @include horizontal-list;
+  }
+  button {
+    @include fancy-button();
+  }
 }
 
 #editor {

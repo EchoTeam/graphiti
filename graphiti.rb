@@ -9,6 +9,7 @@ require 'compass'
 require 'typhoeus'
 require 'yajl'
 require './lib/redised'
+require 'fancy-buttons'
 
 class Graph
   include Redised
