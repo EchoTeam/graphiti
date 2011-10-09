@@ -24,6 +24,7 @@ graph.buildURL();
 Graphiti = window.Graphiti || {};
 
 Graphiti.Graph = function(targetsAndOptions){
+  this.options = {};
   var defaults = {
     width:    800,
     height:   400,
@@ -61,16 +62,15 @@ Graphiti.Graph = function(targetsAndOptions){
 }
 
 Graphiti.Graph.prototype = {
-  options: {},
   urlBase: "http://graphite01.pp.local/render/?",
 
   addTarget: function(targets){
-    var json = "", target;
+    var json = "", target, options;
     if (typeof targets == 'string'){
       target = targets;
     } else {
       target = targets[0];
-      var options = targets[1];
+      options = targets[1];
 
       for(option in options){
         var key = option;
