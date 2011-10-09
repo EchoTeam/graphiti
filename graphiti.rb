@@ -22,13 +22,14 @@ class Graphiti < Sinatra::Base
       config.output_style = :compact
     end
     set :haml, :format => :html5
+    set :scss, Compass.sass_engine_options
   end
 
   get '/' do
     haml :index
   end
 
-  get '/stylesheets/:name' do
+  get '/stylesheets/:name.css' do
     content_type 'text/css'
     scss :"stylesheets/#{params[:name]}"
   end

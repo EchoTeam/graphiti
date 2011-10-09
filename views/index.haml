@@ -5,23 +5,28 @@
 
   %title Graphiti
 
-  %link{href: stylesheet('screen'), media: 'screen, projection', type: 'text/css'}/
-  %link{href: stylesheet('print'), media: 'print', type: 'text/css'}/
+  = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
+  = stylesheet('/stylesheets/print.css', media: 'print')
 
   <!--[if lt IE 8]>
-  %link{href: stylesheet('ie'), media: 'screen, projection', type: 'text/css'}
+  = stylesheet('/stylesheets/ie.css', media: 'screen, projection')
   <![endif]-->
 
-%body.bp
-  %header
-    %h1 Graphiti
+%body
+  %h1 Graphiti
 
-  #container
-    #main
-      Main
-      #editor/
+  #graph-editor
+    :plain
+      {
+        targets: [
+          'stats.timers.rails.production.controller.total.mean'
+        ]
+      }
 
   #footer
     Graphiti #{Graphiti::VERSION}
 
+  %script{src: '/js/libs/ace/ace.js'}
+  %script{src: '/js/libs/ace/mode-javascript.js'}
+  %script{src: '/js/libs/ace/theme-textmate.js'}
   %script{src: '/js/default.js'}

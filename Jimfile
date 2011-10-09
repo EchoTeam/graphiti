@@ -3,9 +3,6 @@
   "vendor_dir": "public/js/libs",
   "bundles": {
     "default" : [
-      "ace/ace",
-      "ace/theme-textmate",
-      "ace/mode-javascript",
       ["jquery", "1.6.4"],
       ["sammy", "0.7.0"],
       "graph",

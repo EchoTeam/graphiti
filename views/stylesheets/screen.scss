@@ -25,3 +25,13 @@ body.bp {
   // Remove the scaffolding when you're ready to start doing visual design.
   // Or leave it in if you're happy with how blueprint looks out-of-the-box
 }
+
+#container {
+  @include container;
+}
+
+#graph-editor {
+  position: relative;
+  width: 600px;
+  height: 300px;
+}
