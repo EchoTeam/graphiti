@@ -8,6 +8,8 @@ gem 'redis'
 gem 'redis-namespace'
 gem 'compass'
 gem 'haml'
+gem 'typhoeus'
+gem 'yajl-ruby'
 
 group :development do
   gem 'sinatra-reloader', :require => 'sinatra/reloader'
