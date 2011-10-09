@@ -11055,8 +11055,8 @@ Graphiti.Graph.prototype = {
   urlBase: "http://graphite01.pp.local/render/?",
 
   addTarget: function(targets){
-    var json = "";
-    if(targets.charCodeAt){
+    var json = "", target;
+    if (typeof targets == 'string'){
       target = targets;
     } else {
       target = targets[0];
