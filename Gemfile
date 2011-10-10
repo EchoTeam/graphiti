@@ -10,7 +10,7 @@ gem 'compass'
 gem 'haml'
 gem 'typhoeus'
 gem 'yajl-ruby'
-gem 'fancy-buttons'
+gem 'uuid'
 
 group :development do
   gem 'sinatra-reloader', :require => 'sinatra/reloader'

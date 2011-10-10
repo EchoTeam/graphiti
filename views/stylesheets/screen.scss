@@ -12,7 +12,6 @@
 
 @import "compass/utilities";
 @import "compass/css3/transform";
-@import "fancy-buttons";
 
 // To generate css equivalent to the blueprint css but with your
 // configuration applied, uncomment:
@@ -115,6 +114,7 @@ body.bp {
 }
 #graph-preview {
   @include column($blueprint-grid-columns, true);
+  @include clearfix;
   img {
     width: 100%;
     height: 400px;

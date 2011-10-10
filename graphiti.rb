@@ -9,7 +9,7 @@ require 'compass'
 require 'typhoeus'
 require 'yajl'
 require './lib/redised'
-require 'fancy-buttons'
+require 'uuid'
 
 class Graph
   include Redised
@@ -21,6 +21,15 @@ class Graph
     get_metrics_list
     redis.set "metrics", @metrics.join("\n")
     @metrics
+  end
+
+  def self.save(graph_json)
+    uuid = UUID.generate(:compact)[0..10]
+    redis.hset "graphs:#{uuid}", "json", graph_json[:json]
+    redis.hset "graphs:#{uuid}", "updated_at", Time.now.to_i
+    redis.hset "graphs:#{uuid}", "url", graph_json[:url]
+    redis.zadd "graphs", Time.now.to_i, uuid
+    uuid
   end
 
   private
@@ -79,6 +88,11 @@ class Graphiti < Sinatra::Base
   get '/stylesheets/:name.css' do
     content_type 'text/css'
     scss :"stylesheets/#{params[:name]}"
+  end
+
+  post '/graphs' do
+    uuid = Graph.save(params[:graph])
+    json :uuid => uuid
   end
 
 end

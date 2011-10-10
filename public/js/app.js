@@ -117,6 +117,17 @@ var app = Sammy('body', function() {
     })
   });
 
+  this.post('/graphs', function(ctx) {
+    var json = this.getEditorJSON();
+    var data = {
+      url: new Graphiti.Graph(json).buildURL(),
+      json: JSON.stringify(json)
+    };
+    $.post('/graphs', {graph: data}, function(resp) {
+      Sammy.log(resp);
+    });
+  });
+
   this.bind('run', function() {
     var ctx = this;
     $('#editor-pane')
