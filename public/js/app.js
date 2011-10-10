@@ -117,14 +117,24 @@ var app = Sammy('body', function() {
     })
   });
 
+  this.get('/graphs/:uuid', function(ctx) {
+    this.load('/graphs/' + this.params.uuid + '.js')
+        .then(function(graph_data) {
+          ctx.showEditor(graph_data.json);
+        });
+  });
+
   this.post('/graphs', function(ctx) {
     var json = this.getEditorJSON();
     var data = {
       url: new Graphiti.Graph(json).buildURL(),
-      json: JSON.stringify(json)
+      json: JSON.stringify(json, null, 2)
     };
     $.post('/graphs', {graph: data}, function(resp) {
       Sammy.log(resp);
+      if (resp.uuid) {
+        ctx.redirect('/graphs/' + resp.uuid);
+      }
     });
   });
 

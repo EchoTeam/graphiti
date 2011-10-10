@@ -32,6 +32,10 @@ class Graph
     uuid
   end
 
+  def self.find(uuid)
+    redis.hgetall "graphs:#{uuid}"
+  end
+
   private
   def self.get_metrics_list(prefix = "stats.")
     url = "http://#{Graphiti.settings.graphite_host}/metrics/find?query=#{prefix}&format=completer"
@@ -73,26 +77,34 @@ class Graphiti < Sinatra::Base
     Graph.redis = settings.redis_url
   end
 
-  get '/' do
-    haml :index
-  end
-
-  get '/graphs/new' do
-    haml :index
+  get '/graphs/:uuid.js' do
+    json Graph.find(params[:uuid])
   end
 
   get '/metrics' do
     json :metrics => Graph.metrics(params[:refresh])
   end
 
-  get '/stylesheets/:name.css' do
-    content_type 'text/css'
-    scss :"stylesheets/#{params[:name]}"
-  end
-
   post '/graphs' do
     uuid = Graph.save(params[:graph])
     json :uuid => uuid
+  end
+
+  get '/graphs/new' do
+    haml :index
+  end
+
+  get '/graphs/:uuid' do
+    haml :index
+  end
+
+  get '/' do
+    haml :index
+  end
+
+  get '/stylesheets/:name.css' do
+    content_type 'text/css'
+    scss :"stylesheets/#{params[:name]}"
   end
 
 end
