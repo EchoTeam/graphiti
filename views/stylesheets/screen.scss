@@ -32,17 +32,34 @@ body.bp {
 
 #container {
   @include container;
+  margin: 10px auto;
 }
 #header {
-
+  background: #001247;
+  h1 {
+    color: #FFF;
+    padding: 10px;
+    margin: 0;
+  }
+  .menu {
+    @include container;
+    position: relative;
+  }
   ul {
+    position: absolute;
+    right: 0;
+    top: 0;
     @include horizontal-list;
   }
-  button {
-    @include fancy-button();
+}
+#graph-actions {
+  padding: 15px;
+  background-color: #f3f3f3;
+  .save {
+    font-size: 12px;
+    font-weight: bold;
   }
 }
-
 #editor {
   position: relative;
   height: 400px;

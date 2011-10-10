@@ -12,19 +12,80 @@
 
 %body.bp
   #header
-    %h1 Graphiti
+    .menu
+      %h1.tk-adrianna Graphiti
 
-    %ul
-      %li
-        %a{href: '/graphs/new'}
-          %button
+      %ul
+        %li
+          %a{href: '/dashboards'}
+            Dashboards
+        %li
+          %a{href: '/graphs'}
+            Graphs
+        %li
+          %a{href: '/graphs/new'}
             + New Graph
-
   #container
-
     #editor-pane{style: 'display:none;'}
       #graph-preview
         %img{src: '/images/loading.gif'}
+      #graph-actions
+        %form{action: '/graphs', method: 'post'}
+          %input.save{type: 'submit', value: 'Save'}
+        .clear
+      .edit-group
+        .edit-head.closed
+          %a Options
+        .edit-body.closed
+          #graph-options
+            %form
+              %p
+                %label Title
+                %input{type: 'text', name: 'title'}
+              %p
+                %label Vertical Title
+                %input{type: 'text', name: 'vtitle'}
+
+              %p
+                %label Background Color
+                %input{type: 'text', name: 'bgcolor'}
+              %p
+                %label Text Color
+                %input{type: 'text', name: 'fgcolor'}
+              %p
+                %label Color List
+                %input{type: 'text', name: 'colorList'}
+              %p
+                %label Major Grid Color
+                %input{type: 'text', name: 'majorGridLineColor'}
+              %p
+                %label Minor Grid Color
+                %input{type: 'text', name: 'minorGridLineColor'}
+
+              %p
+                %label Font
+                %input{type: 'text', name: 'fontName'}
+              %p
+                %label Font Size
+                %input{type: 'text', name: 'fontSize', size: 2}
+              %p
+                %label Bold
+                %input{type: 'checkbox', name: 'fontBold'}
+                %label Italic
+                %input{type: 'checkbox', name: 'fontItalic'}
+
+              /
+                yMin
+                yMax
+                lineMode
+                lineWidth
+                hideLegend
+                hideAxes
+                hideGrid
+                minXStep
+                min
+                max
+        .clear
       .edit-group
         .edit-head.closed
           %a Metrics
@@ -40,8 +101,7 @@
         .edit-head.open
           %a Editor
         .edit-body.open
-          #editor
-            :plain
+          #editor &nbsp;
         .clear
 
 
@@ -52,3 +112,6 @@
   %script{src: '/js/libs/ace/mode-json.js'}
   %script{src: '/js/libs/ace/theme-textmate.js'}
   %script{src: '/js/default.js'}
+  %script{src: "http://use.typekit.com/mpd8blb.js"}
+  :javascript
+    try{Typekit.load();}catch(e){}

@@ -11620,6 +11620,9 @@ var app = Sammy('body', function() {
       $('#editor-pane').show();
       if (!text) {
         text = {
+            "options": {
+              "title": "New Graph"
+            },
             "targets": [
               "stats.timers.production.rails.controller.total.mean"
             ]
