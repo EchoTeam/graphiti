@@ -13,7 +13,7 @@
 %body.bp
   #header
     .menu
-      %h1.tk-adrianna Graphiti
+      %h1 Graphiti
 
       %ul
         %li
@@ -26,15 +26,9 @@
           %a{href: '/graphs/new'}
             + New Graph
   #container
-    #graphs-pane{style: 'display:none;'}
-      .graph{style: 'display:none'}
-        %img{src: '/images/loading.gif'}
-        %h3.title &nbsp;
-        %ul.actions
-          %li
-            %a.edit{href: '/graphs'} Edit
+    #graphs-pane.pane{style: 'display:none;'}
 
-    #editor-pane{style: 'display:none;'}
+    #editor-pane.pane{style: 'display:none;'}
       #graph-preview
         %img{src: '/images/loading.gif'}
         .clear
@@ -122,10 +116,16 @@
   #footer
     Graphiti #{Graphiti::VERSION}
 
+  #templates{style: 'display:none'}
+    .graph{style: 'display:none'}
+      %a.edit
+        %img{src: '/images/loading.gif'}
+      .desc
+        %h3.title &nbsp;
+        %ul.actions
+          %li
+            %a.edit Edit
   %script{src: '/js/libs/ace/ace.js'}
   %script{src: '/js/libs/ace/mode-json.js'}
   %script{src: '/js/libs/ace/theme-textmate.js'}
   %script{src: '/js/default.js'}
-  %script{src: "http://use.typekit.com/mpd8blb.js"}
-  :javascript
-    try{Typekit.load();}catch(e){}

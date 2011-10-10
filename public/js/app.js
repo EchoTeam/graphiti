@@ -124,6 +124,10 @@ var app = Sammy('body', function() {
     }
   });
 
+  this.before({only: {method: 'get'}}, function() {
+    $('.pane').hide();
+  });
+
   this.get('/graphs/new', function(ctx) {
     this.session('lastPreview', function(lastPreview) {
       ctx.showEditor(lastPreview);
@@ -138,13 +142,13 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs', function(ctx) {
-    var $graphs = $('#graphs-pane').show();
+    var $graphs = $('#graphs-pane').html('').show();
     this.load('/graphs.js')
         .then(function(data) {
           var graphs = data.graphs,
               i = 0,
               l = graphs.length,
-              $graph = $('#graphs-pane .graph').clone(),
+              $graph = $('#templates .graph').clone(),
               graph, graph_obj;
           for (; i < l; i++) {
             graph = graphs[i];

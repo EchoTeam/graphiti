@@ -1,42 +1,29 @@
-// This import applies a global reset to any page that imports this stylesheet.
 @import "blueprint/reset";
-
-// To configure blueprint, edit the partials/base.sass file.
 @import "partials/base";
-
-// Import all the default blueprint modules so that we can access their mixins.
+@import "partials/fonts";
 @import "blueprint";
-
-// Import the non-default scaffolding module.
 @import "blueprint/scaffolding";
-@import "blueprint/buttons";
-
 @import "compass/utilities";
 @import "compass/css3";
 
-// To generate css equivalent to the blueprint css but with your
-// configuration applied, uncomment:
-// @include blueprint
-
-// If you are doing a lot of stylesheet concatenation, it is suggested
-// that you scope your blueprint styles, so that you can better control
-// what pages use blueprint when stylesheets are concatenated together.
 body.bp {
   @include blueprint-typography(true);
   @include blueprint-utilities;
   @include blueprint-debug;
   @include blueprint-interaction;
-  // Remove the scaffolding when you're ready to start doing visual design.
-  // Or leave it in if you're happy with how blueprint looks out-of-the-box
 }
-
+@mixin fancy-font {
+  font-family: "MentoneSemiBold", Helvetica, Arial;
+}
 #container {
   @include container;
   margin: 10px auto;
 }
 #header {
   background: #001247;
+  height: 60px;
   h1 {
+    @include fancy-font;
     color: #FFF;
     padding: 10px;
     margin: 0;
@@ -47,9 +34,24 @@ body.bp {
   }
   ul {
     position: absolute;
-    right: 0;
+    right: 20px;
     top: 0;
     @include horizontal-list;
+    li {
+      a {
+        @include fancy-font;
+        @include border-bottom-radius(5px);
+        display:block;
+        font-size: 1.3em;
+        background: #00081f;
+        color: #FFF;
+        padding: 10px 20px 5px;
+        text-decoration: none;
+        &:hover {
+          background: #4b4b4b;
+        }
+      }
+    }
   }
 }
 #graph-actions {
@@ -141,10 +143,28 @@ body.bp {
   @include column($blueprint-grid-columns, true);
   @include clearfix;
   .graph {
-    @include column($blueprint-grid-columns / 2);
+    @include column(($blueprint-grid-columns / 2) - 1, true);
+    @include append(1);
+    h3 {
+      @include fancy-font;
+      margin: 0px;
+      padding: 0px;
+    }
     img {
       width: 100%;
       height: $blueprint-grid-width * ($blueprint-grid-columns / 2) * 0.75;
+    }
+    .desc {
+      padding: 5px;
+      background: #f3f3f3;
+      margin-bottom: 10px;
+    }
+    ul.actions {
+      @include horizontal-list;
+      a {
+        font-weight: bold;
+        text-decoration: none;
+      }
     }
   }
 }
