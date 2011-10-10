@@ -19,6 +19,7 @@ graph.addTarget(['stats.times.stumbled',{drawAsInfinite:true}]);
 
 // Build the URL
 graph.buildURL();
+
 */
 
 Graphiti = window.Graphiti || {};
@@ -64,6 +65,10 @@ Graphiti.Graph = function(targetsAndOptions){
 Graphiti.Graph.prototype = {
   urlBase: "http://graphite01.pp.local/render/?",
 
+  updateOptions: function(options) {
+    $.extend(true, this.options, options || {});
+  },
+
   addTarget: function(targets){
     var json = "", target, options;
     if (typeof targets == 'string'){
@@ -72,7 +77,7 @@ Graphiti.Graph.prototype = {
       target = targets[0];
       options = targets[1];
 
-      for(option in options){
+      for (option in options){
         var key = option;
         var value = options[option];
         if (key == 'mostDeviant'){
@@ -108,5 +113,12 @@ Graphiti.Graph.prototype = {
       };
     });
     return url;
+  },
+
+  image: function($image) {
+    Sammy.log($image.dimensions());
+    this.updateOptions($image.dimensions());
+    $image.attr('src', this.buildURL());
+    return $image;
   }
 };

@@ -25,6 +25,7 @@ class Graph
 
   def self.save(uuid = nil, graph_json)
     uuid ||= UUID.generate(:compact)[0..10]
+    redis.hset "graphs:#{uuid}", "title", graph_json[:title]
     redis.hset "graphs:#{uuid}", "json", graph_json[:json]
     redis.hset "graphs:#{uuid}", "updated_at", Time.now.to_i
     redis.hset "graphs:#{uuid}", "url", graph_json[:url]
@@ -33,7 +34,18 @@ class Graph
   end
 
   def self.find(uuid)
-    redis.hgetall "graphs:#{uuid}"
+    h = redis.hgetall "graphs:#{uuid}"
+    h['uuid'] = uuid
+    h
+  rescue
+    nil
+  end
+
+  def self.all
+    graph_ids = redis.zrevrange "graphs", 0, -1
+    graph_ids.collect do |uuid|
+      find(uuid)
+    end.compact
   end
 
   private
@@ -86,6 +98,10 @@ class Graphiti < Sinatra::Base
     json :metrics => Graph.metrics(params[:refresh])
   end
 
+  get '/graphs.js' do
+    json :graphs => Graph.all
+  end
+
   post '/graphs' do
     uuid = Graph.save(params[:graph])
     json :uuid => uuid
@@ -101,6 +117,10 @@ class Graphiti < Sinatra::Base
   end
 
   get '/graphs/:uuid' do
+    haml :index
+  end
+
+  get '/graphs' do
     haml :index
   end
 

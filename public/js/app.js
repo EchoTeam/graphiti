@@ -78,12 +78,8 @@ var app = Sammy('body', function() {
       // get width/height from img
       this.session('lastPreview', options, function() {
         var $img = $("#graph-preview img");
-        options.options = $.extend(true, {}, $img.dimensions(), options.options);
-        Sammy.log(options);
         var graph = new Graphiti.Graph(options);
-        var url = graph.buildURL();
-        Sammy.log(url);
-        $img.attr('src', url);
+        graph.image($img);
       });
     },
     loadMetricsList: function() {
@@ -141,9 +137,35 @@ var app = Sammy('body', function() {
         });
   });
 
+  this.get('/graphs', function(ctx) {
+    var $graphs = $('#graphs-pane').show();
+    this.load('/graphs.js')
+        .then(function(data) {
+          var graphs = data.graphs,
+              i = 0,
+              l = graphs.length,
+              $graph = $('#graphs-pane .graph').clone(),
+              graph, graph_obj;
+          for (; i < l; i++) {
+            graph = graphs[i];
+            graph_obj = new Graphiti.Graph(JSON.parse(graph.json));
+            this.log(graph_obj);
+            $graph
+            .clone()
+            .find('.title').text(graph.title || 'Untitled').end()
+            .find('a.edit').attr('href', '/graphs/' + graph.uuid).end()
+            .show()
+            .appendTo($graphs).each(function() {
+              graph_obj.image($(this).find('img'));
+            });
+          }
+        })
+  });
+
   this.post('/graphs', function(ctx) {
     var json = this.getEditorJSON();
     var data = {
+      title: json.options.title || 'Untitled',
       url: new Graphiti.Graph(json).buildURL(),
       json: JSON.stringify(json, null, 2)
     };
@@ -158,6 +180,7 @@ var app = Sammy('body', function() {
   this.put('/graphs/:uuid', function(ctx) {
     var json = this.getEditorJSON();
     var data = {
+      title: json.options.title || 'Untitled',
       url: new Graphiti.Graph(json).buildURL(),
       json: JSON.stringify(json, null, 2)
     };

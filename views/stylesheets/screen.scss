@@ -56,6 +56,9 @@ body.bp {
   @include column($blueprint-grid-columns, true);
   padding: 15px;
   background-color: #f3f3f3;
+  ul {
+    @include horizontal-list;
+  }
   .save {
     @include border-radius(4px);
     cursor: pointer;
@@ -132,4 +135,16 @@ body.bp {
   text-align:center;
   color: #666;
   margin: 10px;
+}
+
+#graphs-pane {
+  @include column($blueprint-grid-columns, true);
+  @include clearfix;
+  .graph {
+    @include column($blueprint-grid-columns / 2);
+    img {
+      width: 100%;
+      height: $blueprint-grid-width * ($blueprint-grid-columns / 2) * 0.75;
+    }
+  }
 }
