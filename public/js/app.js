@@ -1,6 +1,15 @@
 var app = Sammy('body', function() {
   this.use('Session');
 
+  var defaultGraph = {
+            "options": {
+              "title": "New Graph"
+            },
+            "targets": [
+              "stats.timers.production.rails.controller.total.mean"
+            ]
+          };
+
   this.helpers({
     setupEditor: function() {
       if (this.app.editor) return;
@@ -21,7 +30,7 @@ var app = Sammy('body', function() {
          bindKey: {
            win: "Ctrl-S",
            mac: "Command-S",
-           sender: "editor"
+           sender: function() { Sammy.log(arguments) }
          },
          exec: function() {
            try {
@@ -31,23 +40,29 @@ var app = Sammy('body', function() {
             }
          }
       });
+
+      key('command+s', function() {
+        Sammy.log("command+s");
+        return false;
+      });
     },
-    showEditor: function(text) {
+    showEditor: function(text, uuid) {
       $('#editor-pane').show();
       if (!text) {
-        text = {
-            "options": {
-              "title": "New Graph"
-            },
-            "targets": [
-              "stats.timers.production.rails.controller.total.mean"
-            ]
-          };
+        text = defaultGraph;
       }
       this.setupEditor();
       var text = this.setEditorJSON(text);
       $('#editor').show();
       this.graphPreview(JSON.parse(text));
+      this.loadMetricsList()
+      if (uuid) { // this is an already saved graph
+        $('#graph-actions .update')
+          .attr('action', '/graphs/' + uuid)
+          .show();
+      } else {
+        $('#graph-actions .update').hide();
+      }
     },
     getEditorJSON: function() {
       return JSON.parse(this.app.editor.getSession().getValue());
@@ -75,7 +90,29 @@ var app = Sammy('body', function() {
       return this.load('/metrics')
                  .then(function(resp) {
                    this.next(resp.metrics);
-                  });
+                 })
+                .then(function(metrics) {
+                  var $list = $('#metrics-list ul');
+                  var $li = $list.find('li:first').clone();
+                  $list.html('');
+                  var i = 0, l = metrics.length;
+                  for (; i < l; i++) {
+                    $li.clone()
+                    .find('strong').text(metrics[i])
+                    .end()
+                    .appendTo($list);
+                  }
+                  // bind delegates only the first time
+                  if (!$list.is('.bound')) {
+                    $list.delegate('li a', 'click', function(e) {
+                      e.preventDefault();
+                      var action = $(this).attr('rel'),
+                          metric = $(this).siblings('strong').text();
+                      Sammy.log('clicked', action, metric);
+                      ctx[action + "GraphMetric"](metric);
+                    }).addClass('.bound');
+                  }
+                });
     },
     addGraphMetric: function(metric) {
       var json = this.getEditorJSON();
@@ -95,32 +132,12 @@ var app = Sammy('body', function() {
     this.session('lastPreview', function(lastPreview) {
       ctx.showEditor(lastPreview);
     });
-    this.loadMetricsList()
-    .then(function(metrics) {
-      var $list = $('#metrics-list ul');
-      var $li = $list.find('li:first').clone();
-      $list.html('');
-      var i = 0, l = metrics.length;
-      for (; i < l; i++) {
-        $li.clone().find('strong').text(metrics[i]).end().appendTo($list);
-      }
-      // bind delegates only the first time
-      if (!$list.is('.bound')) {
-        $list.delegate('li a', 'click', function(e) {
-          e.preventDefault();
-          var action = $(this).attr('rel'),
-              metric = $(this).siblings('strong').text();
-          Sammy.log('clicked', action, metric);
-          ctx[action + "GraphMetric"](metric);
-        }).addClass('.bound');
-      }
-    })
   });
 
   this.get('/graphs/:uuid', function(ctx) {
     this.load('/graphs/' + this.params.uuid + '.js')
         .then(function(graph_data) {
-          ctx.showEditor(graph_data.json);
+          ctx.showEditor(graph_data.json, ctx.params.uuid);
         });
   });
 
@@ -134,6 +151,25 @@ var app = Sammy('body', function() {
       Sammy.log(resp);
       if (resp.uuid) {
         ctx.redirect('/graphs/' + resp.uuid);
+      }
+    });
+  });
+
+  this.put('/graphs/:uuid', function(ctx) {
+    var json = this.getEditorJSON();
+    var data = {
+      url: new Graphiti.Graph(json).buildURL(),
+      json: JSON.stringify(json, null, 2)
+    };
+    $.ajax({
+      url: '/graphs/' + this.params.uuid,
+      data: {graph: data, '_method': 'PUT'},
+      type: 'post',
+      success: function(resp) {
+        Sammy.log(resp);
+        if (resp.uuid) {
+          ctx.redirect('/graphs/' + resp.uuid);
+        }
       }
     });
   });

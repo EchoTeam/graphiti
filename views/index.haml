@@ -31,8 +31,10 @@
         %img{src: '/images/loading.gif'}
         .clear
       #graph-actions
-        %form{action: '/graphs', method: 'post'}
-          %input.save{type: 'submit', value: 'Save'}
+        %form.update{action: '/graphs', method: 'put', style: 'display:none'}
+          %input.save{type: 'submit', value: 'Update'}
+        %form.save-new{action: '/graphs', method: 'post'}
+          %input.save{type: 'submit', value: 'Save New'}
         .clear
       .edit-group
         .edit-head.closed

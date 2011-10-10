@@ -23,8 +23,8 @@ class Graph
     @metrics
   end
 
-  def self.save(graph_json)
-    uuid = UUID.generate(:compact)[0..10]
+  def self.save(uuid = nil, graph_json)
+    uuid ||= UUID.generate(:compact)[0..10]
     redis.hset "graphs:#{uuid}", "json", graph_json[:json]
     redis.hset "graphs:#{uuid}", "updated_at", Time.now.to_i
     redis.hset "graphs:#{uuid}", "url", graph_json[:url]
@@ -74,6 +74,7 @@ class Graphiti < Sinatra::Base
     end
     set :haml, :format => :html5
     set :scss, Compass.sass_engine_options
+    set :method_override, true
     Graph.redis = settings.redis_url
   end
 
@@ -87,6 +88,11 @@ class Graphiti < Sinatra::Base
 
   post '/graphs' do
     uuid = Graph.save(params[:graph])
+    json :uuid => uuid
+  end
+
+  put '/graphs/:uuid' do
+    uuid = Graph.save(params[:uuid], params[:graph])
     json :uuid => uuid
   end
 

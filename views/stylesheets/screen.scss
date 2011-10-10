@@ -9,9 +9,10 @@
 
 // Import the non-default scaffolding module.
 @import "blueprint/scaffolding";
+@import "blueprint/buttons";
 
 @import "compass/utilities";
-@import "compass/css3/transform";
+@import "compass/css3";
 
 // To generate css equivalent to the blueprint css but with your
 // configuration applied, uncomment:
@@ -52,9 +53,14 @@ body.bp {
   }
 }
 #graph-actions {
+  @include column($blueprint-grid-columns, true);
   padding: 15px;
   background-color: #f3f3f3;
   .save {
+    @include border-radius(4px);
+    cursor: pointer;
+    padding: 4px 6px;
+    border: 1px solid #CCC;
     font-size: 12px;
     font-weight: bold;
   }
@@ -97,6 +103,7 @@ body.bp {
 }
 #metrics-list {
   overflow:scroll;
+  height: 400px;
   ul {
     list-style-type: none;
     margin: 0px;
