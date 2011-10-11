@@ -11901,7 +11901,8 @@ var app = Sammy('body', function() {
             }
           });
     },
-    loadAndRenderGraphs: function($graphs, url) {
+    loadAndRenderGraphs: function(url) {
+      var $graphs = $('#graphs-pane').html('').show();
       this.load(url)
           .then(function(data) {
             var title = 'All Graphs';
@@ -11931,6 +11932,30 @@ var app = Sammy('body', function() {
               });
             }
           });
+    },
+    loadAndRenderDashboards: function() {
+      var $dashboards = $('#dashboards-pane').html('<h2>Dashboards</h2>').show();
+      var ctx = this;
+      this.load('/dashboards.js')
+          .then(function(data) {
+            var dashboards = data.dashboards,
+            i = 0, l = dashboards.length, dashboard, alt,
+            $dashboard = $('#templates .dashboard').clone();
+
+            for (; i < l;i++) {
+              dashboard = dashboards[i];
+              alt = ((i+1)%2 == 0) ? 'alt' : '';
+              $dashboard.clone()
+                .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
+                .find('.title').text(dashboard.title).end()
+                .find('.graphs-count').text(dashboard.graphs.length).end()
+                .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
+                .addClass(alt)
+                .show()
+                .appendTo($dashboards);
+            }
+
+          });
     }
   });
 
@@ -11952,35 +11977,19 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs', function(ctx) {
-    var $graphs = $('#graphs-pane').html('').show();
-    this.loadAndRenderGraphs($graphs, '/graphs.js');
+    this.loadAndRenderGraphs('/graphs.js');
   });
 
   this.get('/dashboards/:slug', function(ctx) {
-    var $graphs = $('#graphs-pane').html('').show();
-    this.loadAndRenderGraphs($graphs, '/dashboards/' + this.params.slug + '.js');
+    this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js');
   });
 
   this.get('/dashboards', function(ctx) {
-    var $dashboards = $('#dashboards-pane').html('<h2>Dashboards</h2>').show();
-    this.load('/dashboards.js')
-        .then(function(data) {
-          var dashboards = data.dashboards,
-          i = 0, l = dashboards.length, dashboard,
-          $dashboard = $('#templates .dashboard').clone();
+    this.loadAndRenderDashboards();
+  });
 
-          for (; i < l;i++) {
-            dashboard = dashboards[i];
-            $dashboard.clone()
-              .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
-              .find('.title').text(dashboard.title).end()
-              .find('.graphs-count').text(dashboard.graphs.length).end()
-              .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
-              .show()
-              .appendTo($dashboards);
-          }
-
-        });
+  this.get('', function(ctx) {
+    this.loadAndRenderDashboards();
   });
 
   this.post('/graphs', function(ctx) {

@@ -200,3 +200,46 @@ h2 {
     }
   }
 }
+#dashboards-pane {
+  @include column($blueprint-grid-columns, true);
+  @include clearfix;
+  .dashboard {
+    @include column($blueprint-grid-columns, true);
+    border-bottom: 1px solid #CCC;
+    background: #f3f3f3;
+    position: relative;
+    &.alt {
+      background: #e5e5e5;
+    }
+    &:hover {
+      background: #FFF;
+    }
+    a {
+      color: #333;
+      text-decoration:none;
+      display: block;
+      @include clearfix;
+    }
+    h3 {
+      @include fancy-font;
+      float: left;
+      font-size: 1.8em;
+      margin: 0px;
+      padding: 20px;
+    }
+    .meta {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+    }
+    .updated-at {
+      color: #CCC;
+    }
+    .graphs-count {
+      @include fancy-font;
+      color: #666;
+      font-size: 1.8em;
+      padding: 0px 8px;
+    }
+  }
+}
