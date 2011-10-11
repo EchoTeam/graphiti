@@ -41,6 +41,7 @@ GEM
       version_sorter (~> 1.1.0)
       yajl-ruby
       yajl-ruby
+    kgio (2.6.0)
     leftright (0.9.1)
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
@@ -57,6 +58,7 @@ GEM
       rack
     rack-test (0.6.1)
       rack (>= 1.0)
+    raindrops (0.7.0)
     rake (0.9.2)
     redis (2.2.2)
     redis-namespace (1.1.0)
@@ -106,6 +108,10 @@ GEM
     typhoeus (0.2.4)
       mime-types
       mime-types
+    unicorn (4.1.1)
+      kgio (~> 2.4)
+      rack
+      raindrops (~> 0.6)
     uuid (2.3.4)
       macaddr (~> 1.0)
     version_sorter (1.1.0)
@@ -127,5 +133,6 @@ DEPENDENCIES
   sinatra-reloader
   thin
   typhoeus
+  unicorn
   uuid
   yajl-ruby
