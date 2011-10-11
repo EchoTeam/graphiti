@@ -162,12 +162,21 @@ body.bp {
   margin: 10px;
 }
 
+h2 {
+  @include fancy-font;
+  font-size: 2.4em;
+  padding: 5px;
+  border-bottom: 1px solid #CCC;
+}
+
 #graphs-pane {
   @include column($blueprint-grid-columns, true);
   @include clearfix;
   .graph {
-    @include column(($blueprint-grid-columns / 2) - 1, true);
-    @include append(1);
+    @include column(($blueprint-grid-columns / 2));
+    &.last {
+      @include column(($blueprint-grid-columns / 2), true);
+    }
     h3 {
       @include fancy-font;
       margin: 0px;

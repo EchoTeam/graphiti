@@ -28,9 +28,9 @@ class Graph
     nil
   end
 
-  def self.all
-    graph_ids = redis.zrevrange "graphs", 0, -1
-    graph_ids.collect do |uuid|
+  def self.all(*graph_ids)
+    graph_ids = redis.zrevrange "graphs", 0, -1 if graph_ids.empty?
+    graph_ids.flatten.collect do |uuid|
       find(uuid)
     end.compact
   end

@@ -47,11 +47,15 @@ class Graphiti < Sinatra::Base
   end
 
   get '/dashboards/:slug.js' do
-    json Dashboard.find(params[:slug])
+    json Dashboard.find(params[:slug], true)
   end
 
   get '/dashboards.js' do
-    json :dashboards => Dashboard.all
+    if params[:uuid]
+      json :dashboards => Dashboard.without_graph(params[:uuid])
+    else
+      json :dashboards => Dashboard.all
+    end
   end
 
   post '/graphs' do
@@ -70,7 +74,7 @@ class Graphiti < Sinatra::Base
   end
 
   post '/graphs/dashboards' do
-    json :graphs => Dashboard.add_graph(params[:dashboard], params[:uuid])
+    json Dashboard.add_graph(params[:dashboard], params[:uuid])
   end
 
   get '/graphs/new' do
@@ -82,6 +86,14 @@ class Graphiti < Sinatra::Base
   end
 
   get '/graphs' do
+    haml :index
+  end
+
+  get '/dashboards/:slug' do
+    haml :index
+  end
+
+  get '/dashboards' do
     haml :index
   end
 

@@ -26,8 +26,8 @@
           %a{href: '/graphs/new'}
             + New Graph
   #container
+    #dashboards-pane.pane{style: 'display:none;'}
     #graphs-pane.pane{style: 'display:none;'}
-
     #editor-pane.pane{style: 'display:none;'}
       #graph-preview
         %img{src: '/images/loading.gif'}
@@ -134,6 +134,11 @@
     Graphiti #{Graphiti::VERSION}
 
   #templates{style: 'display:none'}
+    .dashboard{style: 'display:none'}
+      %a.view
+        %h3.title &nbsp;
+        %strong.graphs-count
+        %span.updated-at
     .graph{style: 'display:none'}
       %a.edit
         %img{src: '/images/loading.gif'}

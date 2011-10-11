@@ -11806,7 +11806,7 @@ var app = Sammy('body', function() {
       $('#editor').show();
       this.graphPreview(JSON.parse(text));
       this.loadMetricsList()
-      this.buildDashboardsDropdown()
+      this.buildDashboardsDropdown(uuid);
       if (uuid) { // this is an already saved graph
         $('#graph-actions .update')
           .attr('action', '/graphs/' + uuid)
@@ -11875,8 +11875,16 @@ var app = Sammy('body', function() {
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
-    buildDashboardsDropdown: function() {
-      this.load('/dashboards.js')
+
+    timestamp: function(time) {
+      if (typeof time == 'string') {
+        time = parseInt(time, 10);
+      }
+      return new Date(time * 1000).toString();
+    },
+
+    buildDashboardsDropdown: function(uuid) {
+      this.load('/dashboards.js', {data: {uuid: uuid}})
           .then(function(data) {
             var $select = $('select[name="dashboard"]');
             $select.html('');
@@ -11890,6 +11898,37 @@ var app = Sammy('body', function() {
                 value: dashboard.slug,
                 text: dashboard.title
               }).appendTo($select);
+            }
+          });
+    },
+    loadAndRenderGraphs: function($graphs, url) {
+      this.load(url)
+          .then(function(data) {
+            var title = 'All Graphs';
+            if (data.title) {
+              title = data.title;
+            }
+            $graphs.append('<h2>' + title + '</h2>');
+            var graphs = data.graphs,
+                i = 0,
+                l = graphs.length,
+                $graph = $('#templates .graph').clone(),
+                graph, graph_obj;
+            for (; i < l; i++) {
+              graph = graphs[i];
+              graph_obj = new Graphiti.Graph(JSON.parse(graph.json));
+              this.log(graph_obj);
+              $graph
+              .clone()
+              .find('.title').text(graph.title || 'Untitled').end()
+              .find('a.edit').attr('href', '/graphs/' + graph.uuid).end()
+              .show()
+              .appendTo($graphs).each(function() {
+                graph_obj.image($(this).find('img'));
+                if ((i+1)%2 == 0) {
+                  $(this).addClass('last');
+                }
+              });
             }
           });
     }
@@ -11914,27 +11953,34 @@ var app = Sammy('body', function() {
 
   this.get('/graphs', function(ctx) {
     var $graphs = $('#graphs-pane').html('').show();
-    this.load('/graphs.js')
+    this.loadAndRenderGraphs($graphs, '/graphs.js');
+  });
+
+  this.get('/dashboards/:slug', function(ctx) {
+    var $graphs = $('#graphs-pane').html('').show();
+    this.loadAndRenderGraphs($graphs, '/dashboards/' + this.params.slug + '.js');
+  });
+
+  this.get('/dashboards', function(ctx) {
+    var $dashboards = $('#dashboards-pane').html('<h2>Dashboards</h2>').show();
+    this.load('/dashboards.js')
         .then(function(data) {
-          var graphs = data.graphs,
-              i = 0,
-              l = graphs.length,
-              $graph = $('#templates .graph').clone(),
-              graph, graph_obj;
-          for (; i < l; i++) {
-            graph = graphs[i];
-            graph_obj = new Graphiti.Graph(JSON.parse(graph.json));
-            this.log(graph_obj);
-            $graph
-            .clone()
-            .find('.title').text(graph.title || 'Untitled').end()
-            .find('a.edit').attr('href', '/graphs/' + graph.uuid).end()
-            .show()
-            .appendTo($graphs).each(function() {
-              graph_obj.image($(this).find('img'));
-            });
+          var dashboards = data.dashboards,
+          i = 0, l = dashboards.length, dashboard,
+          $dashboard = $('#templates .dashboard').clone();
+
+          for (; i < l;i++) {
+            dashboard = dashboards[i];
+            $dashboard.clone()
+              .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
+              .find('.title').text(dashboard.title).end()
+              .find('.graphs-count').text(dashboard.graphs.length).end()
+              .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
+              .show()
+              .appendTo($dashboards);
           }
-        })
+
+        });
   });
 
   this.post('/graphs', function(ctx) {
@@ -11975,7 +12021,7 @@ var app = Sammy('body', function() {
   this.post('/graphs/dashboards', function(ctx) {
     var $target = $(this.target);
     $.post('/graphs/dashboards', $target.serialize(), function(resp) {
-      Sammy.log(resp);
+      ctx.buildDashboardsDropdown(resp.uuid);
     });
   });
 
