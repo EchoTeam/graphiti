@@ -69,6 +69,10 @@ class Graphiti < Sinatra::Base
     json :dashboard => dashboard
   end
 
+  post '/graphs/dashboards' do
+    json :graphs => Dashboard.add_graph(params[:dashboard], params[:uuid])
+  end
+
   get '/graphs/new' do
     haml :index
   end

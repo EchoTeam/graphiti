@@ -11811,6 +11811,7 @@ var app = Sammy('body', function() {
         $('#graph-actions .update')
           .attr('action', '/graphs/' + uuid)
           .show();
+        $('[name=uuid]').val(uuid);
         $('#graph-actions .dashboard').show();
       } else {
         $('#graph-actions .update, #graph-actions .dashboard').hide();
@@ -11971,6 +11972,13 @@ var app = Sammy('body', function() {
     });
   });
 
+  this.post('/graphs/dashboards', function(ctx) {
+    var $target = $(this.target);
+    $.post('/graphs/dashboards', $target.serialize(), function(resp) {
+      Sammy.log(resp);
+    });
+  });
+
   this.post('/dashboards', function(ctx) {
     var $target = $(this.target);
     $.post('/dashboards', $target.serialize(), function(resp) {
@@ -11979,6 +11987,7 @@ var app = Sammy('body', function() {
       ctx.trigger('toggle-dashboard-creation', {target: $target.parents('.dashboard')});
     });
   });
+
 
   this.bind('toggle-dashboard-creation', function(e, data) {
     var $parent = $(data.target);

@@ -24,4 +24,13 @@ class Dashboard
     end.compact
   end
 
+  def self.add_graph(slug, uuid)
+    redis.zadd "dashboards:#{slug}:graphs", Time.now.to_i, uuid
+    graph_ids(slug)
+  end
+
+  def self.graph_ids(slug)
+    redis.zrange "dashboards:#{slug}:graphs", 0, -1
+  end
+
 end
