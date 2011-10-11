@@ -118,6 +118,7 @@ DEPENDENCIES
   compass
   haml
   jim
+  rake
   redis
   redis-namespace
   ruby-debug19

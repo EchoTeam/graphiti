@@ -1,32 +1,42 @@
-default_run_options[:pty] = true
+$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
+require 'rvm/capistrano'
 
-set :application, "paperless-graphiti"
-set :deploy_to, "/var/app/paperless-graphiti"
+set :application, "graphiti"
+set :deploy_to, "/var/sites/graphiti"
 set :deploy_via, :remote_cache
 set :scm, :git
 set :repository, "git@github.com:paperlesspost/paperless-graphiti.git"
 set :user, "paperless"
 set :use_sudo, false
 set :normalize_asset_timestamps, false
+set :rvm_ruby_string, 'default'
+set :rvm_bin_path, '/usr/local/bin'
 
 namespace :deploy do
-  task :migrate do
-    puts "    not doing migrate because not a Rails application."
-  end
-  task :finalize_update do
-    puts "    not doing finalize_update because not a Rails application."
-  end
-  task :start do
-    puts "    not doing start because not a Rails application."
-  end
-  task :stop do
-    puts "    not doing stop because not a Rails application."
-  end
   task :restart do
-    puts "    not doing restart because not a Rails application."
+    run "cd #{current_path} && touch tmp/restart.txt"
   end
 end
 
 task :production do
-  role :app, 'graphiti.pp.local', :primary => true
+  server 'graphiti.pp.local', :web, :app, :db, :primary => true,
 end
+
+namespace :graphiti do
+  task :link_configs do
+    run "cd #{release_path} && rm settings.yml && ln -nfs #{shared_path}/settings.yml #{release_path}/settings.yml"
+  end
+end
+
+namespace :bundler do
+  desc "Automatically installed your bundled gems if a Gemfile exists"
+  task :install_gems, :roles => :web do
+    run %{if [ -f #{release_path}/Gemfile ]; then cd #{release_path} &&
+      mkdir -p #{release_path}/vendor &&
+      ln -nfs #{shared_path}/vendor/bundle #{release_path}/vendor/bundle &&
+      bundle install --without test development --deployment; fi
+    }
+  end
+end
+after "deploy:update_code", "graphiti:link_configs"
+after "deploy:update_code", "bundler:install_gems"
