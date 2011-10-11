@@ -18,3 +18,7 @@ group :development do
   gem 'thin'
   gem 'ruby-debug19'
 end
+
+group :production do
+  gem 'unicorn'
+end
