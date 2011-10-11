@@ -12,9 +12,26 @@ set :normalize_asset_timestamps, false
 set :rvm_ruby_string, 'default'
 set :rvm_bin_path, '/usr/local/bin'
 
+set :unicorn_binary, "/usr/local/rvm/gems/ruby-1.9.2-p0/bin/unicorn"
+set :unicorn_config, "#{current_path}/config/unicorn.rb"
+set :unicorn_pid, "#{current_path}/tmp/pids/unicorn.pid"
+
 namespace :deploy do
-  task :restart do
-    run "cd #{current_path} && touch tmp/restart.txt"
+  task :start, :roles => :app, :except => { :no_release => true } do 
+    run "cd #{current_path} && bundle exec #{unicorn_binary} -c #{unicorn_config} -E production -D"
+  end
+  task :stop, :roles => :app, :except => { :no_release => true } do 
+    run "kill `cat #{unicorn_pid}`"
+  end
+  task :graceful_stop, :roles => :app, :except => { :no_release => true } do
+    run "kill -s QUIT `cat #{unicorn_pid}`"
+  end
+  task :reload, :roles => :app, :except => { :no_release => true } do
+    run "kill -s USR2 `cat #{unicorn_pid}`"
+  end
+  task :restart, :roles => :app, :except => { :no_release => true } do
+    stop
+    start
   end
 end
 
