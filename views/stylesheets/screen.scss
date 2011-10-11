@@ -56,18 +56,41 @@ body.bp {
 }
 #graph-actions {
   @include column($blueprint-grid-columns, true);
-  padding: 15px;
+  padding: 10px;
   background-color: #f3f3f3;
+  border-bottom: 4px solid #CCC;
   ul {
     @include horizontal-list;
+    li {
+      &.first {
+        @include column(6);
+        @include border;
+        form {
+          float: left;
+          padding-right: 5px;
+        }
+      }
+    }
   }
   .save {
     @include border-radius(4px);
+    background: #e5e5e5;
     cursor: pointer;
     padding: 4px 6px;
     border: 1px solid #CCC;
     font-size: 12px;
     font-weight: bold;
+    &.create {
+      background: #FFF;
+    }
+  }
+  select, input[type=text] {
+    font-size: 12px;
+  }
+  h4 {
+    @include fancy-font;
+    font-size: 1.3em;
+    margin-bottom: 5px;
   }
 }
 #editor {
@@ -79,7 +102,6 @@ body.bp {
    border-top: 1px solid #CCC;
   .edit-head {
     @include column($blueprint-grid-columns, true);
-    font-weight: bold;
     font-size: 1.4em;
     cursor: pointer;
     padding: 4px 0px;
@@ -90,6 +112,7 @@ body.bp {
       top: 40px;
     }
     a {
+      @include fancy-font;
       padding: 4px 8px;
       text-decoration: none;
     }
@@ -128,7 +151,7 @@ body.bp {
   @include column($blueprint-grid-columns, true);
   @include clearfix;
   img {
-    width: 100%;
+    @include column($blueprint-grid-columns, true);
     height: 400px;
   }
 }

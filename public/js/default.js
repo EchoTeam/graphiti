@@ -11806,12 +11806,14 @@ var app = Sammy('body', function() {
       $('#editor').show();
       this.graphPreview(JSON.parse(text));
       this.loadMetricsList()
+      this.buildDashboardsDropdown()
       if (uuid) { // this is an already saved graph
         $('#graph-actions .update')
           .attr('action', '/graphs/' + uuid)
           .show();
+        $('#graph-actions .dashboard').show();
       } else {
-        $('#graph-actions .update').hide();
+        $('#graph-actions .update, #graph-actions .dashboard').hide();
       }
     },
     getEditorJSON: function() {
@@ -11871,10 +11873,28 @@ var app = Sammy('body', function() {
       json.targets = [[metric]];
       this.graphPreview(json);
       this.setEditorJSON(json);
+    },
+    buildDashboardsDropdown: function() {
+      this.load('/dashboards.js')
+          .then(function(data) {
+            var $select = $('select[name="dashboard"]');
+            $select.html('');
+            var dashboards = data.dashboards,
+                i = 0,
+                l = dashboards.length,
+                dashboard;
+            for (; i < l; i++) {
+              dashboard = dashboards[i];
+              $('<option />', {
+                value: dashboard.slug,
+                text: dashboard.title
+              }).appendTo($select);
+            }
+          });
     }
   });
 
-  this.before({only: {method: 'get'}}, function() {
+  this.before({only: {verb: 'get'}}, function() {
     $('.pane').hide();
   });
 
@@ -11951,6 +11971,26 @@ var app = Sammy('body', function() {
     });
   });
 
+  this.post('/dashboards', function(ctx) {
+    var $target = $(this.target);
+    $.post('/dashboards', $target.serialize(), function(resp) {
+      $target.find('input[type=text]').val('');
+      ctx.buildDashboardsDropdown();
+      ctx.trigger('toggle-dashboard-creation', {target: $target.parents('.dashboard')});
+    });
+  });
+
+  this.bind('toggle-dashboard-creation', function(e, data) {
+    var $parent = $(data.target);
+    var $new = $parent.find('.new-dashboard');
+    var $add = $parent.find('.add-to-dashboard');
+    if ($new.is(':visible')) {
+      $new.hide(); $add.show();
+    } else {
+      $new.show(); $add.hide();
+    }
+  });
+
   this.bind('run', function() {
     var ctx = this;
     $('#editor-pane')
@@ -11963,6 +12003,17 @@ var app = Sammy('body', function() {
       } else {
         $group.addClass('closed').removeClass('open');
       }
+    });
+    $('select[name="dashboard"]').live('change', function() {
+      if ($(this).val() == '') {
+        $(this).siblings('.save').attr('disabled', 'disabled');
+      } else {
+        $(this).siblings('.save').removeAttr('disabled');
+      }
+    });
+    $('.dashboard button[rel=create], .dashboard a[rel="cancel"]').live('click', function(e) {
+      e.preventDefault();
+      ctx.trigger('toggle-dashboard-creation', {target: $(this).parents('.dashboard')});
     });
   });
 

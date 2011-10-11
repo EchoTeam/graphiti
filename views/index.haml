@@ -34,12 +34,28 @@
         .clear
       #graph-actions
         %ul
-          %li
+          %li.first
+            %h4 Graph
             %form.update{action: '/graphs', method: 'put', style: 'display:none'}
               %input.save{type: 'submit', value: 'Update'}
-          %li
             %form.save-new{action: '/graphs', method: 'post'}
               %input.save{type: 'submit', value: 'Save New'}
+          %li
+            .dashboard
+              %h4 Dashboards
+              .new-dashboard{style: 'display: none'}
+                %form{action: '/dashboards', method: 'post'}
+                  %strong New Dashboard
+                  %input{type: 'text', size: 10, placeholder: 'Slug', name: 'dashboard[slug]'}
+                  %input{type: 'text', size: 20, placeholder: 'Title', name: 'dashboard[title]'}
+                  %input.save{type: 'submit', value: 'Create'}
+                  %a{rel: 'cancel'} Cancel
+              .add-to-dashboard
+                %form{action: '/dashboards/graphs', method: 'post'}
+                  %strong Add to
+                  %select{name: 'dashboard'}
+                  %input.save{type: 'submit', value: 'Save', disabled: 'disabled'}
+                  %button.save.create{rel: 'create'} Create New
         .clear
       .edit-group
         .edit-head.closed
