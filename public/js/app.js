@@ -30,19 +30,16 @@ var app = Sammy('body', function() {
          bindKey: {
            win: "Ctrl-S",
            mac: "Command-S",
-           sender: function() { Sammy.log(arguments) }
+           sender: 'editor'
          },
          exec: function() {
-           try {
-             ctx.graphPreview(ctx.getEditorJSON());
-            } catch(e) {
-              alert(e);
-            }
+           ctx.graphPreview(ctx.getEditorJSON());
          }
       });
 
       key('command+s', function() {
         Sammy.log("command+s");
+         ctx.graphPreview(ctx.getEditorJSON());
         return false;
       });
     },
