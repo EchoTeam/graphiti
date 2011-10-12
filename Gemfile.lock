@@ -122,6 +122,7 @@ PLATFORMS
 
 DEPENDENCIES
   compass
+  downlow
   haml
   jim
   rake
