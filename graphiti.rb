@@ -11,6 +11,8 @@ require 'yajl'
 require './lib/redised'
 require './lib/graph'
 require './lib/dashboard'
+require './lib/s3/request'
+require './lib/s3/signature'
 require 'uuid'
 
 class Graphiti < Sinatra::Base
