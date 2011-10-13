@@ -10,6 +10,30 @@ var app = Sammy('body', function() {
             ]
           };
 
+
+  var canon = require("pilot/canon");
+
+  this.registerShortcut = function(name, keys, callback) {
+    var app = this;
+    app.bind(name, callback);
+    canon.addCommand({
+       name: name,
+       bindKey: {
+         win: "Ctrl-" + keys,
+         mac: "Command-" + keys,
+         sender: 'editor'
+       },
+       exec: function() {
+         app.trigger(name);
+       }
+    });
+
+    key('command+' + keys, function() {
+      app.trigger(name);
+      return false;
+    });
+  };
+
   this.helpers({
     setupEditor: function() {
       if (this.app.editor) return;
@@ -22,29 +46,10 @@ var app = Sammy('body', function() {
       session.setMode(new JSONMode());
       session.setUseSoftTabs(true);
       session.setTabSize(2);
-
-      var canon = require("pilot/canon");
-
-      canon.addCommand({
-         name: "save",
-         bindKey: {
-           win: "Ctrl-S",
-           mac: "Command-S",
-           sender: 'editor'
-         },
-         exec: function() {
-          ctx.redrawPreview();
-         }
-      });
-
-      key('command+s', function() {
-        Sammy.log("command+s");
-        ctx.redrawPreview();
-        return false;
-      });
     },
     redrawPreview: function() {
       try {
+        this.log('redraw');
         this.graphPreview(this.getEditorJSON());
       } catch(e) {
         alert(e);
@@ -298,7 +303,6 @@ var app = Sammy('body', function() {
     });
   });
 
-
   this.bind('toggle-dashboard-creation', function(e, data) {
     var $parent = $(data.target);
     var $new = $parent.find('.new-dashboard');
@@ -308,6 +312,10 @@ var app = Sammy('body', function() {
     } else {
       $new.show(); $add.hide();
     }
+  });
+
+  this.registerShortcut('redraw-preview', 'g', function() {
+    this.redrawPreview();
   });
 
   this.bind('run', function() {
@@ -336,7 +344,6 @@ var app = Sammy('body', function() {
     });
     $('#graph-actions').delegate('.redraw', 'click', function(e) {
       e.preventDefault();
-      ctx.log('redraw');
       ctx.redrawPreview();
     });
   });

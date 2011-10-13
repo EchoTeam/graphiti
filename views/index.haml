@@ -35,11 +35,11 @@
         %ul
           %li.first
             %h4 Graph
-            %button.save.redraw.create Redraw
+            %button.save.redraw Redraw
             %form.update{action: '/graphs', method: 'put', style: 'display:none'}
               %input.save{type: 'submit', value: 'Update'}
             %form.save-new{action: '/graphs', method: 'post'}
-              %input.save{type: 'submit', value: 'Save New'}
+              %input.save.create{type: 'submit', value: 'Save New'}
           %li
             .dashboard
               %h4 Dashboards

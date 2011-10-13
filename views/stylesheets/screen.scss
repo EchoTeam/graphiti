@@ -72,6 +72,10 @@ body.bp {
       }
     }
   }
+  button.redraw {
+    float: left;
+    margin-right: 6px;
+  }
   .save {
     @include border-radius(4px);
     background: #e5e5e5;
