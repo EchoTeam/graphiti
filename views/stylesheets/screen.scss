@@ -157,6 +157,9 @@ body.bp {
   img {
     @include column($blueprint-grid-columns, true);
     height: 400px;
+    &.loading {
+      @include opacity(0.4);
+    }
   }
 }
 

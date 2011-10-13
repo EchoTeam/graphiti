@@ -115,9 +115,12 @@ Graphiti.Graph.prototype = {
   },
 
   image: function($image) {
-    Sammy.log($image.dimensions());
     this.updateOptions($image.dimensions());
-    $image.attr('src', this.buildURL());
+    $image.bind('load', function() {
+      $(this).removeClass('loading');
+      })
+      .addClass('loading')
+      .attr('src', this.buildURL());
     return $image;
   }
 };
