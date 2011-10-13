@@ -11848,6 +11848,7 @@ var app = Sammy('body', function() {
       });
     },
     loadMetricsList: function() {
+      var ctx = this;
       return this.load('/metrics.js')
                  .then(function(resp) {
                    this.next(resp.metrics);

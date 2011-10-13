@@ -133,6 +133,7 @@ body.bp {
     }
   }
 }
+
 #metrics-list {
   overflow:scroll;
   height: 400px;
@@ -146,7 +147,12 @@ body.bp {
       white-space: nowrap;
       a {
         font-weight: bold;
-        padding: 0px 4px;
+        padding: 0px 2px;
+        text-decoration:none;
+        cursor: pointer;
+      }
+      strong {
+        font-size: 1.1em;
       }
     }
   }
