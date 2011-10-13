@@ -29,7 +29,6 @@ Graphiti.Graph = function(targetsAndOptions){
   var defaults = {
     width:    800,
     height:   400,
-    areaMode: "stacked",
     from:     '-6hour',
     fontSize: "10",
     title:    "",

@@ -33,15 +33,23 @@ var app = Sammy('body', function() {
            sender: 'editor'
          },
          exec: function() {
-           ctx.graphPreview(ctx.getEditorJSON());
+          ctx.redrawPreview();
          }
       });
 
       key('command+s', function() {
         Sammy.log("command+s");
-         ctx.graphPreview(ctx.getEditorJSON());
+        ctx.redrawPreview();
         return false;
       });
+    },
+    redrawPreview: function() {
+      try {
+        this.graphPreview(this.getEditorJSON());
+      } catch(e) {
+        alert(e);
+      }
+      return false;
     },
     showEditor: function(text, uuid) {
       $('#editor-pane').show();
@@ -83,7 +91,7 @@ var app = Sammy('body', function() {
       });
     },
     loadMetricsList: function() {
-      return this.load('/metrics')
+      return this.load('/metrics.js')
                  .then(function(resp) {
                    this.next(resp.metrics);
                  })
@@ -131,7 +139,7 @@ var app = Sammy('body', function() {
     },
 
     buildDashboardsDropdown: function(uuid) {
-      this.load('/dashboards.js', {data: {uuid: uuid}})
+      this.load('/dashboards.js', {cache: false, data: {uuid: uuid}})
           .then(function(data) {
             var $select = $('select[name="dashboard"]');
             $select.html('');
@@ -150,7 +158,7 @@ var app = Sammy('body', function() {
     },
     loadAndRenderGraphs: function(url) {
       var $graphs = $('#graphs-pane').html('').show();
-      this.load(url)
+      this.load(url, {cache: false})
           .then(function(data) {
             var title = 'All Graphs';
             if (data.title) {
@@ -183,7 +191,7 @@ var app = Sammy('body', function() {
     loadAndRenderDashboards: function() {
       var $dashboards = $('#dashboards-pane').html('<h2>Dashboards</h2>').show();
       var ctx = this;
-      this.load('/dashboards.js')
+      this.load('/dashboards.js', {cache: false})
           .then(function(data) {
             var dashboards = data.dashboards,
             i = 0, l = dashboards.length, dashboard, alt,
@@ -217,7 +225,7 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs/:uuid', function(ctx) {
-    this.load('/graphs/' + this.params.uuid + '.js')
+    this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
         .then(function(graph_data) {
           ctx.showEditor(graph_data.json, ctx.params.uuid);
         });

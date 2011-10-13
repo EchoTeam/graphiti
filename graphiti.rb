@@ -38,7 +38,7 @@ class Graphiti < Sinatra::Base
     json Graph.find(params[:uuid])
   end
 
-  get '/metrics' do
+  get '/metrics.js' do
     json :metrics => Graph.metrics(params[:refresh])
   end
 
