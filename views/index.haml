@@ -6,9 +6,8 @@
   %title Graphiti
 
   = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
-  <!--[if lt IE 8]>
-  = stylesheet('/stylesheets/ie.css', media: 'screen, projection')
-  <![endif]-->
+
+
 
 %body.bp
   #header
@@ -36,6 +35,7 @@
         %ul
           %li.first
             %h4 Graph
+            %button.save.redraw.create Redraw
             %form.update{action: '/graphs', method: 'put', style: 'display:none'}
               %input.save{type: 'submit', value: 'Update'}
             %form.save-new{action: '/graphs', method: 'post'}

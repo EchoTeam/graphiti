@@ -334,6 +334,11 @@ var app = Sammy('body', function() {
       e.preventDefault();
       ctx.trigger('toggle-dashboard-creation', {target: $(this).parents('.dashboard')});
     });
+    $('#graph-actions').delegate('.redraw', 'click', function(e) {
+      e.preventDefault();
+      ctx.log('redraw');
+      ctx.redrawPreview();
+    });
   });
 
 });
