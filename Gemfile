@@ -11,7 +11,6 @@ gem 'compass'
 gem 'haml'
 gem 'typhoeus'
 gem 'yajl-ruby'
-gem 'downlow'
 gem 'uuid'
 
 group :development do
