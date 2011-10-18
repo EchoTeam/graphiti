@@ -1,3 +1,4 @@
 *.swp
+amazon_s3.yml
 .sass-cache*
 .DS_Store
