@@ -30,7 +30,6 @@ class Graphiti < Sinatra::Base
     set :haml, :format => :html5
     set :scss, Compass.sass_engine_options
     set :method_override, true
-    set :app_file, __FILE__
     Graph.redis = settings.redis_url
     Dashboard.redis = settings.redis_url
   end
@@ -108,7 +107,3 @@ class Graphiti < Sinatra::Base
   end
 
 end
-
-
-require './lib/s3/request'
-require './lib/s3/signature'
