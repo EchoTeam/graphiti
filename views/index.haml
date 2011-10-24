@@ -151,4 +151,7 @@
   %script{src: '/js/libs/ace/ace.js'}
   %script{src: '/js/libs/ace/mode-json.js'}
   %script{src: '/js/libs/ace/theme-textmate.js'}
+  :javascript
+    Graphiti = window.Graphiti || {};
+    Graphiti.graphite_host = "#{settings.graphite_host}";
   %script{src: '/js/default.js'}

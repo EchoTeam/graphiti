@@ -62,7 +62,7 @@ Graphiti.Graph = function(targetsAndOptions){
 }
 
 Graphiti.Graph.prototype = {
-  urlBase: "http://graphite01.pp.local/render/?",
+  urlBase: (function() { return "http://" + Graphiti.graphite_host + "/render/?"; })(),
 
   updateOptions: function(options) {
     $.extend(true, this.options, options || {});
