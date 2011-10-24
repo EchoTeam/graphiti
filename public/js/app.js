@@ -255,9 +255,13 @@ var app = Sammy('body', function() {
   });
 
   this.post('/graphs', function(ctx) {
+    var $button = $(this.target).find('input');
+    var original_val = $button.val();
+    $button.val('Saving').attr('disabled', 'disabled');
     var graph = new Graphiti.Graph(this.getEditorJSON());
     graph.save(function(resp) {
       Sammy.log('created', resp);
+      $button.val(original_val).removeAttr('disabled');
       if (resp.uuid) {
         ctx.redirect('/graphs/' + resp.uuid);
       }
@@ -265,11 +269,16 @@ var app = Sammy('body', function() {
   });
 
   this.put('/graphs/:uuid', function(ctx) {
+    var $button = $(this.target).find('input');
+    var original_val = $button.val();
+    Sammy.log($button);
+    $button.val('Saving').attr('disabled', 'disabled');
     var graph = new Graphiti.Graph(this.getEditorJSON());
     graph.save(this.params.uuid, function(response) {
       Sammy.log('updated', response);
+      ctx.redrawPreview();
+      $button.val(original_val).removeAttr('disabled');
     });
-    return false;
   });
 
   this.post('/graphs/dashboards', function(ctx) {
