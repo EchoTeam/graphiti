@@ -11651,6 +11651,9 @@ Graphiti = window.Graphiti || {};
 
 Graphiti.Graph = function(targetsAndOptions){
   this.options = {};
+  this.targets = [];
+  this.parsedTargets = [];
+
   var defaults = {
     width:    800,
     height:   400,
@@ -11721,7 +11724,8 @@ Graphiti.Graph.prototype = {
         };
       };
     };
-    this.options.targets.push(target);
+    this.targets.push(targets);
+    this.parsedTargets.push(target);
     return this;
   },
 
@@ -11729,13 +11733,10 @@ Graphiti.Graph.prototype = {
     var url = this.urlBase;
     var parts = [];
     $.each(this.options, function(key,value){
-      if (key == "targets"){
-        $.each(value, function(c, target){
-          parts.push("target=" + target);
-        });
-      } else {
-        parts.push(key + "=" + value);
-      };
+      parts.push(key + "=" + value);
+    });
+    $.each(this.parsedTargets, function(c, target){
+      parts.push("target=" + target);
     });
     return url + parts.join('&');
   },
@@ -11751,6 +11752,39 @@ Graphiti.Graph.prototype = {
       $image.removeClass('loading');
     }, 5 * 1000);
     return $image;
+  },
+
+  toJSON: function() {
+    return JSON.stringify({options: this.options, targets: this.targets}, null, 2)
+  },
+
+  save: function(uuid, callback) {
+    var url;
+    var data = {
+      graph: {
+        title: this.options.title || 'Untitled',
+        url: this.buildURL(),
+        json: this.toJSON()
+      }
+    };
+    if ($.isFunction(uuid)) {
+      callback = uuid;
+      uuid = null;
+    }
+    // update
+    if (uuid) {
+      url = '/graphs/' + uuid;
+      data['_method'] = 'PUT';
+    // create
+    } else {
+      url = '/graphs';
+    }
+    $.ajax({
+      url: url,
+      data: data,
+      type: 'post',
+      success: callback
+    });
   }
 };
 
@@ -12011,14 +12045,9 @@ var app = Sammy('body', function() {
   });
 
   this.post('/graphs', function(ctx) {
-    var json = this.getEditorJSON();
-    var data = {
-      title: json.options.title || 'Untitled',
-      url: new Graphiti.Graph(json).buildURL(),
-      json: JSON.stringify(json, null, 2)
-    };
-    $.post('/graphs', {graph: data}, function(resp) {
-      Sammy.log(resp);
+    var graph = new Graphiti.Graph(this.getEditorJSON());
+    graph.save(function(resp) {
+      Sammy.log('created', resp);
       if (resp.uuid) {
         ctx.redirect('/graphs/' + resp.uuid);
       }
@@ -12026,23 +12055,11 @@ var app = Sammy('body', function() {
   });
 
   this.put('/graphs/:uuid', function(ctx) {
-    var json = this.getEditorJSON();
-    var data = {
-      title: json.options.title || 'Untitled',
-      url: new Graphiti.Graph(json).buildURL(),
-      json: JSON.stringify(json, null, 2)
-    };
-    $.ajax({
-      url: '/graphs/' + this.params.uuid,
-      data: {graph: data, '_method': 'PUT'},
-      type: 'post',
-      success: function(resp) {
-        Sammy.log(resp);
-        if (resp.uuid) {
-          ctx.redirect('/graphs/' + resp.uuid);
-        }
-      }
+    var graph = new Graphiti.Graph(this.getEditorJSON());
+    graph.save(this.params.uuid, function(response) {
+      Sammy.log('updated', response);
     });
+    return false;
   });
 
   this.post('/graphs/dashboards', function(ctx) {
