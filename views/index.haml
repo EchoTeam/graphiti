@@ -118,6 +118,9 @@
         .edit-head.closed
           %a Metrics
         .edit-body.closed
+          #metrics-menu
+            %input{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
+            %button{rel: 'reload'} Reload List
           #metrics-list
             %ul
               %li

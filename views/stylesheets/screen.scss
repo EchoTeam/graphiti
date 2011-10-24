@@ -129,6 +129,7 @@ body.bp {
     @include column($blueprint-grid-columns - 1, true);
     height: 400px;
     background-color: #FFF;
+    position: relative;
     &.closed {
       display:none;
     }
@@ -138,12 +139,22 @@ body.bp {
   }
 }
 
+#metrics-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #e5e5e5;
+  padding: 5px;
+  width: 100%;
+  z-index: 15;
+}
 #metrics-list {
   overflow:scroll;
   height: 400px;
+  position: relative;
   ul {
     list-style-type: none;
-    margin: 0px;
+    margin: 40px 0px 0px 0px;
     padding: 0px;
     li {
       padding: 2px;
@@ -174,9 +185,9 @@ body.bp {
 }
 #graph-url {
   input {
-    @include column($blueprint-grid-columns - 1);
+    @include column($blueprint-grid-columns, true);
     border: 1px solid #CCC;
-    padding: 4px;
+    padding: 4px 0px;
     font-size: 12px;
     color: #666;
   }

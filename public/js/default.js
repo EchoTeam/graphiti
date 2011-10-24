@@ -11886,9 +11886,11 @@ var app = Sammy('body', function() {
         $url.val(graph.buildURL());
       });
     },
-    loadMetricsList: function() {
+    loadMetricsList: function(refresh) {
       var ctx = this;
-      return this.load('/metrics.js')
+      var url = '/metrics.js';
+      if (refresh) { url += '?refresh=true'; }
+      return this.load(url)
                  .then(function(resp) {
                    this.next(resp.metrics);
                  })
@@ -11905,6 +11907,23 @@ var app = Sammy('body', function() {
                   }
                   // bind delegates only the first time
                   if (!$list.is('.bound')) {
+                    $('#metrics-menu')
+                      .find('[rel="reload"]').live('click', function() {
+                        Sammy.log('reload!');
+                        ctx.loadMetricsList(true);
+                      }).end()
+                      .find('input[type="search"]').live('keyup', function() {
+                        var search = $(this).val();
+                        Sammy.log('search', search);
+                        var $lis = $('#metrics-list li')
+                        if (search != '') {
+                          $lis.hide()
+                          .filter(':contains(' + search + ')')
+                          .show();
+                        } else {
+                          $lis.show();
+                        }
+                      });
                     $list.delegate('li a', 'click', function(e) {
                       e.preventDefault();
                       var action = $(this).attr('rel'),
