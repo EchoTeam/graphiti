@@ -168,6 +168,14 @@ body.bp {
     }
   }
 }
+#graph-url {
+  input {
+    @include column($blueprint-grid-columns - 1);
+    border: 1px solid #CCC;
+    padding: 4px;
+    font-size: 12px;
+  }
+}
 
 #footer {
   text-align:center;

@@ -90,9 +90,10 @@ var app = Sammy('body', function() {
     graphPreview: function(options) {
       // get width/height from img
       this.session('lastPreview', options, function() {
-        var $img = $("#graph-preview img");
+        var $img = $("#graph-preview img"), $url = $('#graph-url input');
         var graph = new Graphiti.Graph(options);
         graph.image($img);
+        $url.val(graph.buildURL());
       });
     },
     loadMetricsList: function() {

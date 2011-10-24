@@ -11727,25 +11727,29 @@ Graphiti.Graph.prototype = {
 
   buildURL: function(){
     var url = this.urlBase;
+    var parts = [];
     $.each(this.options, function(key,value){
-      if(key == "targets"){
+      if (key == "targets"){
         $.each(value, function(c, target){
-          url += ("&target=" + target);
+          parts.push("target=" + target);
         });
       } else {
-        url += ("&" + (key + "=" + value));
+        parts.push(key + "=" + value);
       };
     });
-    return url;
+    return url + parts.join('&');
   },
 
   image: function($image) {
     this.updateOptions($image.dimensions());
     $image.bind('load', function() {
-      $(this).removeClass('loading');
+        $(this).removeClass('loading');
       })
       .addClass('loading')
       .attr('src', this.buildURL());
+    setTimeout(function() {
+      $image.removeClass('loading');
+    }, 5 * 1000);
     return $image;
   }
 };
@@ -11842,9 +11846,10 @@ var app = Sammy('body', function() {
     graphPreview: function(options) {
       // get width/height from img
       this.session('lastPreview', options, function() {
-        var $img = $("#graph-preview img");
+        var $img = $("#graph-preview img"), $url = $('#graph-url input');
         var graph = new Graphiti.Graph(options);
         graph.image($img);
+        $url.val(graph.buildURL());
       });
     },
     loadMetricsList: function() {
