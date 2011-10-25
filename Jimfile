@@ -6,7 +6,9 @@
       ["jquery", "1.6.4"],
       "keymaster",
       ["sammy", "0.7.0"],
+      ["sammy.nested_params", "0.7.0"],
       ["sammy.storage", "0.7.1pre"],
+      "jscolor",
       "extensions",
       "graph",
       "app"

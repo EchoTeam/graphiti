@@ -2,9 +2,11 @@
 source "http://rubygems.org"
 
 gem 'rake'
+gem 'rack', '1.3.5'
 gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'jim'
+gem 'closure-compiler'
 gem 'redis'
 gem 'redis-namespace'
 gem 'compass'

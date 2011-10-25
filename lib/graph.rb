@@ -5,6 +5,7 @@ class Graph
     redis_metrics = redis.get("metrics")
     @metrics = redis_metrics.split("\n") if redis_metrics
     return @metrics if @metrics && !@metrics.empty? && !refresh
+    @metrics = []
     get_metrics_list
     redis.set "metrics", @metrics.join("\n")
     @metrics

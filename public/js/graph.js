@@ -108,12 +108,13 @@ Graphiti.Graph.prototype = {
     var url = this.urlBase;
     var parts = [];
     $.each(this.options, function(key,value){
-      parts.push(key + "=" + value);
+      parts.push(key + "=" + encodeURIComponent(value));
     });
     $.each(this.parsedTargets, function(c, target){
       parts.push("target=" + target);
     });
-    return url + parts.join('&');
+    parts.push('_timestamp_=' + new Date().getTime());
+    return url + parts.join('&') + '#.png';
   },
 
   image: function($image) {
@@ -123,9 +124,6 @@ Graphiti.Graph.prototype = {
       })
       .addClass('loading')
       .attr('src', this.buildURL());
-    setTimeout(function() {
-      $image.removeClass('loading');
-    }, 5 * 1000);
     return $image;
   },
 

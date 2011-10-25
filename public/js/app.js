@@ -1,5 +1,6 @@
 var app = Sammy('body', function() {
   this.use('Session');
+  this.use('NestedParams');
 
   var defaultGraph = {
             "options": {
@@ -76,6 +77,7 @@ var app = Sammy('body', function() {
       } else {
         $('#graph-actions .update, #graph-actions .dashboard').hide();
       }
+      this.toggleEditorPanesByPreference();
     },
     getEditorJSON: function() {
       return JSON.parse(this.app.editor.getSession().getValue());
@@ -95,6 +97,22 @@ var app = Sammy('body', function() {
         graph.image($img);
         $url.val(graph.buildURL());
       });
+      this.updateOptionsForm(options);
+    },
+    updateOptionsForm: function(options) {
+      var opts = options.options ? options.options : options,
+          key, $form = $('#graph-options form');
+      for (key in opts) {
+        if (opts[key] != '') {
+          $form.find('[name="options[' + key + ']"]').val(opts[key]);
+        }
+      }
+    },
+    saveOptions: function(params) {
+      var json = this.getEditorJSON();
+      json.options = params;
+      this.graphPreview(json);
+      this.setEditorJSON(json);
     },
     loadMetricsList: function(refresh) {
       var ctx = this;
@@ -156,7 +174,6 @@ var app = Sammy('body', function() {
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
-
     timestamp: function(time) {
       if (typeof time == 'string') {
         time = parseInt(time, 10);
@@ -237,6 +254,39 @@ var app = Sammy('body', function() {
             }
 
           });
+    },
+
+    bindEditorPanes: function() {
+      var ctx = this;
+      $('#editor-pane')
+      .delegate('.edit-group .edit-head', 'click', function(e) {
+        e.preventDefault();
+        var $group = $(this).add($(this).siblings('.edit-body'))
+        var group_name = $group.parents('.edit-group').attr('data-group');
+        if ($group.is('.closed')) {
+          $group.removeClass('closed').addClass('open');
+          ctx.session('groups:' + group_name, true);
+        } else {
+          $group.addClass('closed').removeClass('open');
+          ctx.session('groups:' + group_name, false);
+        }
+      });
+    },
+
+    toggleEditorPanesByPreference: function() {
+      var ctx = this;
+      $('#editor-pane .edit-group').each(function() {
+        var $group = $(this), group_name = $group.attr('data-group'),
+            $parts = $group.find('.edit-head, .edit-body');
+        ctx.session('groups:' + group_name, function(open) {
+          if (open) {
+            $parts.removeClass('closed').addClass('open');
+          } else {
+            $parts.removeClass('open').addClass('closed');
+          }
+        });
+      });
+
     }
   });
 
@@ -287,10 +337,13 @@ var app = Sammy('body', function() {
     });
   });
 
+  this.put('/graphs/options', function(ctx) {
+    this.saveOptions(this.params.options);
+  });
+
   this.put('/graphs/:uuid', function(ctx) {
     var $button = $(this.target).find('input');
     var original_val = $button.val();
-    Sammy.log($button);
     $button.val('Saving').attr('disabled', 'disabled');
     var graph = new Graphiti.Graph(this.getEditorJSON());
     graph.save(this.params.uuid, function(response) {
@@ -300,12 +353,14 @@ var app = Sammy('body', function() {
     });
   });
 
+
   this.post('/graphs/dashboards', function(ctx) {
     var $target = $(this.target);
     $.post('/graphs/dashboards', $target.serialize(), function(resp) {
       ctx.buildDashboardsDropdown(resp.uuid);
     });
   });
+
 
   this.post('/dashboards', function(ctx) {
     var $target = $(this.target);
@@ -333,17 +388,9 @@ var app = Sammy('body', function() {
 
   this.bind('run', function() {
     var ctx = this;
-    $('#editor-pane')
-    .delegate('.edit-group .edit-head', 'click', function(e) {
-      e.preventDefault();
-      var $group = $(this).add($(this).siblings('.edit-body'))
-      Sammy.log($group);
-      if ($group.is('.closed')) {
-        $group.removeClass('closed').addClass('open');
-      } else {
-        $group.addClass('closed').removeClass('open');
-      }
-    });
+
+    this.bindEditorPanes();
+
     $('select[name="dashboard"]').live('change', function() {
       if ($(this).val() == '') {
         $(this).siblings('.save').attr('disabled', 'disabled');
@@ -351,10 +398,12 @@ var app = Sammy('body', function() {
         $(this).siblings('.save').removeAttr('disabled');
       }
     });
+
     $('.dashboard button[rel=create], .dashboard a[rel="cancel"]').live('click', function(e) {
       e.preventDefault();
       ctx.trigger('toggle-dashboard-creation', {target: $(this).parents('.dashboard')});
     });
+
     $('#graph-actions').delegate('.redraw', 'click', function(e) {
       e.preventDefault();
       ctx.redrawPreview();
