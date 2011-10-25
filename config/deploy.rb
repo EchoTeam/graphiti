@@ -42,6 +42,7 @@ end
 namespace :graphiti do
   task :link_configs do
     run "cd #{release_path} && rm settings.yml && ln -nfs #{shared_path}/settings.yml #{release_path}/settings.yml"
+    run "cd #{release_path} && ln -nfs #{shared_path}/amazon_s3.yml #{release_path}/amazon_s3.yml"
   end
 
   task :compress do
