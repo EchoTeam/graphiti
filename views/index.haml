@@ -66,41 +66,41 @@
           %a Options
         .edit-body.closed
           #graph-options
-            %form
+            %form{action: '/graphs/options', method: 'put'}
               %p
                 %label Title
-                %input{type: 'text', name: 'title'}
+                %input{type: 'text', name: 'options[title]'}
               %p
                 %label Vertical Title
-                %input{type: 'text', name: 'vtitle'}
+                %input{type: 'text', name: 'options[vtitle]'}
 
               %p
                 %label Background Color
-                %input{type: 'text', name: 'bgcolor'}
+                %input{type: 'text', name: 'options[bgcolor]'}
               %p
                 %label Text Color
-                %input{type: 'text', name: 'fgcolor'}
+                %input{type: 'text', name: 'options[fgcolor]'}
               %p
                 %label Color List
-                %input{type: 'text', name: 'colorList'}
+                %input{type: 'text', name: 'options[colorList]'}
               %p
                 %label Major Grid Color
-                %input{type: 'text', name: 'majorGridLineColor'}
+                %input{type: 'text', name: 'options[majorGridLineColor]'}
               %p
                 %label Minor Grid Color
-                %input{type: 'text', name: 'minorGridLineColor'}
+                %input{type: 'text', name: 'options[minorGridLineColor]'}
 
               %p
                 %label Font
-                %input{type: 'text', name: 'fontName'}
+                %input{type: 'text', name: 'options[fontName]'}
               %p
                 %label Font Size
-                %input{type: 'text', name: 'fontSize', size: 2}
+                %input{type: 'text', name: 'options[fontSize]', size: 2}
               %p
                 %label Bold
-                %input{type: 'checkbox', name: 'fontBold'}
+                %input{type: 'checkbox', name: 'options[fontBold]'}
                 %label Italic
-                %input{type: 'checkbox', name: 'fontItalic'}
+                %input{type: 'checkbox', name: 'options[fontItalic]'}
 
               /
                 yMin
@@ -113,6 +113,7 @@
                 minXStep
                 min
                 max
+              %input.save{type: 'submit', value: 'Update'}
         .clear
       .edit-group
         .edit-head.closed

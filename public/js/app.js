@@ -1,5 +1,6 @@
 var app = Sammy('body', function() {
   this.use('Session');
+  this.use('NestedParams');
 
   var defaultGraph = {
             "options": {
@@ -95,6 +96,22 @@ var app = Sammy('body', function() {
         graph.image($img);
         $url.val(graph.buildURL());
       });
+      this.updateOptionsForm(options);
+    },
+    updateOptionsForm: function(options) {
+      var opts = options.options ? options.options : options,
+          key, $form = $('#graph-options form');
+      for (key in opts) {
+        if (opts[key] != '') {
+          $form.find('[name="options[' + key + ']"]').val(opts[key]);
+        }
+      }
+    },
+    saveOptions: function(params) {
+      var json = this.getEditorJSON();
+      json.options = params;
+      this.graphPreview(json);
+      this.setEditorJSON(json);
     },
     loadMetricsList: function(refresh) {
       var ctx = this;
@@ -156,7 +173,6 @@ var app = Sammy('body', function() {
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
-
     timestamp: function(time) {
       if (typeof time == 'string') {
         time = parseInt(time, 10);
@@ -287,6 +303,10 @@ var app = Sammy('body', function() {
     });
   });
 
+  this.put('/graphs/options', function(ctx) {
+    this.saveOptions(this.params.options);
+  });
+
   this.put('/graphs/:uuid', function(ctx) {
     var $button = $(this.target).find('input');
     var original_val = $button.val();
@@ -300,12 +320,14 @@ var app = Sammy('body', function() {
     });
   });
 
+
   this.post('/graphs/dashboards', function(ctx) {
     var $target = $(this.target);
     $.post('/graphs/dashboards', $target.serialize(), function(resp) {
       ctx.buildDashboardsDropdown(resp.uuid);
     });
   });
+
 
   this.post('/dashboards', function(ctx) {
     var $target = $(this.target);
