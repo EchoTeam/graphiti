@@ -61,7 +61,7 @@
                   %input.save{type: 'submit', value: 'Save', disabled: 'disabled'}
                   %button.save.create{rel: 'create'} Create New
         .clear
-      .edit-group
+      .edit-group{'data-group' => 'options'}
         .edit-head.closed
           %a Options
         .edit-body.closed
@@ -76,23 +76,26 @@
 
               %p
                 %label Background Color
-                %input{type: 'text', name: 'options[bgcolor]'}
+                %input{type: 'text', class: 'color', name: 'options[bgcolor]'}
               %p
                 %label Text Color
-                %input{type: 'text', name: 'options[fgcolor]'}
-              %p
-                %label Color List
-                %input{type: 'text', name: 'options[colorList]'}
+                %input{type: 'text', class: 'color', name: 'options[fgcolor]'}
+              /
+                %p
+                  %label Color List
+                  %input{type: 'text', class: 'color', name: 'options[colorList]'}
               %p
                 %label Major Grid Color
-                %input{type: 'text', name: 'options[majorGridLineColor]'}
+                %input{type: 'text', class: 'color', name: 'options[majorGridLineColor]'}
               %p
                 %label Minor Grid Color
-                %input{type: 'text', name: 'options[minorGridLineColor]'}
+                %input{type: 'text', class: 'color', name: 'options[minorGridLineColor]'}
 
               %p
                 %label Font
-                %input{type: 'text', name: 'options[fontName]'}
+                %select{name: 'options[fontName]'}
+                  - Graphiti.settings.fonts.each do |font|
+                    %option= font
               %p
                 %label Font Size
                 %input{type: 'text', name: 'options[fontSize]', size: 2}
@@ -115,7 +118,7 @@
                 max
               %input.save{type: 'submit', value: 'Update'}
         .clear
-      .edit-group
+      .edit-group{'data-group' => 'metrics'}
         .edit-head.closed
           %a Metrics
         .edit-body.closed
@@ -129,10 +132,10 @@
                 %a{rel: 'replace'} Replace
                 %strong &nbsp;
         .clear
-      .edit-group
-        .edit-head.open
+      .edit-group{'data-group' => 'editor'}
+        .edit-head.closed
           %a Editor
-        .edit-body.open
+        .edit-body.closed
           #editor &nbsp;
         .clear
 

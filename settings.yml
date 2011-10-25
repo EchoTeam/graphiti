@@ -1,3 +1,6 @@
 ---
 graphite_host: graphite01.pp.local
 redis_url: localhost:6379:1/graphiti
+fonts:
+  - DroidSans
+  - DejaVuSans

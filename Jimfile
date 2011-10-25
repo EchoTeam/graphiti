@@ -8,6 +8,7 @@
       ["sammy", "0.7.0"],
       ["sammy.nested_params", "0.7.0"],
       ["sammy.storage", "0.7.1pre"],
+      "jscolor",
       "extensions",
       "graph",
       "app"

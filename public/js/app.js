@@ -59,6 +59,7 @@ var app = Sammy('body', function() {
     },
     showEditor: function(text, uuid) {
       $('#editor-pane').show();
+      this.toggleEditorPanesByPreference();
       if (!text) {
         text = defaultGraph;
       }
@@ -253,6 +254,39 @@ var app = Sammy('body', function() {
             }
 
           });
+    },
+
+    bindEditorPanes: function() {
+      var ctx = this;
+      $('#editor-pane')
+      .delegate('.edit-group .edit-head', 'click', function(e) {
+        e.preventDefault();
+        var $group = $(this).add($(this).siblings('.edit-body'))
+        var group_name = $group.parents('.edit-group').attr('data-group');
+        if ($group.is('.closed')) {
+          $group.removeClass('closed').addClass('open');
+          ctx.session('groups:' + group_name, true);
+        } else {
+          $group.addClass('closed').removeClass('open');
+          ctx.session('groups:' + group_name, false);
+        }
+      });
+    },
+
+    toggleEditorPanesByPreference: function() {
+      var ctx = this;
+      $('#editor-pane .edit-group').each(function() {
+        var $group = $(this), group_name = $group.attr('data-group'),
+            $parts = $group.find('.edit-head, .edit-body');
+        ctx.session('groups:' + group_name, function(open) {
+          if (open) {
+            $parts.removeClass('closed').addClass('open');
+          } else {
+            $parts.removeClass('open').addClass('closed');
+          }
+        });
+      });
+
     }
   });
 
@@ -310,7 +344,6 @@ var app = Sammy('body', function() {
   this.put('/graphs/:uuid', function(ctx) {
     var $button = $(this.target).find('input');
     var original_val = $button.val();
-    Sammy.log($button);
     $button.val('Saving').attr('disabled', 'disabled');
     var graph = new Graphiti.Graph(this.getEditorJSON());
     graph.save(this.params.uuid, function(response) {
@@ -355,17 +388,9 @@ var app = Sammy('body', function() {
 
   this.bind('run', function() {
     var ctx = this;
-    $('#editor-pane')
-    .delegate('.edit-group .edit-head', 'click', function(e) {
-      e.preventDefault();
-      var $group = $(this).add($(this).siblings('.edit-body'))
-      Sammy.log($group);
-      if ($group.is('.closed')) {
-        $group.removeClass('closed').addClass('open');
-      } else {
-        $group.addClass('closed').removeClass('open');
-      }
-    });
+
+    this.bindEditorPanes();
+
     $('select[name="dashboard"]').live('change', function() {
       if ($(this).val() == '') {
         $(this).siblings('.save').attr('disabled', 'disabled');
@@ -373,10 +398,12 @@ var app = Sammy('body', function() {
         $(this).siblings('.save').removeAttr('disabled');
       }
     });
+
     $('.dashboard button[rel=create], .dashboard a[rel="cancel"]').live('click', function(e) {
       e.preventDefault();
       ctx.trigger('toggle-dashboard-creation', {target: $(this).parents('.dashboard')});
     });
+
     $('#graph-actions').delegate('.redraw', 'click', function(e) {
       e.preventDefault();
       ctx.redrawPreview();
