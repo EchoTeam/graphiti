@@ -26,6 +26,9 @@ Graphiti = window.Graphiti || {};
 
 Graphiti.Graph = function(targetsAndOptions){
   this.options = {};
+  this.targets = [];
+  this.parsedTargets = [];
+
   var defaults = {
     width:    800,
     height:   400,
@@ -62,7 +65,7 @@ Graphiti.Graph = function(targetsAndOptions){
 }
 
 Graphiti.Graph.prototype = {
-  urlBase: "http://graphite01.pp.local/render/?",
+  urlBase: (function() { return "http://" + Graphiti.graphite_host + "/render/?"; })(),
 
   updateOptions: function(options) {
     $.extend(true, this.options, options || {});
@@ -96,31 +99,66 @@ Graphiti.Graph.prototype = {
         };
       };
     };
-    this.options.targets.push(target);
+    this.targets.push(targets);
+    this.parsedTargets.push(target);
     return this;
   },
 
   buildURL: function(){
     var url = this.urlBase;
+    var parts = [];
     $.each(this.options, function(key,value){
-      if(key == "targets"){
-        $.each(value, function(c, target){
-          url += ("&target=" + target);
-        });
-      } else {
-        url += ("&" + (key + "=" + value));
-      };
+      parts.push(key + "=" + value);
     });
-    return url;
+    $.each(this.parsedTargets, function(c, target){
+      parts.push("target=" + target);
+    });
+    return url + parts.join('&');
   },
 
   image: function($image) {
     this.updateOptions($image.dimensions());
     $image.bind('load', function() {
-      $(this).removeClass('loading');
+        $(this).removeClass('loading');
       })
       .addClass('loading')
       .attr('src', this.buildURL());
+    setTimeout(function() {
+      $image.removeClass('loading');
+    }, 5 * 1000);
     return $image;
+  },
+
+  toJSON: function() {
+    return JSON.stringify({options: this.options, targets: this.targets}, null, 2)
+  },
+
+  save: function(uuid, callback) {
+    var url;
+    var data = {
+      graph: {
+        title: this.options.title || 'Untitled',
+        url: this.buildURL(),
+        json: this.toJSON()
+      }
+    };
+    if ($.isFunction(uuid)) {
+      callback = uuid;
+      uuid = null;
+    }
+    // update
+    if (uuid) {
+      url = '/graphs/' + uuid;
+      data['_method'] = 'PUT';
+    // create
+    } else {
+      url = '/graphs';
+    }
+    $.ajax({
+      url: url,
+      data: data,
+      type: 'post',
+      success: callback
+    });
   }
 };

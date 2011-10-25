@@ -90,14 +90,17 @@ var app = Sammy('body', function() {
     graphPreview: function(options) {
       // get width/height from img
       this.session('lastPreview', options, function() {
-        var $img = $("#graph-preview img");
+        var $img = $("#graph-preview img"), $url = $('#graph-url input');
         var graph = new Graphiti.Graph(options);
         graph.image($img);
+        $url.val(graph.buildURL());
       });
     },
-    loadMetricsList: function() {
+    loadMetricsList: function(refresh) {
       var ctx = this;
-      return this.load('/metrics.js')
+      var url = '/metrics.js';
+      if (refresh) { url += '?refresh=true'; }
+      return this.load(url)
                  .then(function(resp) {
                    this.next(resp.metrics);
                  })
@@ -114,6 +117,23 @@ var app = Sammy('body', function() {
                   }
                   // bind delegates only the first time
                   if (!$list.is('.bound')) {
+                    $('#metrics-menu')
+                      .find('[rel="reload"]').live('click', function() {
+                        Sammy.log('reload!');
+                        ctx.loadMetricsList(true);
+                      }).end()
+                      .find('input[type="search"]').live('keyup', function() {
+                        var search = $(this).val();
+                        Sammy.log('search', search);
+                        var $lis = $('#metrics-list li')
+                        if (search != '') {
+                          $lis.hide()
+                          .filter(':contains(' + search + ')')
+                          .show();
+                        } else {
+                          $lis.show();
+                        }
+                      });
                     $list.delegate('li a', 'click', function(e) {
                       e.preventDefault();
                       var action = $(this).attr('rel'),
@@ -254,14 +274,13 @@ var app = Sammy('body', function() {
   });
 
   this.post('/graphs', function(ctx) {
-    var json = this.getEditorJSON();
-    var data = {
-      title: json.options.title || 'Untitled',
-      url: new Graphiti.Graph(json).buildURL(),
-      json: JSON.stringify(json, null, 2)
-    };
-    $.post('/graphs', {graph: data}, function(resp) {
-      Sammy.log(resp);
+    var $button = $(this.target).find('input');
+    var original_val = $button.val();
+    $button.val('Saving').attr('disabled', 'disabled');
+    var graph = new Graphiti.Graph(this.getEditorJSON());
+    graph.save(function(resp) {
+      Sammy.log('created', resp);
+      $button.val(original_val).removeAttr('disabled');
       if (resp.uuid) {
         ctx.redirect('/graphs/' + resp.uuid);
       }
@@ -269,22 +288,15 @@ var app = Sammy('body', function() {
   });
 
   this.put('/graphs/:uuid', function(ctx) {
-    var json = this.getEditorJSON();
-    var data = {
-      title: json.options.title || 'Untitled',
-      url: new Graphiti.Graph(json).buildURL(),
-      json: JSON.stringify(json, null, 2)
-    };
-    $.ajax({
-      url: '/graphs/' + this.params.uuid,
-      data: {graph: data, '_method': 'PUT'},
-      type: 'post',
-      success: function(resp) {
-        Sammy.log(resp);
-        if (resp.uuid) {
-          ctx.redirect('/graphs/' + resp.uuid);
-        }
-      }
+    var $button = $(this.target).find('input');
+    var original_val = $button.val();
+    Sammy.log($button);
+    $button.val('Saving').attr('disabled', 'disabled');
+    var graph = new Graphiti.Graph(this.getEditorJSON());
+    graph.save(this.params.uuid, function(response) {
+      Sammy.log('updated', response);
+      ctx.redrawPreview();
+      $button.val(original_val).removeAttr('disabled');
     });
   });
 
