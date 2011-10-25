@@ -23,9 +23,17 @@ class Graph
   def self.find(uuid)
     h = redis.hgetall "graphs:#{uuid}"
     h['uuid'] = uuid
+    h['snapshots'] = redis.smembers "graphs:#{uuid}:snapshots"
     h
   rescue
     nil
+  end
+
+  def self.snapshot(uuid)
+    snapshot = Snapshot.new(uuid)
+    filename = snapshot.get_graph_file
+    redis.sadd "graphs:#{uuid}:snapshots", filename
+    filename
   end
 
   def self.all(*graph_ids)

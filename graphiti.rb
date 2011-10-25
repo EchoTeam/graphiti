@@ -11,6 +11,7 @@ require 'yajl'
 require './lib/redised'
 require './lib/graph'
 require './lib/dashboard'
+require './lib/snapshot'
 require 'uuid'
 
 class Graphiti < Sinatra::Base
@@ -85,6 +86,11 @@ class Graphiti < Sinatra::Base
     haml :index
   end
 
+  get '/graphs/:uuid/snapshots' do
+    graph = Graph.find(params[:uuid])
+    json graph['snapshots']
+  end
+
   get '/graphs' do
     haml :index
   end
@@ -95,6 +101,11 @@ class Graphiti < Sinatra::Base
 
   get '/dashboards' do
     haml :index
+  end
+
+  post '/snapshot' do
+    filename = Graph.snapshot(params[:uuid])
+    json {filename: filename}
   end
 
   get '/' do
