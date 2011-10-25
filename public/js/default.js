@@ -12726,7 +12726,6 @@ var app = Sammy('body', function() {
     },
     showEditor: function(text, uuid) {
       $('#editor-pane').show();
-      this.toggleEditorPanesByPreference();
       if (!text) {
         text = defaultGraph;
       }
@@ -12745,6 +12744,7 @@ var app = Sammy('body', function() {
       } else {
         $('#graph-actions .update, #graph-actions .dashboard').hide();
       }
+      this.toggleEditorPanesByPreference();
     },
     getEditorJSON: function() {
       return JSON.parse(this.app.editor.getSession().getValue());

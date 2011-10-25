@@ -67,56 +67,79 @@
         .edit-body.closed
           #graph-options
             %form{action: '/graphs/options', method: 'put'}
-              %p
-                %label Title
-                %input{type: 'text', name: 'options[title]'}
-              %p
-                %label Vertical Title
-                %input{type: 'text', name: 'options[vtitle]'}
-
-              %p
-                %label Background Color
-                %input{type: 'text', class: 'color', name: 'options[bgcolor]'}
-              %p
-                %label Text Color
-                %input{type: 'text', class: 'color', name: 'options[fgcolor]'}
-              /
+              .options-group
                 %p
-                  %label Color List
-                  %input{type: 'text', class: 'color', name: 'options[colorList]'}
-              %p
-                %label Major Grid Color
-                %input{type: 'text', class: 'color', name: 'options[majorGridLineColor]'}
-              %p
-                %label Minor Grid Color
-                %input{type: 'text', class: 'color', name: 'options[minorGridLineColor]'}
+                  %label Title
+                  %input{type: 'text', name: 'options[title]'}
+                %p
+                  %label Vertical Title
+                  %input{type: 'text', name: 'options[vtitle]'}
+                %p
+                  %label Font
+                  %select{name: 'options[fontName]'}
+                    - Graphiti.settings.fonts.each do |font|
+                      %option= font
+                %p
+                  %label Font Size
+                  %select{name: 'options[fontSize]'}
+                    - 6.upto(32) do |i|
+                      %option= i
+                %p
+                  %label.check{for: 'check_fontBold'} Bold
+                  %input{type: 'checkbox', id: 'check_fontBold', name: 'options[fontBold]'}
+                  %label.check{for: 'check_fontItalic'} Italic
+                  %input{type: 'checkbox', id: 'check_fontItalic', name: 'options[fontItalic]'}
+              .options-group
+                %p
+                  %label Line Mode
+                  %select{name: 'options[lineMode]'}
+                    %option slope
+                    %option staircase
+                %p
+                  %label Line Thickness
+                  %select{name: 'options[thickness]'}
+                    - 1.upto(10) do |i|
+                      %option= i
+                %p
+                  %label Background Color
+                  %input{type: 'text', class: 'color {hash: true}', name: 'options[bgcolor]'}
+                %p
+                  %label Text Color
+                  %input{type: 'text', class: 'color {hash: true}', name: 'options[fgcolor]'}
+                %p
+                  %label Major Grid Color
+                  %input{type: 'text', class: 'color {hash: true}', name: 'options[majorGridLineColor]'}
+                %p
+                  %label Minor Grid Color
+                  %input{type: 'text', class: 'color {hash: true}', name: 'options[minorGridLineColor]'}
+              .options-group.last
+                %p
+                  %label Y Min
+                  %input{type: 'text', size: 3, name: 'yMin'}
+                %p
+                  %label Y Max
+                  %input{type: 'text', size: 3, name: 'yMax'}
+                %p
+                  %label{for: 'check_hideGrid'} Hide Grid
+                  %input{type: 'checkbox', id: 'check_hideGrid', name: 'options[hideGrid]'}
+                %p
+                  %label{for: 'check_hideAxes'} Hide Axes
+                  %input{type: 'checkbox', id: 'check_hideAxes', name: 'options[hideAxes]'}
+                %p
+                  %label{for: 'check_hideLegend'} Hide Legend
+                  %input{type: 'checkbox', id: 'check_hideLegend', name: 'options[hideLegend]'}
+                %p
+                  %label{for: 'check_autoStacked'} Stacked
+                  %input{type: 'checkbox', id: 'check_autoStacked', name: 'options[autoStacked]'}
+              .clear
 
-              %p
-                %label Font
-                %select{name: 'options[fontName]'}
-                  - Graphiti.settings.fonts.each do |font|
-                    %option= font
-              %p
-                %label Font Size
-                %input{type: 'text', name: 'options[fontSize]', size: 2}
-              %p
-                %label Bold
-                %input{type: 'checkbox', name: 'options[fontBold]'}
-                %label Italic
-                %input{type: 'checkbox', name: 'options[fontItalic]'}
 
               /
                 yMin
                 yMax
-                lineMode
-                lineWidth
-                hideLegend
-                hideAxes
-                hideGrid
-                minXStep
-                min
-                max
-              %input.save{type: 'submit', value: 'Update'}
+              .options-group
+                %p
+                  %input.save{type: 'submit', value: 'Update'}
         .clear
       .edit-group{'data-group' => 'metrics'}
         .edit-head.closed
@@ -133,9 +156,9 @@
                 %strong &nbsp;
         .clear
       .edit-group{'data-group' => 'editor'}
-        .edit-head.closed
+        .edit-head.open
           %a Editor
-        .edit-body.closed
+        .edit-body.open
           #editor &nbsp;
         .clear
 

@@ -58,6 +58,20 @@ body.bp {
     }
   }
 }
+#editor-pane {
+  .save {
+    @include border-radius(4px);
+    background: #e5e5e5;
+    cursor: pointer;
+    padding: 4px 6px;
+    border: 1px solid #CCC;
+    font-size: 12px;
+    font-weight: bold;
+    &.create {
+      background: #FFF;
+    }
+  }
+}
 #graph-actions {
   @include column($blueprint-grid-columns, true);
   padding: 10px;
@@ -79,18 +93,6 @@ body.bp {
   button.redraw {
     float: left;
     margin-right: 6px;
-  }
-  .save {
-    @include border-radius(4px);
-    background: #e5e5e5;
-    cursor: pointer;
-    padding: 4px 6px;
-    border: 1px solid #CCC;
-    font-size: 12px;
-    font-weight: bold;
-    &.create {
-      background: #FFF;
-    }
   }
   select, input[type=text] {
     font-size: 12px;
@@ -191,6 +193,34 @@ body.bp {
     font-size: 12px;
     color: #666;
   }
+}
+
+#graph-options {
+  .options-group {
+    margin-top: 10px;
+    @include column($blueprint-grid-columns / 3);
+    &.last {
+      @include column(($blueprint-grid-columns / 3) - 1, true);
+    }
+    p {
+      padding: 5px 0px 0px 15px;
+      label {
+        font-weight: bold;
+        width: 100px;
+        float: left;
+        &.check {
+          float: none;
+          width: auto;
+        }
+      }
+      input[type=text] {
+        border: 1px solid #CCC;
+        padding: 4px;
+        font-size: 12px;
+      }
+    }
+  }
+
 }
 
 #footer {
