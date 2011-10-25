@@ -114,7 +114,7 @@ Graphiti.Graph.prototype = {
       parts.push("target=" + target);
     });
     parts.push('_timestamp_=' + new Date().getTime());
-    return url + parts.join('&');
+    return url + parts.join('&') + '#.png';
   },
 
   image: function($image) {
