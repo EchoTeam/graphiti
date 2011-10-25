@@ -193,4 +193,7 @@
   :javascript
     Graphiti = window.Graphiti || {};
     Graphiti.graphite_host = "#{settings.graphite_host}";
-  %script{src: '/js/default.js'}
+  - if Graphiti.production?
+    %script{src: '/js/default.min.js'}
+  - else
+    %script{src: '/js/default.js'}

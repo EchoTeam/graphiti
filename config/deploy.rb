@@ -17,10 +17,10 @@ set :unicorn_config, "#{current_path}/config/unicorn.rb"
 set :unicorn_pid, "#{current_path}/tmp/pids/unicorn.pid"
 
 namespace :deploy do
-  task :start, :roles => :app, :except => { :no_release => true } do 
+  task :start, :roles => :app, :except => { :no_release => true } do
     run "cd #{current_path} && bundle exec #{unicorn_binary} -c #{unicorn_config} -E production -D"
   end
-  task :stop, :roles => :app, :except => { :no_release => true } do 
+  task :stop, :roles => :app, :except => { :no_release => true } do
     run "kill `cat #{unicorn_pid}`"
   end
   task :graceful_stop, :roles => :app, :except => { :no_release => true } do
@@ -43,6 +43,10 @@ namespace :graphiti do
   task :link_configs do
     run "cd #{release_path} && rm settings.yml && ln -nfs #{shared_path}/settings.yml #{release_path}/settings.yml"
   end
+
+  task :compress do
+    run "cd #{release_path} && bundle exec jim compress"
+  end
 end
 
 namespace :bundler do
@@ -57,3 +61,4 @@ namespace :bundler do
 end
 after "deploy:update_code", "graphiti:link_configs"
 after "deploy:update_code", "bundler:install_gems"
+after "deploy:update_code", "graphiti:compress"
