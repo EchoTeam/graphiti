@@ -69,6 +69,12 @@
             %form{action: '/graphs/options', method: 'put'}
               .options-group
                 %p
+                  %label From
+                  %input{type: 'text', name: 'options[from]'}
+                %p
+                  %label Until
+                  %input{type: 'text', name: 'options[until]'}
+                %p
                   %label Title
                   %input{type: 'text', name: 'options[title]'}
                 %p
@@ -94,6 +100,7 @@
                   %label Line Mode
                   %select{name: 'options[lineMode]'}
                     %option slope
+                    %option connected
                     %option staircase
                 %p
                   %label Line Thickness
@@ -120,6 +127,13 @@
                   %label Y Max
                   %input{type: 'text', size: 3, name: 'yMax'}
                 %p
+                  %label Area Mode
+                  %select{name: 'options[areaMode]'}
+                    %option
+                    %option stacked
+                    %option first
+                    %option all
+                %p
                   %label{for: 'check_hideGrid'} Hide Grid
                   %input{type: 'checkbox', id: 'check_hideGrid', name: 'options[hideGrid]'}
                 %p
@@ -128,15 +142,7 @@
                 %p
                   %label{for: 'check_hideLegend'} Hide Legend
                   %input{type: 'checkbox', id: 'check_hideLegend', name: 'options[hideLegend]'}
-                %p
-                  %label{for: 'check_autoStacked'} Stacked
-                  %input{type: 'checkbox', id: 'check_autoStacked', name: 'options[autoStacked]'}
               .clear
-
-
-              /
-                yMin
-                yMax
               .options-group
                 %p
                   %input.save{type: 'submit', value: 'Update'}
