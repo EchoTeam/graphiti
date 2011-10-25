@@ -118,3 +118,6 @@ class Graphiti < Sinatra::Base
   end
 
 end
+
+require './lib/s3/request'
+require './lib/s3/signature'
