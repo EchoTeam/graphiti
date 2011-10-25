@@ -1,5 +1,5 @@
 *.swp
 .sass-cache*
 .DS_Store
-settings.yml
+config/settings.yml
 config/amazon_s3.yml

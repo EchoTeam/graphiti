@@ -20,7 +20,7 @@ class Graphiti < Sinatra::Base
 
   register Sinatra::Contrib
 
-  config_file 'settings.yml'
+  config_file 'config/settings.yml'
 
   configure do
     Compass.configuration do |config|
@@ -105,7 +105,7 @@ class Graphiti < Sinatra::Base
 
   post '/snapshot' do
     filename = Graph.snapshot(params[:uuid])
-    json {filename: filename}
+    json :filename => filename
   end
 
   get '/' do
