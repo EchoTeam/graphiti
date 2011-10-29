@@ -120,6 +120,7 @@ var app = Sammy('body', function() {
       if (refresh) { url += '?refresh=true'; }
       return this.load(url)
                  .then(function(resp) {
+                   this.app.metrics = resp.metrics;
                    this.next(resp.metrics);
                  })
                 .then(function(metrics) {
@@ -129,6 +130,7 @@ var app = Sammy('body', function() {
                   var i = 0, l = metrics.length;
                   for (; i < l; i++) {
                     $li.clone()
+                    .attr('id', "metric_list_metric_" + i)
                     .find('strong').text(metrics[i])
                     .end()
                     .appendTo($list);
@@ -141,16 +143,7 @@ var app = Sammy('body', function() {
                         ctx.loadMetricsList(true);
                       }).end()
                       .find('input[type="search"]').live('keyup', function() {
-                        var search = $(this).val();
-                        Sammy.log('search', search);
-                        var $lis = $('#metrics-list li')
-                        if (search != '') {
-                          $lis.hide()
-                          .filter(':contains(' + search + ')')
-                          .show();
-                        } else {
-                          $lis.show();
-                        }
+                        ctx.searchMetrics($(this).val(), $list);
                       });
                     $list.delegate('li a', 'click', function(e) {
                       e.preventDefault();
@@ -286,7 +279,22 @@ var app = Sammy('body', function() {
           }
         });
       });
+    },
 
+    searchMetrics: function(search, $list) {
+      if (search == '') {
+        return $list.find('li').show();
+      } else {
+        var i = 0, l = this.app.metrics.length;
+        search = new RegExp("/" + search + "/i");
+        for (; i < l; i++) {
+          if (this.app.metrics[i].match(search)) {
+            $list.find('#metric_list_metric_' + i).show();
+          } else {
+            $list.find('#metric_list_metric_' + i).hide();
+          }
+        }
+      }
     }
   });
 
