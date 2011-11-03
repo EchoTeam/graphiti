@@ -9,6 +9,7 @@ require 'compass'
 require 'typhoeus'
 require 'yajl'
 require './lib/redised'
+require './lib/metric'
 require './lib/graph'
 require './lib/dashboard'
 require 'uuid'
@@ -33,6 +34,7 @@ class Graphiti < Sinatra::Base
     set :app_file, __FILE__
     Graph.redis = settings.redis_url
     Dashboard.redis = settings.redis_url
+    Metric.redis = settings.redis_url
   end
 
   get '/graphs/:uuid.js' do
@@ -40,7 +42,7 @@ class Graphiti < Sinatra::Base
   end
 
   get '/metrics.js' do
-    json :metrics => Graph.metrics(params[:refresh])
+    json :metrics => Metric.find(params[:q])
   end
 
   get '/graphs.js' do
