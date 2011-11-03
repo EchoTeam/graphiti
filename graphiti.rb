@@ -74,6 +74,10 @@ class Graphiti < Sinatra::Base
     json :dashboard => dashboard
   end
 
+  delete '/dashboards/:slug' do
+    Dashboard.destroy(params[:slug])
+  end
+
   post '/graphs/dashboards' do
     json Dashboard.add_graph(params[:dashboard], params[:uuid])
   end

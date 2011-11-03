@@ -308,5 +308,14 @@ h2 {
       font-size: 1.8em;
       padding: 0px 8px;
     }
+    .delete-button {
+      color: #F00;
+      background: #e5e5e5;
+      cursor: pointer;
+      padding: 4px 6px;
+      border: 1px solid #CCC;
+      font-size: 12px;
+      font-weight: bold;
+    }
   }
 }

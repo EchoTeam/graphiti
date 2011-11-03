@@ -179,6 +179,9 @@
         .meta
           %span.updated-at
           %strong.graphs-count
+      .delete-button
+        %form{method: 'delete'}
+          %input{type: 'submit', value: 'delete'}
     .graph{style: 'display:none'}
       %a.edit
         %img{src: '/images/loading.gif'}

@@ -15,6 +15,10 @@ gem 'typhoeus'
 gem 'yajl-ruby'
 gem 'uuid'
 
+group :test do
+  gem 'minitest-display'
+end
+
 group :development do
   gem 'sinatra-reloader', :require => 'sinatra/reloader'
   gem 'thin'

@@ -234,6 +234,7 @@ var app = Sammy('body', function() {
     loadAndRenderDashboards: function() {
       var $dashboards = $('#dashboards-pane').html('<h2>Dashboards</h2>').show();
       var ctx = this;
+
       this.load('/dashboards.js', {cache: false})
           .then(function(data) {
             var dashboards = data.dashboards,
@@ -248,6 +249,7 @@ var app = Sammy('body', function() {
                 .find('.title').text(dashboard.title).end()
                 .find('.graphs-count').text(dashboard.graphs.length).end()
                 .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
+                .find('.delete-button form').attr('action','/dashboards/'+dashboard.slug).end()
                 .addClass(alt)
                 .show()
                 .appendTo($dashboards);
@@ -317,6 +319,20 @@ var app = Sammy('body', function() {
 
   this.get('/dashboards', function(ctx) {
     this.loadAndRenderDashboards();
+  });
+
+  this.del('/dashboards/:slug', function(ctx){
+    var slug = this.params.slug;
+    $.ajax({
+      type: 'DELETE',
+      url: '/dashboards/'+slug,
+      success: function(resp){
+        ctx.loadAndRenderDashboards();
+      },
+      failure: function(resp){
+        ctx.loadAndRenderDashboards();
+      }
+    });
   });
 
   this.get('', function(ctx) {
