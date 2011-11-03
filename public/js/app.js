@@ -120,7 +120,7 @@ var app = Sammy('body', function() {
       if (refresh) { url += '?refresh=true'; }
       return this.load(url)
                  .then(function(resp) {
-                   this.app.metrics = resp.metrics;
+                   ctx.app.metrics = resp.metrics;
                    this.next(resp.metrics);
                  })
                 .then(function(metrics) {
@@ -129,11 +129,12 @@ var app = Sammy('body', function() {
                   $list.html('');
                   var i = 0, l = metrics.length;
                   for (; i < l; i++) {
+                    Sammy.log(metrics[i]);
                     $li.clone()
                     .attr('id', "metric_list_metric_" + i)
                     .find('strong').text(metrics[i])
                     .end()
-                    .appendTo($list);
+                    .appendTo($list).show();
                   }
                   // bind delegates only the first time
                   if (!$list.is('.bound')) {
