@@ -149,11 +149,23 @@ body.bp {
   padding: 5px;
   width: 100%;
   z-index: 15;
+  .search {
+    width: 95%;
+  }
 }
 #metrics-list {
   overflow:scroll;
   height: 400px;
   position: relative;
+  .empty, .loading {
+    margin-top: 40px;
+    color: #666;
+    font-weight: bold;
+    padding: 10px;
+  }
+  .loading {
+    color: #CCC;
+  }
   ul {
     list-style-type: none;
     margin: 40px 0px 0px 0px;

@@ -13,23 +13,20 @@ class Metric
 
   def self.find(match, max = 50)
     match = match.to_s.strip
-    if match.length < 4
-      []
-    else
-      matches = []
-      all.each do |m|
-        if m =~ /#{match.strip}/i
-          matches << m
-        end
-        break if matches.length > max
+    matches = []
+    all.each do |m|
+      if m =~ /#{match.strip}/i
+        matches << m
       end
-      matches
+      break if matches.length > max
     end
+    matches
   end
 
   private
   def self.get_metrics_list(prefix = "stats.")
     url = "http://#{Graphiti.settings.graphite_host}/metrics/find?query=#{prefix}&format=completer"
+    puts url
     response = Typhoeus::Request.get(url)
     if response.success?
       json = Yajl::Parser.parse(response.body)

@@ -152,10 +152,11 @@
           %a Metrics
         .edit-body.closed
           #metrics-menu
-            %input{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
-            %button{rel: 'reload'} Reload List
+            %input.search{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
           #metrics-list
-            %ul
+            .empty No metrics found. Search for metrics above.
+            .loading{style: 'display:none;'} ... Loading ...
+            %ul{style: 'display:none;'}
               %li{style: 'display:none;'}
                 %a{rel: 'add'} Add
                 %a{rel: 'replace'} Replace
