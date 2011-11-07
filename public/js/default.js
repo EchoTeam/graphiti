@@ -12919,7 +12919,7 @@ var app = Sammy('body', function() {
                 .find('.title').text(dashboard.title).end()
                 .find('.graphs-count').text(dashboard.graphs.length).end()
                 .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
-                .find('.delete-button form').attr('action','/dashboards/'+dashboard.slug).end()
+                .find('form.delete').attr('action','/dashboards/'+dashboard.slug).end()
                 .addClass(alt)
                 .show()
                 .appendTo($dashboards);
@@ -12960,6 +12960,11 @@ var app = Sammy('body', function() {
       });
     },
 
+    confirmDelete: function(type) {
+      var warning = "Are you sure you want to delete this " + type + "? There is no undo. You may regret this later.";
+      return confirm(warning);
+    }
+
   });
 
   this.before({only: {verb: 'get'}}, function() {
@@ -12999,16 +13004,19 @@ var app = Sammy('body', function() {
 
   this.del('/dashboards/:slug', function(ctx){
     var slug = this.params.slug;
-    $.ajax({
-      type: 'DELETE',
-      url: '/dashboards/'+slug,
-      success: function(resp){
-        ctx.loadAndRenderDashboards();
-      },
-      failure: function(resp){
-        ctx.loadAndRenderDashboards();
-      }
-    });
+    if (this.confirmDelete('dashboard')) {
+      $.ajax({
+        type: 'post',
+        data: '_method=DELETE',
+        url: '/dashboards/'+slug,
+        success: function(resp){
+          ctx.loadAndRenderDashboards();
+        },
+        failure: function(resp){
+          ctx.loadAndRenderDashboards();
+        }
+      });
+    }
   });
 
   this.get('', function(ctx) {
