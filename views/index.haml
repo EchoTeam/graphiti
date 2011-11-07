@@ -181,6 +181,8 @@
           %span.updated-at
           %strong.graphs-count
       .actions
+        %a.view
+          %button Show
         %form.delete{method: 'delete', action: '/dashboards/'}
           %input{type: 'submit', value: 'Delete'}
     .graph{style: 'display:none'}

@@ -324,7 +324,14 @@ h2 {
       text-align: right;
       border-top: 1px solid #CCC;
       padding: 4px 20px;
-      input {
+      a {
+        display:inline;
+        margin-right: 8px;
+      }
+      .delete {
+        float: right;
+      }
+      input, button{
         @include border-radius(4px);
         color: #666;
         background: #e5e5e5;
