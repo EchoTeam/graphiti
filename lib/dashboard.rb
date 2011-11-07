@@ -44,6 +44,12 @@ class Dashboard
     {uuid: uuid, slug: slug}
   end
 
+  def self.remove_graph(slug, uuid)
+    redis.zrem "dashboards:#{slug}:graphs", uuid
+    redis.srem "graphs:#{uuid}:dashboards", slug
+    redis.zrem "dashboards", slug
+  end
+
   def self.graph_ids(slug)
     redis.zrange "dashboards:#{slug}:graphs", 0, -1
   end

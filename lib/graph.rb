@@ -19,6 +19,18 @@ class Graph
     nil
   end
 
+  def self.dashboards(uuid)
+    redis.smembers("graphs:#{uuid}:dashboards")
+  end
+
+  def self.destroy(uuid)
+    redis.del "graphs:#{uuid}"
+    redis.zrem "graphs", uuid
+    self.dashboards(uuid).each do |dashboard|
+      Dashboard.remove_graph dashboard, uuid
+    end
+  end
+
   def self.all(*graph_ids)
     graph_ids = redis.zrevrange "graphs", 0, -1 if graph_ids.empty?
     graph_ids.flatten.collect do |uuid|

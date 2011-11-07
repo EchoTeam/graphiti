@@ -180,11 +180,13 @@
         .meta
           %span.updated-at
           %strong.graphs-count
-      .actions
-        %a.view
-          %button Show
-        %form.delete{method: 'delete', action: '/dashboards/'}
-          %input{type: 'submit', value: 'Delete'}
+      %ul.actions
+        %li
+          %form.delete{method: 'delete', action: '/dashboards/'}
+            %input{type: 'submit', value: 'Delete'}
+        %li
+          %a.view
+            %button Show
     .graph{style: 'display:none'}
       %a.edit
         %img{src: '/images/loading.gif'}
@@ -192,7 +194,8 @@
         %h3.title &nbsp;
         %ul.actions
           %li
-            %a.edit Edit
+            %a.edit
+              %button Edit
 
   %script{src: '/js/libs/ace/ace.js'}
   %script{src: '/js/libs/ace/mode-json.js'}
