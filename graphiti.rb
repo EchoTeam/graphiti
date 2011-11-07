@@ -80,33 +80,32 @@ class Graphiti < Sinatra::Base
     json Dashboard.add_graph(params[:dashboard], params[:uuid])
   end
 
-  get '/graphs/new' do
-    haml :index
-  end
-
-  get '/graphs/:uuid' do
-    haml :index
-  end
-
-  get '/graphs' do
-    haml :index
-  end
-
-  get '/dashboards/:slug' do
-    haml :index
-  end
-
-  get '/dashboards' do
-    haml :index
-  end
-
-  get '/' do
-    haml :index
+  # Routes that are entirely handled by Sammy/frontend
+  # and just need to load the empty index
+  %w{
+    /graphs/workspace
+    /graphs/new
+    /graphs/:uuid
+    /graphs
+    /dashboards/:slug
+    /dashboards
+    /
+  }.each do |path|
+    get path do
+      haml :index
+    end
   end
 
   get '/stylesheets/:name.css' do
     content_type 'text/css'
     scss :"stylesheets/#{params[:name]}"
+  end
+
+  def default_graph
+    {
+      :options => settings.default_options,
+      :targets => settings.default_metrics.collect {|m| [m, {}] }
+    }
   end
 
 end

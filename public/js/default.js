@@ -12667,16 +12667,6 @@ var app = Sammy('body', function() {
   this.use('Session');
   this.use('NestedParams');
 
-  var defaultGraph = {
-            "options": {
-              "title": "New Graph"
-            },
-            "targets": [
-              "stats.timers.production.rails.controller.total.mean"
-            ]
-          };
-
-
   var canon = require("pilot/canon");
 
   this.registerShortcut = function(name, keys, callback) {
@@ -12975,6 +12965,12 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs/new', function(ctx) {
+    this.session('lastPreview', Graphiti.defaultGraph, function() {
+      ctx.redirect('/graphs/workspace');
+    });
+  });
+
+  this.get('/graphs/workspace', function(ctx) {
     this.session('lastPreview', function(lastPreview) {
       ctx.showEditor(lastPreview);
     });
