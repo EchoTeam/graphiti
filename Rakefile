@@ -9,7 +9,6 @@ rescue Bundler::BundlerError => e
 end
 
 require 'rake'
-
 require File.join(File.dirname(__FILE__), 'graphiti')
 
 require 'rake/testtask'
@@ -20,3 +19,13 @@ Rake::TestTask.new(:test) do |test|
 end
 
 task :default => :test
+
+namespace :graphiti do
+
+  desc 'Rebuild Metrics List'
+  task :metrics do
+    list = Metric.all true
+    puts "Got #{list.length} metrics"
+  end
+
+end

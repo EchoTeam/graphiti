@@ -122,10 +122,10 @@
               .options-group.last
                 %p
                   %label Y Min
-                  %input{type: 'text', size: 3, name: 'yMin'}
+                  %input{type: 'text', size: 3, name: 'options[yMin]'}
                 %p
                   %label Y Max
-                  %input{type: 'text', size: 3, name: 'yMax'}
+                  %input{type: 'text', size: 3, name: 'options[yMax]'}
                 %p
                   %label Area Mode
                   %select{name: 'options[areaMode]'}
@@ -152,11 +152,12 @@
           %a Metrics
         .edit-body.closed
           #metrics-menu
-            %input{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
-            %button{rel: 'reload'} Reload List
+            %input.search{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
           #metrics-list
-            %ul
-              %li
+            .empty No metrics found. Search for metrics above.
+            .loading{style: 'display:none;'} ... Loading ...
+            %ul{style: 'display:none;'}
+              %li{style: 'display:none;'}
                 %a{rel: 'add'} Add
                 %a{rel: 'replace'} Replace
                 %strong &nbsp;
@@ -190,12 +191,16 @@
         %ul.actions
           %li
             %a.edit Edit
+
   %script{src: '/js/libs/ace/ace.js'}
   %script{src: '/js/libs/ace/mode-json.js'}
   %script{src: '/js/libs/ace/theme-textmate.js'}
+
   :javascript
     Graphiti = window.Graphiti || {};
     Graphiti.graphite_host = "#{settings.graphite_host}";
+    Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
+
   - if Graphiti.production?
     %script{src: '/js/default.min.js'}
   - else

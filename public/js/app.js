@@ -2,16 +2,6 @@ var app = Sammy('body', function() {
   this.use('Session');
   this.use('NestedParams');
 
-  var defaultGraph = {
-            "options": {
-              "title": "New Graph"
-            },
-            "targets": [
-              "stats.timers.production.rails.controller.total.mean"
-            ]
-          };
-
-
   var canon = require("pilot/canon");
 
   this.registerShortcut = function(name, keys, callback) {
@@ -66,7 +56,6 @@ var app = Sammy('body', function() {
       var text = this.setEditorJSON(text);
       $('#editor').show();
       this.graphPreview(JSON.parse(text));
-      this.loadMetricsList()
       this.buildDashboardsDropdown(uuid);
       if (uuid) { // this is an already saved graph
         $('#graph-actions .update')
@@ -114,53 +103,69 @@ var app = Sammy('body', function() {
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
-    loadMetricsList: function(refresh) {
+    buildMetricsList: function($list, metrics) {
+      var $li = $list.find('li:first').clone();
+      $list.html('');
+      var i = 0, l = metrics.length;
+      for (; i < l; i++) {
+        Sammy.log(metrics[i]);
+        $li.clone()
+        .attr('id', "metric_list_metric_" + i)
+        .find('strong').text(metrics[i])
+        .end()
+        .appendTo($list).show();
+      }
+    },
+    bindMetricsList: function() {
       var ctx = this;
+      var $list = $('#metrics-list ul')
+      var throttle;
+      $('#metrics-menu')
+        .find('input[type="search"]').live('keyup', function() {
+          var val = $(this).val();
+          if (throttle) {
+            clearTimeout(throttle);
+          }
+          throttle = setTimeout(function() {
+            ctx.searchMetricsList(val);
+          }, 200);
+        });
+      $list.delegate('li a', 'click', function(e) {
+        e.preventDefault();
+        var action = $(this).attr('rel'),
+            metric = $(this).siblings('strong').text();
+        Sammy.log('clicked', action, metric);
+        ctx[action + "GraphMetric"](metric);
+      }).addClass('.bound');
+    },
+
+    searchMetricsList: function(search) {
+      var ctx = this;
+      var $list = $('#metrics-list ul');
+      var $loading = $('#metrics-list .loading');
+      var $empty = $('#metrics-list .empty');
       var url = '/metrics.js';
-      if (refresh) { url += '?refresh=true'; }
-      return this.load(url)
-                 .then(function(resp) {
-                   this.next(resp.metrics);
-                 })
-                .then(function(metrics) {
-                  var $list = $('#metrics-list ul');
-                  var $li = $list.find('li:first').clone();
-                  $list.html('');
-                  var i = 0, l = metrics.length;
-                  for (; i < l; i++) {
-                    $li.clone()
-                    .find('strong').text(metrics[i])
-                    .end()
-                    .appendTo($list);
-                  }
-                  // bind delegates only the first time
-                  if (!$list.is('.bound')) {
-                    $('#metrics-menu')
-                      .find('[rel="reload"]').live('click', function() {
-                        Sammy.log('reload!');
-                        ctx.loadMetricsList(true);
-                      }).end()
-                      .find('input[type="search"]').live('keyup', function() {
-                        var search = $(this).val();
-                        Sammy.log('search', search);
-                        var $lis = $('#metrics-list li')
-                        if (search != '') {
-                          $lis.hide()
-                          .filter(':contains(' + search + ')')
-                          .show();
-                        } else {
-                          $lis.show();
-                        }
-                      });
-                    $list.delegate('li a', 'click', function(e) {
-                      e.preventDefault();
-                      var action = $(this).attr('rel'),
-                          metric = $(this).siblings('strong').text();
-                      Sammy.log('clicked', action, metric);
-                      ctx[action + "GraphMetric"](metric);
-                    }).addClass('.bound');
-                  }
-                });
+      url += '?q=' + search;
+      if (ctx.app.searching) return;
+      if (search.length > 4) {
+        ctx.app.searching = true;
+        $empty.hide();
+        $loading.show();
+        return this.load(url).then(function(metrics) {
+          var metrics = metrics.metrics;
+          $loading.hide();
+          if (metrics.length > 0) {
+            $list.show();
+            ctx.buildMetricsList($list, metrics);
+          } else {
+            $empty.show();
+          }
+          ctx.app.searching = false;
+        });
+      } else {
+        $empty.show();
+        $list.hide();
+      }
     },
     addGraphMetric: function(metric) {
       var json = this.getEditorJSON();
@@ -288,8 +293,8 @@ var app = Sammy('body', function() {
           }
         });
       });
+    },
 
-    }
   });
 
   this.before({only: {verb: 'get'}}, function() {
@@ -297,6 +302,12 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs/new', function(ctx) {
+    this.session('lastPreview', Graphiti.defaultGraph, function() {
+      ctx.redirect('/graphs/workspace');
+    });
+  });
+
+  this.get('/graphs/workspace', function(ctx) {
     this.session('lastPreview', function(lastPreview) {
       ctx.showEditor(lastPreview);
     });
@@ -406,6 +417,7 @@ var app = Sammy('body', function() {
     var ctx = this;
 
     this.bindEditorPanes();
+    this.bindMetricsList();
 
     $('select[name="dashboard"]').live('change', function() {
       if ($(this).val() == '') {

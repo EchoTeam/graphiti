@@ -9,6 +9,7 @@ require 'compass'
 require 'typhoeus'
 require 'yajl'
 require './lib/redised'
+require './lib/metric'
 require './lib/graph'
 require './lib/dashboard'
 require 'uuid'
@@ -33,6 +34,7 @@ class Graphiti < Sinatra::Base
     set :app_file, __FILE__
     Graph.redis = settings.redis_url
     Dashboard.redis = settings.redis_url
+    Metric.redis = settings.redis_url
   end
 
   get '/graphs/:uuid.js' do
@@ -40,7 +42,7 @@ class Graphiti < Sinatra::Base
   end
 
   get '/metrics.js' do
-    json :metrics => Graph.metrics(params[:refresh])
+    json :metrics => Metric.find(params[:q])
   end
 
   get '/graphs.js' do
@@ -82,33 +84,32 @@ class Graphiti < Sinatra::Base
     json Dashboard.add_graph(params[:dashboard], params[:uuid])
   end
 
-  get '/graphs/new' do
-    haml :index
-  end
-
-  get '/graphs/:uuid' do
-    haml :index
-  end
-
-  get '/graphs' do
-    haml :index
-  end
-
-  get '/dashboards/:slug' do
-    haml :index
-  end
-
-  get '/dashboards' do
-    haml :index
-  end
-
-  get '/' do
-    haml :index
+  # Routes that are entirely handled by Sammy/frontend
+  # and just need to load the empty index
+  %w{
+    /graphs/workspace
+    /graphs/new
+    /graphs/:uuid
+    /graphs
+    /dashboards/:slug
+    /dashboards
+    /
+  }.each do |path|
+    get path do
+      haml :index
+    end
   end
 
   get '/stylesheets/:name.css' do
     content_type 'text/css'
     scss :"stylesheets/#{params[:name]}"
+  end
+
+  def default_graph
+    {
+      :options => settings.default_options,
+      :targets => settings.default_metrics.collect {|m| [m, {}] }
+    }
   end
 
 end
