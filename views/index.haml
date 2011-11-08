@@ -203,6 +203,15 @@
           %li
             %a.edit
               %button Edit
+    #dashboards-empty.empty
+      %h3
+        You haven't set up any dashboards yet. Create a
+        %a{href: '/graphs/new'} new graph
+        and add it to a dashboard.
+    #graphs-empty.empty
+      %h3
+        You haven't set up any graphs yet. Create a
+        %a{href: '/graphs/new'} new graph.
 
   %script{src: '/js/libs/ace/ace.js'}
   %script{src: '/js/libs/ace/mode-json.js'}

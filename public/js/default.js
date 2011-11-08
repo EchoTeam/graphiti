@@ -12892,6 +12892,10 @@ var app = Sammy('body', function() {
                 l = graphs.length,
                 $graph = $('#templates .graph').clone(),
                 graph, graph_obj;
+            if (data.graphs.length == 0) {
+              $graphs.append($('#graphs-empty'));
+              return true;
+            }
             for (; i < l; i++) {
               graph = graphs[i];
               graph_obj = new Graphiti.Graph(JSON.parse(graph.json));
@@ -12936,18 +12940,22 @@ var app = Sammy('body', function() {
             i = 0, l = dashboards.length, dashboard, alt,
             $dashboard = $('#templates .dashboard').clone();
 
-            for (; i < l;i++) {
-              dashboard = dashboards[i];
-              alt = ((i+1)%2 == 0) ? 'alt' : '';
-              $dashboard.clone()
-                .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
-                .find('.title').text(dashboard.title).end()
-                .find('.graphs-count').text(dashboard.graphs.length).end()
-                .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
-                .find('form.delete').attr('action','/dashboards/'+dashboard.slug).end()
-                .addClass(alt)
-                .show()
-                .appendTo($dashboards);
+            if (dashboards.length == 0) {
+              $dashboards.append($('#dashboards-empty'));
+            } else {
+              for (; i < l;i++) {
+                dashboard = dashboards[i];
+                alt = ((i+1)%2 == 0) ? 'alt' : '';
+                $dashboard.clone()
+                  .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
+                  .find('.title').text(dashboard.title).end()
+                  .find('.graphs-count').text(dashboard.graphs.length).end()
+                  .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
+                  .find('form.delete').attr('action','/dashboards/'+dashboard.slug).end()
+                  .addClass(alt)
+                  .show()
+                  .appendTo($dashboards);
+              }
             }
 
           });
@@ -13101,14 +13109,12 @@ var app = Sammy('body', function() {
     });
   });
 
-
   this.post('/graphs/dashboards', function(ctx) {
     var $target = $(this.target);
     $.post('/graphs/dashboards', $target.serialize(), function(resp) {
       ctx.buildDashboardsDropdown(resp.uuid);
     });
   });
-
 
   this.post('/dashboards', function(ctx) {
     var $target = $(this.target);
@@ -13140,7 +13146,7 @@ var app = Sammy('body', function() {
     this.bindEditorPanes();
     this.bindMetricsList();
 
-    $('select[name="dashboard"]').live('change', function() {
+    $('select[name="dashboard"]').live('focus', function() {
       if ($(this).val() == '') {
         $(this).siblings('.save').attr('disabled', 'disabled');
       } else {

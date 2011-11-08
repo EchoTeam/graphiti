@@ -18,6 +18,7 @@ body.bp {
 #container {
   @include container;
   margin: 10px auto;
+  min-height: 500px;
 }
 #header {
   background: #001247;
@@ -238,7 +239,7 @@ body.bp {
 #footer {
   text-align:center;
   color: #666;
-  margin: 10px;
+  margin: 100px 0px 0px 20px;
 }
 
 h2 {
@@ -340,5 +341,11 @@ h2 {
     text-align:center;
     color: #666;
     margin: 100px 0px;
+  }
+}
+.empty {
+  h3 {
+    background: #E3E3E3;
+    padding: 20px;
   }
 }
