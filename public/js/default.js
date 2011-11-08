@@ -12691,6 +12691,13 @@ var app = Sammy('body', function() {
   };
 
   this.helpers({
+    showPane: function(pane, content) {
+      var selector = '#' + pane + '-pane';
+      $('.pane:not(' + selector + ')').hide();
+      var $pane = $(selector);
+      if (content) { $pane.html(content); }
+      return $pane.show();
+    },
     setupEditor: function() {
       if (this.app.editor) return;
 
@@ -12713,7 +12720,7 @@ var app = Sammy('body', function() {
       return false;
     },
     showEditor: function(text, uuid) {
-      $('#editor-pane').show();
+      this.showPane('editor');
       if (!text) {
         text = defaultGraph;
       }
@@ -12850,7 +12857,6 @@ var app = Sammy('body', function() {
       }
       return new Date(time * 1000).toString();
     },
-
     buildDashboardsDropdown: function(uuid) {
       this.load('/dashboards.js', {cache: false, data: {uuid: uuid}})
           .then(function(data) {
@@ -12870,7 +12876,7 @@ var app = Sammy('body', function() {
           });
     },
     loadAndRenderGraphs: function(url) {
-      var $graphs = $('#graphs-pane').html('').show();
+      var $graphs = this.showPane('graphs', ' ');
       this.load(url, {cache: false})
           .then(function(data) {
             var title = 'All Graphs', all_graphs;
@@ -12921,7 +12927,7 @@ var app = Sammy('body', function() {
           });
     },
     loadAndRenderDashboards: function() {
-      var $dashboards = $('#dashboards-pane').html('<h2>Dashboards</h2>').show();
+      var $dashboards = this.showPane('dashboards', '<h2>Dashboards</h2>');
       var ctx = this;
 
       this.load('/dashboards.js', {cache: false})
@@ -12987,7 +12993,7 @@ var app = Sammy('body', function() {
   });
 
   this.before({only: {verb: 'get'}}, function() {
-    $('.pane').hide();
+    this.showPane('loading');
   });
 
   this.get('/graphs/new', function(ctx) {
