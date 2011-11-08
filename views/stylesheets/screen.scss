@@ -18,6 +18,7 @@ body.bp {
 #container {
   @include container;
   margin: 10px auto;
+  min-height: 500px;
 }
 #header {
   background: #001247;
@@ -149,11 +150,23 @@ body.bp {
   padding: 5px;
   width: 100%;
   z-index: 15;
+  .search {
+    width: 95%;
+  }
 }
 #metrics-list {
   overflow:scroll;
   height: 400px;
   position: relative;
+  .empty, .loading {
+    margin-top: 40px;
+    color: #666;
+    font-weight: bold;
+    padding: 10px;
+  }
+  .loading {
+    color: #CCC;
+  }
   ul {
     list-style-type: none;
     margin: 40px 0px 0px 0px;
@@ -226,7 +239,7 @@ body.bp {
 #footer {
   text-align:center;
   color: #666;
-  margin: 10px;
+  margin: 100px 0px 0px 20px;
 }
 
 h2 {
@@ -258,13 +271,6 @@ h2 {
       background: #f3f3f3;
       margin-bottom: 10px;
     }
-    ul.actions {
-      @include horizontal-list;
-      a {
-        font-weight: bold;
-        text-decoration: none;
-      }
-    }
   }
 }
 #dashboards-pane {
@@ -276,10 +282,10 @@ h2 {
     background: #f3f3f3;
     position: relative;
     &.alt {
-      background: #e5e5e5;
+      background: #FEFEFE;
     }
     &:hover {
-      background: #FFF;
+      background: #E3E3E3;
     }
     a {
       color: #333;
@@ -308,5 +314,38 @@ h2 {
       font-size: 1.8em;
       padding: 0px 8px;
     }
+  }
+}
+
+#container ul.actions {
+  @include horizontal-list(8px, right);
+  border-top: 1px solid #CCC;
+  padding: 4px;
+  input, button{
+    @include border-radius(4px);
+    color: #666;
+    background: #e5e5e5;
+    cursor: pointer;
+    padding: 2px 4px;
+    border: 1px solid #CCC;
+    font-size: 10px;
+    font-weight: bold;
+  }
+}
+#dashboards ul.actions {
+  padding-right: 20px;
+}
+#loading-pane {
+  h2 {
+    border: none;
+    text-align:center;
+    color: #666;
+    margin: 100px 0px;
+  }
+}
+.empty {
+  h3 {
+    background: #E3E3E3;
+    padding: 20px;
   }
 }

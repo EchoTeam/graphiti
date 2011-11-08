@@ -2,16 +2,6 @@ var app = Sammy('body', function() {
   this.use('Session');
   this.use('NestedParams');
 
-  var defaultGraph = {
-            "options": {
-              "title": "New Graph"
-            },
-            "targets": [
-              "stats.timers.production.rails.controller.total.mean"
-            ]
-          };
-
-
   var canon = require("pilot/canon");
 
   this.registerShortcut = function(name, keys, callback) {
@@ -36,6 +26,13 @@ var app = Sammy('body', function() {
   };
 
   this.helpers({
+    showPane: function(pane, content) {
+      var selector = '#' + pane + '-pane';
+      $('.pane:not(' + selector + ')').hide();
+      var $pane = $(selector);
+      if (content) { $pane.html(content); }
+      return $pane.show();
+    },
     setupEditor: function() {
       if (this.app.editor) return;
 
@@ -58,7 +55,7 @@ var app = Sammy('body', function() {
       return false;
     },
     showEditor: function(text, uuid) {
-      $('#editor-pane').show();
+      this.showPane('editor');
       if (!text) {
         text = defaultGraph;
       }
@@ -66,7 +63,6 @@ var app = Sammy('body', function() {
       var text = this.setEditorJSON(text);
       $('#editor').show();
       this.graphPreview(JSON.parse(text));
-      this.loadMetricsList()
       this.buildDashboardsDropdown(uuid);
       if (uuid) { // this is an already saved graph
         $('#graph-actions .update')
@@ -114,53 +110,69 @@ var app = Sammy('body', function() {
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
-    loadMetricsList: function(refresh) {
+    buildMetricsList: function($list, metrics) {
+      var $li = $list.find('li:first').clone();
+      $list.html('');
+      var i = 0, l = metrics.length;
+      for (; i < l; i++) {
+        Sammy.log(metrics[i]);
+        $li.clone()
+        .attr('id', "metric_list_metric_" + i)
+        .find('strong').text(metrics[i])
+        .end()
+        .appendTo($list).show();
+      }
+    },
+    bindMetricsList: function() {
       var ctx = this;
+      var $list = $('#metrics-list ul')
+      var throttle;
+      $('#metrics-menu')
+        .find('input[type="search"]').live('keyup', function() {
+          var val = $(this).val();
+          if (throttle) {
+            clearTimeout(throttle);
+          }
+          throttle = setTimeout(function() {
+            ctx.searchMetricsList(val);
+          }, 200);
+        });
+      $list.delegate('li a', 'click', function(e) {
+        e.preventDefault();
+        var action = $(this).attr('rel'),
+            metric = $(this).siblings('strong').text();
+        Sammy.log('clicked', action, metric);
+        ctx[action + "GraphMetric"](metric);
+      }).addClass('.bound');
+    },
+
+    searchMetricsList: function(search) {
+      var ctx = this;
+      var $list = $('#metrics-list ul');
+      var $loading = $('#metrics-list .loading');
+      var $empty = $('#metrics-list .empty');
       var url = '/metrics.js';
-      if (refresh) { url += '?refresh=true'; }
-      return this.load(url)
-                 .then(function(resp) {
-                   this.next(resp.metrics);
-                 })
-                .then(function(metrics) {
-                  var $list = $('#metrics-list ul');
-                  var $li = $list.find('li:first').clone();
-                  $list.html('');
-                  var i = 0, l = metrics.length;
-                  for (; i < l; i++) {
-                    $li.clone()
-                    .find('strong').text(metrics[i])
-                    .end()
-                    .appendTo($list);
-                  }
-                  // bind delegates only the first time
-                  if (!$list.is('.bound')) {
-                    $('#metrics-menu')
-                      .find('[rel="reload"]').live('click', function() {
-                        Sammy.log('reload!');
-                        ctx.loadMetricsList(true);
-                      }).end()
-                      .find('input[type="search"]').live('keyup', function() {
-                        var search = $(this).val();
-                        Sammy.log('search', search);
-                        var $lis = $('#metrics-list li')
-                        if (search != '') {
-                          $lis.hide()
-                          .filter(':contains(' + search + ')')
-                          .show();
-                        } else {
-                          $lis.show();
-                        }
-                      });
-                    $list.delegate('li a', 'click', function(e) {
-                      e.preventDefault();
-                      var action = $(this).attr('rel'),
-                          metric = $(this).siblings('strong').text();
-                      Sammy.log('clicked', action, metric);
-                      ctx[action + "GraphMetric"](metric);
-                    }).addClass('.bound');
-                  }
-                });
+      url += '?q=' + search;
+      if (ctx.app.searching) return;
+      if (search.length > 4) {
+        ctx.app.searching = true;
+        $empty.hide();
+        $loading.show();
+        return this.load(url).then(function(metrics) {
+          var metrics = metrics.metrics;
+          $loading.hide();
+          if (metrics.length > 0) {
+            $list.show();
+            ctx.buildMetricsList($list, metrics);
+          } else {
+            $empty.show();
+          }
+          ctx.app.searching = false;
+        });
+      } else {
+        $empty.show();
+        $list.hide();
+      }
     },
     addGraphMetric: function(metric) {
       var json = this.getEditorJSON();
@@ -180,7 +192,6 @@ var app = Sammy('body', function() {
       }
       return new Date(time * 1000).toString();
     },
-
     buildDashboardsDropdown: function(uuid) {
       this.load('/dashboards.js', {cache: false, data: {uuid: uuid}})
           .then(function(data) {
@@ -200,12 +211,15 @@ var app = Sammy('body', function() {
           });
     },
     loadAndRenderGraphs: function(url) {
-      var $graphs = $('#graphs-pane').html('').show();
+      var $graphs = this.showPane('graphs', ' ');
       this.load(url, {cache: false})
           .then(function(data) {
-            var title = 'All Graphs';
+            var title = 'All Graphs', all_graphs;
             if (data.title) {
+              all_graphs = false;
               title = data.title;
+            } else {
+              all_graphs = true;
             }
             $graphs.append('<h2>' + title + '</h2>');
             var graphs = data.graphs,
@@ -213,44 +227,70 @@ var app = Sammy('body', function() {
                 l = graphs.length,
                 $graph = $('#templates .graph').clone(),
                 graph, graph_obj;
+            if (data.graphs.length == 0) {
+              $graphs.append($('#graphs-empty'));
+              return true;
+            }
             for (; i < l; i++) {
               graph = graphs[i];
               graph_obj = new Graphiti.Graph(JSON.parse(graph.json));
-              this.log(graph_obj);
+
               $graph
               .clone()
               .find('.title').text(graph.title || 'Untitled').end()
               .find('a.edit').attr('href', '/graphs/' + graph.uuid).end()
               .show()
               .appendTo($graphs).each(function() {
+                // actually replace the graph image
                 graph_obj.image($(this).find('img'));
+                // add a last class alternatingly to fix the display grid
                 if ((i+1)%2 == 0) {
                   $(this).addClass('last');
+                }
+                // if its all graphs, delete operates on everything
+                if (all_graphs) {
+                  $(this)
+                  .find('.delete')
+                  .attr('action', '/graphs/' + graph.uuid);
+                // otherwise it just removes the graphs
+                } else {
+                  $(this)
+                  .find('.delete')
+                  .attr('action', '/graphs/dashboards')
+                  .find('[name=dashboard]').val(data.slug).end()
+                  .find('[name=uuid]').val(graph.uuid).end()
+                  .find('[type=submit]').val('Remove');
                 }
               });
             }
           });
     },
     loadAndRenderDashboards: function() {
-      var $dashboards = $('#dashboards-pane').html('<h2>Dashboards</h2>').show();
+      var $dashboards = this.showPane('dashboards', '<h2>Dashboards</h2>');
       var ctx = this;
+
       this.load('/dashboards.js', {cache: false})
           .then(function(data) {
             var dashboards = data.dashboards,
             i = 0, l = dashboards.length, dashboard, alt,
             $dashboard = $('#templates .dashboard').clone();
 
-            for (; i < l;i++) {
-              dashboard = dashboards[i];
-              alt = ((i+1)%2 == 0) ? 'alt' : '';
-              $dashboard.clone()
-                .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
-                .find('.title').text(dashboard.title).end()
-                .find('.graphs-count').text(dashboard.graphs.length).end()
-                .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
-                .addClass(alt)
-                .show()
-                .appendTo($dashboards);
+            if (dashboards.length == 0) {
+              $dashboards.append($('#dashboards-empty'));
+            } else {
+              for (; i < l;i++) {
+                dashboard = dashboards[i];
+                alt = ((i+1)%2 == 0) ? 'alt' : '';
+                $dashboard.clone()
+                  .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
+                  .find('.title').text(dashboard.title).end()
+                  .find('.graphs-count').text(dashboard.graphs.length).end()
+                  .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
+                  .find('form.delete').attr('action','/dashboards/'+dashboard.slug).end()
+                  .addClass(alt)
+                  .show()
+                  .appendTo($dashboards);
+              }
             }
 
           });
@@ -286,15 +326,26 @@ var app = Sammy('body', function() {
           }
         });
       });
+    },
 
+    confirmDelete: function(type) {
+      var warning = "Are you sure you want to delete this " + type + "? There is no undo. You may regret this later.";
+      return confirm(warning);
     }
+
   });
 
   this.before({only: {verb: 'get'}}, function() {
-    $('.pane').hide();
+    this.showPane('loading');
   });
 
   this.get('/graphs/new', function(ctx) {
+    this.session('lastPreview', Graphiti.defaultGraph, function() {
+      ctx.redirect('/graphs/workspace');
+    });
+  });
+
+  this.get('/graphs/workspace', function(ctx) {
     this.session('lastPreview', function(lastPreview) {
       ctx.showEditor(lastPreview);
     });
@@ -317,6 +368,46 @@ var app = Sammy('body', function() {
 
   this.get('/dashboards', function(ctx) {
     this.loadAndRenderDashboards();
+  });
+
+  this.del('/dashboards/:slug', function(ctx){
+    var slug = this.params.slug;
+    if (this.confirmDelete('dashboard')) {
+      $.ajax({
+        type: 'post',
+        data: '_method=DELETE',
+        url: '/dashboards/'+slug,
+        complete: function(resp){
+          ctx.loadAndRenderDashboards();
+        }
+      });
+    }
+  });
+
+  this.del('/graphs/dashboards', function(ctx){
+    if (this.confirmDelete('graph')) {
+      $.ajax({
+        type: 'post',
+        data: $(ctx.target).serialize() + '&_method=DELETE',
+        url: '/graphs/dashboards',
+        success: function(resp){
+          ctx.app.refresh();
+        }
+      });
+    }
+  });
+
+  this.del('/graphs/:uuid', function(ctx){
+    if (this.confirmDelete('graph')) {
+      $.ajax({
+        type: 'post',
+        data: '_method=DELETE',
+        url: '/graphs/'+uuid,
+        success: function(resp){
+          ctx.refresh();
+        }
+      });
+    }
   });
 
   this.get('', function(ctx) {
@@ -353,14 +444,12 @@ var app = Sammy('body', function() {
     });
   });
 
-
   this.post('/graphs/dashboards', function(ctx) {
     var $target = $(this.target);
     $.post('/graphs/dashboards', $target.serialize(), function(resp) {
       ctx.buildDashboardsDropdown(resp.uuid);
     });
   });
-
 
   this.post('/dashboards', function(ctx) {
     var $target = $(this.target);
@@ -390,8 +479,9 @@ var app = Sammy('body', function() {
     var ctx = this;
 
     this.bindEditorPanes();
+    this.bindMetricsList();
 
-    $('select[name="dashboard"]').live('change', function() {
+    $('select[name="dashboard"]').live('focus', function() {
       if ($(this).val() == '') {
         $(this).siblings('.save').attr('disabled', 'disabled');
       } else {

@@ -29,12 +29,25 @@ class Dashboard
     end.compact
   end
 
+  def self.destroy(slug)
+    key = "dashboards:#{slug}"
+    redis.del key
+    redis.zrem "dashboards", slug
+    redis.srem "graphs:dashboards", slug
+  end
+
   def self.add_graph(slug, uuid)
     redis.zadd "dashboards:#{slug}:graphs", Time.now.to_i, uuid
     redis.sadd "graphs:#{uuid}:dashboards", slug
     redis.hset "dashboards:#{slug}", "updated_at", Time.now.to_i
     redis.zadd "dashboards", Time.now.to_i, slug
     {uuid: uuid, slug: slug}
+  end
+
+  def self.remove_graph(slug, uuid)
+    redis.zrem "dashboards:#{slug}:graphs", uuid
+    redis.srem "graphs:#{uuid}:dashboards", slug
+    redis.zrem "dashboards", slug
   end
 
   def self.graph_ids(slug)

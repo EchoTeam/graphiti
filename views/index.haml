@@ -26,6 +26,8 @@
           %a{href: '/graphs/new'}
             + New Graph
   #container
+    #loading-pane.pane
+      %h2 ... Loading ...
     #dashboards-pane.pane{style: 'display:none;'}
     #graphs-pane.pane{style: 'display:none;'}
     #editor-pane.pane{style: 'display:none;'}
@@ -122,10 +124,10 @@
               .options-group.last
                 %p
                   %label Y Min
-                  %input{type: 'text', size: 3, name: 'yMin'}
+                  %input{type: 'text', size: 3, name: 'options[yMin]'}
                 %p
                   %label Y Max
-                  %input{type: 'text', size: 3, name: 'yMax'}
+                  %input{type: 'text', size: 3, name: 'options[yMax]'}
                 %p
                   %label Area Mode
                   %select{name: 'options[areaMode]'}
@@ -152,11 +154,12 @@
           %a Metrics
         .edit-body.closed
           #metrics-menu
-            %input{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
-            %button{rel: 'reload'} Reload List
+            %input.search{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
           #metrics-list
-            %ul
-              %li
+            .empty No metrics found. Search for metrics above.
+            .loading{style: 'display:none;'} ... Loading ...
+            %ul{style: 'display:none;'}
+              %li{style: 'display:none;'}
                 %a{rel: 'add'} Add
                 %a{rel: 'replace'} Replace
                 %strong &nbsp;
@@ -179,6 +182,13 @@
         .meta
           %span.updated-at
           %strong.graphs-count
+      %ul.actions
+        %li
+          %form.delete{method: 'delete', action: '/dashboards/'}
+            %input{type: 'submit', value: 'Delete'}
+        %li
+          %a.view
+            %button Show
     .graph{style: 'display:none'}
       %a.edit
         %img{src: '/images/loading.gif'}
@@ -186,13 +196,32 @@
         %h3.title &nbsp;
         %ul.actions
           %li
-            %a.edit Edit
+            %form.delete{method: 'delete', action: '/dashboards/'}
+              %input{type: 'hidden', name: 'uuid'}
+              %input{type: 'hidden', name: 'dashboard'}
+              %input{type: 'submit', value: 'Delete'}
+          %li
+            %a.edit
+              %button Edit
+    #dashboards-empty.empty
+      %h3
+        You haven't set up any dashboards yet. Create a
+        %a{href: '/graphs/new'} new graph
+        and add it to a dashboard.
+    #graphs-empty.empty
+      %h3
+        You haven't set up any graphs yet. Create a
+        %a{href: '/graphs/new'} new graph.
+
   %script{src: '/js/libs/ace/ace.js'}
   %script{src: '/js/libs/ace/mode-json.js'}
   %script{src: '/js/libs/ace/theme-textmate.js'}
+
   :javascript
     Graphiti = window.Graphiti || {};
     Graphiti.graphite_host = "#{settings.graphite_host}";
+    Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
+
   - if Graphiti.production?
     %script{src: '/js/default.min.js'}
   - else

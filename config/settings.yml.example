@@ -5,3 +5,15 @@ tmp_dir: /tmp
 fonts:
   - DroidSans
   - DejaVuSans
+default_options:
+  title: "New Graph"
+  from: -7d
+  font: DroidSans
+  fontSize: 10
+  thickness: 2
+  bgcolor: "#FFFFFF"
+  fgcolor: "#333333"
+  majorGridLineColor: "#ADADAD"
+  minorGridLineColor: "#E5E5E5"
+default_metrics: 
+  - "stats.timers.production.rails.controller.total.mean"
