@@ -26,13 +26,13 @@ class Graph
     url, params = graph['url'].split('?', 2)
     url = url + '?' + Rack::Utils.escape(params)
     puts url
-    response = Typhoeus::Request.get(url)
+    response = Typhoeus::Request.get(url, :timeout => 600)
     if response.success?
       graph_data = response.body
       filename = "/#{uuid}/#{Time.now.to_i}.png"
       if S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
         redis.sadd "graphs:#{uuid}:snapshots", filename
-        filename
+        return filename
       end
     end
     false
