@@ -14,6 +14,7 @@ GEM
     downlow (0.1.4)
       archive-tar-minitar (>= 0.5.2)
       rubyzip (>= 0.9.4)
+    escape_utils (0.2.4)
     eventmachine (0.12.10)
     fakeweb (1.3.0)
     fssm (0.2.7)
@@ -127,6 +128,7 @@ PLATFORMS
 DEPENDENCIES
   closure-compiler
   compass
+  escape_utils
   haml
   jim
   minitest-display

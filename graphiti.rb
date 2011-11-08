@@ -12,6 +12,7 @@ require 'redis/namespace'
 require 'compass'
 require 'typhoeus'
 require 'yajl'
+require 'escape_utils'
 require 'uuid'
 
 require './lib/s3/request'

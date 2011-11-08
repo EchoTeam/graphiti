@@ -23,10 +23,8 @@ class Graph
   def self.snapshot(uuid)
     graph = find(uuid)
     return nil if !graph
-    url, params = graph['url'].split('?', 2)
-    url = url + '?' + Rack::Utils.escape(params)
-    puts url
-    response = Typhoeus::Request.get(url, :timeout => 600)
+    url = EscapeUtils.escape_uri(graph['url'])
+    response = Typhoeus::Request.get(url, :timeout => 20000)
     if response.success?
       graph_data = response.body
       filename = "/#{uuid}/#{Time.now.to_i}.png"
