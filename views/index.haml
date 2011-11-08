@@ -194,6 +194,11 @@
         %h3.title &nbsp;
         %ul.actions
           %li
+            %form.delete{method: 'delete', action: '/dashboards/'}
+              %input{type: 'hidden', name: 'uuid'}
+              %input{type: 'hidden', name: 'dashboard'}
+              %input{type: 'submit', value: 'Delete'}
+          %li
             %a.edit
               %button Edit
 

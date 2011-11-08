@@ -71,21 +71,25 @@ class Graphiti < Sinatra::Base
     json :uuid => uuid
   end
 
-  delete '/graphs/:uuid' do
-    Graph.destroy(params[:uuid])
-  end
-
   post '/dashboards' do
     dashboard = Dashboard.save(params[:dashboard])
     json :dashboard => dashboard
   end
 
-  delete '/dashboards/:slug' do
-    Dashboard.destroy(params[:slug])
-  end
-
   post '/graphs/dashboards' do
     json Dashboard.add_graph(params[:dashboard], params[:uuid])
+  end
+
+  delete '/graphs/dashboards' do
+    json Dashboard.remove_graph(params[:dashboard], params[:uuid])
+  end
+
+  delete '/graphs/:uuid' do
+    Graph.destroy(params[:uuid])
+  end
+
+  delete '/dashboards/:slug' do
+    Dashboard.destroy(params[:slug])
   end
 
   # Routes that are entirely handled by Sammy/frontend

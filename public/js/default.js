@@ -12873,9 +12873,12 @@ var app = Sammy('body', function() {
       var $graphs = $('#graphs-pane').html('').show();
       this.load(url, {cache: false})
           .then(function(data) {
-            var title = 'All Graphs';
+            var title = 'All Graphs', all_graphs;
             if (data.title) {
+              all_graphs = false;
               title = data.title;
+            } else {
+              all_graphs = true;
             }
             $graphs.append('<h2>' + title + '</h2>');
             var graphs = data.graphs,
@@ -12886,16 +12889,32 @@ var app = Sammy('body', function() {
             for (; i < l; i++) {
               graph = graphs[i];
               graph_obj = new Graphiti.Graph(JSON.parse(graph.json));
-              this.log(graph_obj);
+
               $graph
               .clone()
               .find('.title').text(graph.title || 'Untitled').end()
               .find('a.edit').attr('href', '/graphs/' + graph.uuid).end()
               .show()
               .appendTo($graphs).each(function() {
+                // actually replace the graph image
                 graph_obj.image($(this).find('img'));
+                // add a last class alternatingly to fix the display grid
                 if ((i+1)%2 == 0) {
                   $(this).addClass('last');
+                }
+                // if its all graphs, delete operates on everything
+                if (all_graphs) {
+                  $(this)
+                  .find('.delete')
+                  .attr('action', '/graphs/' + graph.uuid);
+                // otherwise it just removes the graphs
+                } else {
+                  $(this)
+                  .find('.delete')
+                  .attr('action', '/graphs/dashboards')
+                  .find('[name=dashboard]').val(data.slug).end()
+                  .find('[name=uuid]').val(graph.uuid).end()
+                  .find('[type=submit]').val('Remove');
                 }
               });
             }
@@ -13009,11 +13028,34 @@ var app = Sammy('body', function() {
         type: 'post',
         data: '_method=DELETE',
         url: '/dashboards/'+slug,
+        complete: function(resp){
+          ctx.loadAndRenderDashboards();
+        }
+      });
+    }
+  });
+
+  this.del('/graphs/dashboards', function(ctx){
+    if (this.confirmDelete('graph')) {
+      $.ajax({
+        type: 'post',
+        data: $(ctx.target).serialize() + '&_method=DELETE',
+        url: '/graphs/dashboards',
         success: function(resp){
-          ctx.loadAndRenderDashboards();
-        },
-        failure: function(resp){
-          ctx.loadAndRenderDashboards();
+          ctx.app.refresh();
+        }
+      });
+    }
+  });
+
+  this.del('/graphs/:uuid', function(ctx){
+    if (this.confirmDelete('graph')) {
+      $.ajax({
+        type: 'post',
+        data: '_method=DELETE',
+        url: '/graphs/'+uuid,
+        success: function(resp){
+          ctx.refresh();
         }
       });
     }
