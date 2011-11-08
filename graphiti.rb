@@ -86,11 +86,6 @@ class Graphiti < Sinatra::Base
     haml :index
   end
 
-  get '/graphs/:uuid/snapshots' do
-    graph = Graph.find(params[:uuid])
-    json graph['snapshots']
-  end
-
   get '/graphs' do
     haml :index
   end

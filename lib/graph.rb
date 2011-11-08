@@ -31,10 +31,19 @@ class Graph
   end
 
   def self.snapshot(uuid)
-    snapshot = Snapshot.new(uuid)
-    filename = snapshot.get_graph_file
-    redis.sadd "graphs:#{uuid}:snapshots", filename
-    filename
+    graph = find(uuid)
+    return nil if !graph
+
+    response = Typhoeus::Request.get(graph['url'])
+    if response.success?
+      graph_data = response.body
+      filename = "/#{uuid}/#{Time.now.to_i}.png"
+      if S3::Request.upload(key, graph_data, 'image/png')
+        redis.sadd "graphs:#{uuid}:snapshots", filename
+        filename
+      end
+    end
+    false
   end
 
   def self.all(*graph_ids)
