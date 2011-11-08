@@ -1,10 +1,10 @@
 require 'base64'
+require 'logger'
 
 module S3
   # Our own lightweight S3 uploader that uses typhoeus to make the requests internally
   class Request < Struct.new(:host, :method, :path, :headers, :body, :content_type)
-    CREDENTIALS = YAML.load_file(File.join(::Graphiti.root, 'config', 'amazon_s3.yml'))
-    GRAPHITI_ENV = Graphiti.environment.to_s
+    CREDENTIALS = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'config', 'amazon_s3.yml'))
 
     DEFAULTS = {
       :headers => {},
@@ -29,12 +29,12 @@ module S3
     # @option options [String] :acl Access Control for request (default 'public-read')
     def setup_headers(options = {})
       headers = {
-       'cache-control' => "max-age=#{12.months.to_i}, public"
+       'cache-control' => "max-age=31104000, public"
       }.merge(options[:headers] || {})
       headers['x-amz-acl'] = options[:acl] || 'public-read'
       headers["date"] = Time.now.httpdate
 
-      if body && !body.empty?
+      if body && body.length > 0
         headers["content-type"] = content_type
         headers["content-md5"] = Base64.encode64(Digest::MD5.digest(body)).chomp
       end
@@ -42,8 +42,8 @@ module S3
       self.headers = self.headers.merge(headers)
       self.headers["authorization"] = ::S3::Signature.generate(:host => self.host,
                                                     :request => self,
-                                                    :access_key_id => CREDENTIALS[GRAPHITI_ENV]['access_key_id'],
-                                                    :secret_access_key => CREDENTIALS[GRAPHITI_ENV]['secret_access_key'])
+                                                    :access_key_id => CREDENTIALS[RACK_ENV]['access_key_id'],
+                                                    :secret_access_key => CREDENTIALS[RACK_ENV]['secret_access_key'])
     end
 
     # The full URL of the request resource
@@ -57,7 +57,7 @@ module S3
     def run
       logger.info "-- S3::Request #{method} #{url}"
       response = Typhoeus::Request.send(method, url, :body => body, :headers => headers)
-      if GRAPHITI_ENV == 'test' && !response.mock
+      if RACK_ENV == 'test' && !response.mock
         warn "Actually making a request to s3 in a test - you probably dont want to do that"
       end
       logger.info "-- S3::Request Response success? #{response.success?} response:\n\n#{response.inspect}\n\n"
@@ -89,7 +89,11 @@ module S3
       #
       # @return [Boolean] true if the request succeeds
       def upload(to, file, content_type, headers = {})
-        file = File.read(file) if file.is_a?(String)
+        if file.is_a?(String)
+          file = File.read(file)
+        else
+          file = file.read
+        end
 
         request = new(host: host, method: :put, path: to, body: file, content_type: content_type)
         request.setup_headers(headers: headers)
@@ -116,7 +120,11 @@ module S3
 
       # Alias to the debug logger
       def logger
-        DEBUG_LOGGER
+        @logger ||= Logger.new(STDOUT, Logger::DEBUG)
+      end
+
+      def logger=(logger)
+        @logger = logger
       end
 
       # s3 hostname including the bucket
@@ -132,7 +140,7 @@ module S3
       # the bucket pulled from the CREDENTIALS (aka the `amazon_s3.yml`
       # config file)
       def default_bucket
-        CREDENTIALS[GRAPHITI_ENV]['bucket']
+        CREDENTIALS[RACK_ENV]['bucket']
       end
 
     end

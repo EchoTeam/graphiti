@@ -2,18 +2,27 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup
 
+if !defined?(RACK_ENV)
+  RACK_ENV = ENV['RACK_ENV'] || 'development'
+end
+
 require 'sinatra/base'
 require 'sinatra/contrib'
 require 'redis/namespace'
 require 'compass'
 require 'typhoeus'
 require 'yajl'
+require 'uuid'
+
+require './lib/s3/request'
+require './lib/s3/signature'
 require './lib/redised'
+
 require './lib/metric'
 require './lib/graph'
 require './lib/dashboard'
 require './lib/snapshot'
-require 'uuid'
+
 
 class Graphiti < Sinatra::Base
 
@@ -24,6 +33,7 @@ class Graphiti < Sinatra::Base
   config_file 'config/settings.yml'
 
   configure do
+    set :logging, true
     Compass.configuration do |config|
       config.project_path = settings.root
       config.sass_dir = File.join(settings.views, 'stylesheets')
@@ -35,6 +45,10 @@ class Graphiti < Sinatra::Base
     Graph.redis = settings.redis_url
     Dashboard.redis = settings.redis_url
     Metric.redis = settings.redis_url
+  end
+
+  before do
+    S3::Request.logger = logger
   end
 
   get '/graphs/:uuid.js' do
@@ -126,6 +140,3 @@ class Graphiti < Sinatra::Base
   end
 
 end
-
-require './lib/s3/request'
-require './lib/s3/signature'

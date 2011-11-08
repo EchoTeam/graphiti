@@ -23,12 +23,14 @@ class Graph
   def self.snapshot(uuid)
     graph = find(uuid)
     return nil if !graph
-
-    response = Typhoeus::Request.get(graph['url'])
+    url, params = graph['url'].split('?', 2)
+    url = url + '?' + Rack::Utils.escape(params)
+    puts url
+    response = Typhoeus::Request.get(url)
     if response.success?
       graph_data = response.body
       filename = "/#{uuid}/#{Time.now.to_i}.png"
-      if S3::Request.upload(key, graph_data, 'image/png')
+      if S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
         redis.sadd "graphs:#{uuid}:snapshots", filename
         filename
       end
