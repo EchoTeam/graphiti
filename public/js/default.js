@@ -12667,7 +12667,7 @@ Graphiti.Graph.prototype = {
       dataType: 'json',
       url: '/graphs/' + uuid + '/snapshot',
       success: function(json) {
-        callback(json.filename);
+        callback(json.url);
       }
     });
   }
@@ -12740,9 +12740,11 @@ var app = Sammy('body', function() {
       this.graphPreview(JSON.parse(text));
       this.buildDashboardsDropdown(uuid);
       if (uuid) { // this is an already saved graph
-        $('#graph-actions .update')
-          .attr('action', '/graphs/' + uuid)
-          .show();
+        $('#graph-actions form').attr('action', function(i, action) {
+          if (action) {
+            return action.replace(/:uuid/, uuid)
+          }
+        }).show();
         $('[name=uuid]').val(uuid);
         $('#graph-actions .dashboard').show();
       } else {
@@ -12885,6 +12887,22 @@ var app = Sammy('body', function() {
             }
           });
     },
+    buildSnapshotsDropdown: function(urls, clear) {
+      var $select = $('select[name="snapshot"]');
+      if (clear) { $select.html(''); }
+      var i = 0,
+          l = urls.length, url, date;
+      for (; i < l; i++) {
+        url = urls[i];
+        try {
+          date = new Date(parseInt(url.match(/\/(\d+)\.png/)[1], 10)).toString();
+        } catch (e) { }
+        $('<option />', {
+          value: url,
+          text: date
+        }).prependTo($select).attr('selected', 'selected');
+      }
+    },
     loadAndRenderGraphs: function(url) {
       var $graphs = this.showPane('graphs', ' ');
       this.load(url, {cache: false})
@@ -13006,6 +13024,16 @@ var app = Sammy('body', function() {
     confirmDelete: function(type) {
       var warning = "Are you sure you want to delete this " + type + "? There is no undo. You may regret this later.";
       return confirm(warning);
+    },
+
+    showSaving: function(title) {
+      this.$button = $(this.target).find('input');
+      this.original_button_val = this.$button.val();
+      this.$button.val('Saving').attr('disabled', 'disabled');
+    },
+
+    hideSaving: function() {
+      this.$button.val(this.original_button_val).removeAttr('disabled');
     }
 
   });
@@ -13029,8 +13057,15 @@ var app = Sammy('body', function() {
   this.get('/graphs/:uuid', function(ctx) {
     this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
         .then(function(graph_data) {
+          ctx.buildSnapshotsDropdown(graph_data.snapshots, true);
           ctx.showEditor(graph_data.json, ctx.params.uuid);
         });
+  });
+
+  this.get('/graphs/:uuid/snapshots', function(ctx) {
+    if (this.params.snapshot) {
+      window.location = this.params.snapshot;
+    }
   });
 
   this.get('/graphs', function(ctx) {
@@ -13090,13 +13125,11 @@ var app = Sammy('body', function() {
   });
 
   this.post('/graphs', function(ctx) {
-    var $button = $(this.target).find('input');
-    var original_val = $button.val();
-    $button.val('Saving').attr('disabled', 'disabled');
+    ctx.showSaving();
     var graph = new Graphiti.Graph(this.getEditorJSON());
     graph.save(function(resp) {
+      ctx.hideSaving();
       Sammy.log('created', resp);
-      $button.val(original_val).removeAttr('disabled');
       if (resp.uuid) {
         ctx.redirect('/graphs/' + resp.uuid);
       }
@@ -13107,15 +13140,25 @@ var app = Sammy('body', function() {
     this.saveOptions(this.params.options);
   });
 
+  this.post('/graphs/:uuid/snapshots', function(ctx) {
+    ctx.showSaving();
+    var graph = new Graphiti.Graph(this.getEditorJSON());
+    graph.snapshot(this.params.uuid, function(url) {
+      ctx.hideSaving();
+      Sammy.log('snapshotted', url);
+      if (url) {
+        ctx.buildSnapshotsDropdown([url]);
+      }
+    });
+  });
+
   this.put('/graphs/:uuid', function(ctx) {
-    var $button = $(this.target).find('input');
-    var original_val = $button.val();
-    $button.val('Saving').attr('disabled', 'disabled');
+    ctx.showSaving();
     var graph = new Graphiti.Graph(this.getEditorJSON());
     graph.save(this.params.uuid, function(response) {
       Sammy.log('updated', response);
+      ctx.hideSaving();
       ctx.redrawPreview();
-      $button.val(original_val).removeAttr('disabled');
     });
   });
 

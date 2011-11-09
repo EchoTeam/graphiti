@@ -12,7 +12,6 @@ require 'redis/namespace'
 require 'compass'
 require 'typhoeus'
 require 'yajl'
-require 'escape_utils'
 require 'uuid'
 
 require './lib/s3/request'
@@ -80,8 +79,8 @@ class Graphiti < Sinatra::Base
   end
 
   post '/graphs/:uuid/snapshot' do
-    filename = Graph.snapshot(params[:uuid])
-    json :filename => filename
+    url = Graph.snapshot(params[:uuid])
+    json :url => url
   end
 
   put '/graphs/:uuid' do
@@ -121,6 +120,7 @@ class Graphiti < Sinatra::Base
     /graphs/workspace
     /graphs/new
     /graphs/:uuid
+    /graphs/:uuid/snapshots
     /graphs
     /dashboards/:slug
     /dashboards

@@ -80,6 +80,7 @@ body.bp {
   ul {
     @include horizontal-list;
     padding: 10px;
+    width: 1400px; // to prevent wrapping
     li {
       &.graph-edit {
         @include border;
@@ -92,6 +93,12 @@ body.bp {
       &.dashboard {
         @include border;
       }
+      &.snapshots {
+        form {
+          float: left;
+          padding-right: 5px;
+        }
+      }
     }
   }
   button.redraw {
@@ -100,6 +107,9 @@ body.bp {
   }
   select, input[type=text] {
     font-size: 12px;
+  }
+  select[name=snapshot] {
+    width: 220px;
   }
   h4 {
     @include fancy-font;
