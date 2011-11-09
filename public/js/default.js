@@ -12659,6 +12659,17 @@ Graphiti.Graph.prototype = {
       type: 'post',
       success: callback
     });
+  },
+
+  snapshot: function(uuid, callback) {
+    $.ajax({
+      type: 'post',
+      dataType: 'json',
+      url: '/graphs/' + uuid + '/snapshot',
+      success: function(json) {
+        callback(json.filename);
+      }
+    });
   }
 };
 

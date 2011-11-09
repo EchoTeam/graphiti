@@ -75,19 +75,22 @@ body.bp {
 }
 #graph-actions {
   @include column($blueprint-grid-columns, true);
-  padding: 10px;
   background-color: #f3f3f3;
   border-bottom: 4px solid #CCC;
   ul {
     @include horizontal-list;
+    padding: 10px;
     li {
-      &.first {
-        @include column(6);
+      &.graph-edit {
         @include border;
+        @include column(6);
         form {
           float: left;
           padding-right: 5px;
         }
+      }
+      &.dashboard {
+        @include border;
       }
     }
   }

@@ -22,8 +22,6 @@ require './lib/redised'
 require './lib/metric'
 require './lib/graph'
 require './lib/dashboard'
-require './lib/snapshot'
-
 
 class Graphiti < Sinatra::Base
 
@@ -79,6 +77,11 @@ class Graphiti < Sinatra::Base
   post '/graphs' do
     uuid = Graph.save(params[:graph])
     json :uuid => uuid
+  end
+
+  post '/graphs/:uuid/snapshot' do
+    filename = Graph.snapshot(params[:uuid])
+    json :filename => filename
   end
 
   put '/graphs/:uuid' do

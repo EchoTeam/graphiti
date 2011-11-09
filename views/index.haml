@@ -38,30 +38,31 @@
         %input.graph-url{type: 'text', readonly: true}
       #graph-actions
         %ul
-          %li.first
+          %li.graph-edit
             %h4 Graph
             %button.save.redraw Redraw
             %form.update{action: '/graphs', method: 'put', style: 'display:none'}
               %input.save{type: 'submit', value: 'Update'}
             %form.save-new{action: '/graphs', method: 'post'}
               %input.save.create{type: 'submit', value: 'Save New'}
-          %li
-            .dashboard
-              %h4 Dashboards
-              .new-dashboard{style: 'display: none'}
-                %form{action: '/dashboards', method: 'post'}
-                  %strong New Dashboard
-                  %input{type: 'text', size: 10, placeholder: 'Slug', name: 'dashboard[slug]'}
-                  %input{type: 'text', size: 20, placeholder: 'Title', name: 'dashboard[title]'}
-                  %input.save{type: 'submit', value: 'Create'}
-                  %a{rel: 'cancel'} Cancel
-              .add-to-dashboard
-                %form{action: '/graphs/dashboards', method: 'post'}
-                  %strong Add to
-                  %input{type: 'hidden', name: 'uuid'}
-                  %select{name: 'dashboard'}
-                  %input.save{type: 'submit', value: 'Save', disabled: 'disabled'}
-                  %button.save.create{rel: 'create'} Create New
+          %li.dashboard
+            %h4 Dashboards
+            .new-dashboard{style: 'display: none'}
+              %form{action: '/dashboards', method: 'post'}
+                %strong New Dashboard
+                %input{type: 'text', size: 10, placeholder: 'Slug', name: 'dashboard[slug]'}
+                %input{type: 'text', size: 20, placeholder: 'Title', name: 'dashboard[title]'}
+                %input.save{type: 'submit', value: 'Create'}
+                %a{rel: 'cancel'} Cancel
+            .add-to-dashboard
+              %form{action: '/graphs/dashboards', method: 'post'}
+                %strong Add to
+                %input{type: 'hidden', name: 'uuid'}
+                %select{name: 'dashboard'}
+                %input.save{type: 'submit', value: 'Save', disabled: 'disabled'}
+                %button.save.create{rel: 'create'} Create New
+          %li.snapshots
+            %h4 Snapshots
         .clear
       .edit-group{'data-group' => 'options'}
         .edit-head.closed

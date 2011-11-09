@@ -13,8 +13,8 @@ class Graph
 
   def self.find(uuid)
     h = redis.hgetall "graphs:#{uuid}"
-    h['uuid'] = uuid
-    h['snapshots'] = redis.smembers "graphs:#{uuid}:snapshots"
+    h['uuid']      = uuid
+    h['snapshots'] = redis.zrevrange "graphs:#{uuid}:snapshots", 0, -1
     h
   rescue
     nil
@@ -25,15 +25,13 @@ class Graph
     return nil if !graph
     url = EscapeUtils.escape_uri(graph['url'])
     response = Typhoeus::Request.get(url, :timeout => 20000)
-    if response.success?
-      graph_data = response.body
-      filename = "/#{uuid}/#{Time.now.to_i}.png"
-      if S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
-        redis.sadd "graphs:#{uuid}:snapshots", filename
-        return filename
-      end
-    end
-    false
+    return false if !response.success?
+    graph_data = response.body
+    time = Time.now.to_f * 1000
+    filename = "/#{uuid}/#{time}.png"
+    return false if !S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
+    redis.zadd "graphs:#{uuid}:snapshots", time, filename
+    filename
   end
 
   def self.dashboards(uuid)
