@@ -5,7 +5,7 @@ set :application, "graphiti"
 set :deploy_to, "/var/sites/graphiti"
 set :deploy_via, :remote_cache
 set :scm, :git
-set :repository, "git@github.com:paperlesspost/paperless-graphiti.git"
+set :repository, "git@github.com:paperlesspost/graphiti.git"
 set :user, "paperless"
 set :use_sudo, false
 set :normalize_asset_timestamps, false
