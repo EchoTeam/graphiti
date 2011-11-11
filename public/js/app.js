@@ -72,8 +72,9 @@ var app = Sammy('body', function() {
         }).show();
         $('[name=uuid]').val(uuid);
         $('#graph-actions .dashboard').show();
+        $('#graph-actions .snapshot').show();
       } else {
-        $('#graph-actions .update, #graph-actions .dashboard').hide();
+        $('#graph-actions .update, #graph-actions .dashboard, #grap-actions .snapshot').hide();
       }
       this.toggleEditorPanesByPreference();
     },
