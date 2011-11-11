@@ -12746,10 +12746,9 @@ var app = Sammy('body', function() {
           }
         }).show();
         $('[name=uuid]').val(uuid);
-        $('#graph-actions .dashboard').show();
-        $('#graph-actions .snapshot').show();
+        $('#graph-actions').find('.update, .dashboard, .snapshots').show();
       } else {
-        $('#graph-actions .update, #graph-actions .dashboard, #grap-actions .snapshot').hide();
+        $('#graph-actions').find('.update, .dashboard, .snapshots').hide();
       }
       this.toggleEditorPanesByPreference();
     },
