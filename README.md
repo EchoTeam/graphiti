@@ -54,13 +54,23 @@ No authentication is considered a feature of Graphiti.  It's behind your VPN, yo
 * `bundle install`
 * `cap deploy`
 
-## Usage
+## Background
+
+This application is meant to replace the web application that ships with Graphite.  While it's great for getting introduced to the wonders of Graphite graphs, it left a lot to be desired for us, both in terms of style and functionality.
+
+We started talking to some smart people that were using Graphite in their own ways, and realized that the underlying API for graph access is pretty great.  We started dreaming big for ways to generate graph links, came up with something useful right away, and hammered at it a bit.  We think Graphiti can probably be improved, so we wanted to open source it.
+
+If you've stumbled across this application and you don't know what Graphite is, you can check it out [here](http://graphite.wikidot.com/).  Don't be scared by the word ENTERPRISE.  If you've stumbled across this application and you know what Graphite is but you don't know why you should be graphing, please refer to [this](http://pivotallabs.com/talks/139-metrics-metrics-everywhere) and [this](http://aq.iriscouch.com/swinger/_design/swinger/index.html#/preso/aq-mdd/display/1).
 
 ## TODO
 
 * Remove graphiti.pp.local from deploy.rb
 * Maybe make Unicorn optional?
 * TEEEESSSTTTTSSSS
+
+## Credits
+
+Mad peace and shout outs to @tmm1 and the Github crew for very helpful advice on infrastructure and graph construction code.
 
 ## Contributing to Graphiti
 
