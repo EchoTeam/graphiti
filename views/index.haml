@@ -30,6 +30,7 @@
       %h2 ... Loading ...
     #dashboards-pane.pane{style: 'display:none;'}
     #graphs-pane.pane{style: 'display:none;'}
+    #snapshots-pane.pane{style: 'display:none;'}
     #editor-pane.pane{style: 'display:none;'}
       #graph-preview
         %img{src: '/images/loading.gif'}
@@ -67,7 +68,9 @@
               %input.save.create{type: 'submit', value: 'Save New'}
             %form.select{"data-action" => '/graphs/:uuid/snapshots', method: 'get'}
               %select{name: 'snapshot'}
-              %input.save{type: 'submit', value: 'View'}
+              %input.save.create{type: 'submit', value: 'View'}
+            %form.select{"data-action" => '/graphs/:uuid/snapshots', method: 'get'}
+              %input.save{type: 'submit', value: 'View All'}
         .clear
       .edit-group{'data-group' => 'options'}
         .edit-head.closed
@@ -210,7 +213,7 @@
             %a.edit
               %button Edit
       .snapshot{style: 'display:none'}
-        %a.view
+        %a.view{target: 'blank'}
           %img{src: '/images/loading.gif'}
         .desc
           %h3.title &nbsp;

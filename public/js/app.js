@@ -219,9 +219,7 @@ var app = Sammy('body', function() {
           l = urls.length, url, date;
       for (; i < l; i++) {
         url = urls[i];
-        try {
-          date = new Date(parseInt(url.match(/\/(\d+)\.png/)[1], 10)).toString();
-        } catch (e) { }
+        date = this.snapshotURLToDate(url);
         $('<option />', {
           value: url,
           text: date
@@ -314,6 +312,34 @@ var app = Sammy('body', function() {
           });
     },
 
+    loadAndRenderSnapshots: function() {
+      var ctx = this;
+      this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
+          .then(function(graph_data) {
+            var $snapshots = ctx.showPane('snapshots', '<h2>' + graph_data.title + '</h2>');
+            var snapshots = graph_data.snapshots,
+            i = 0, l = snapshots.length, snapshot,
+            $snapshot = $('#templates .snapshot').clone();
+            for (; i < l; i++) {
+              snapshot = snapshots[i];
+              $snapshot.clone()
+              .find('a.view').attr('href', snapshot).end()
+              .find('img').attr('src', snapshot).end()
+              .find('h3.title').text(ctx.snapshotURLToDate(snapshot)).end()
+              .show()
+              .appendTo($snapshots);
+            }
+          });
+    },
+
+    snapshotURLToDate: function(url) {
+      var date;
+      try {
+        date = new Date(parseInt(url.match(/\/(\d+)\.png/)[1], 10)).toString();
+      } catch (e) { }
+      return date;
+    },
+
     bindEditorPanes: function() {
       var ctx = this;
       $('#editor-pane')
@@ -388,10 +414,7 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs/:uuid/snapshots', function(ctx) {
-    this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
-        .then(function(graph_data) {
-          ctx.buildSnapshotsDropdown(graph_data.snapshots, true);
-        });
+    this.loadAndRenderSnapshots();
   });
 
   this.get('/graphs', function(ctx) {

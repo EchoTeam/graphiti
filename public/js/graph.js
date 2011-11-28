@@ -30,7 +30,7 @@ Graphiti.Graph = function(targetsAndOptions){
   this.parsedTargets = [];
 
   var defaults = {
-    width:    800,
+    width:    950,
     height:   400,
     from:     '-6hour',
     fontSize: "10",

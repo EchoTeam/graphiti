@@ -109,7 +109,7 @@ body.bp {
     font-size: 12px;
   }
   select[name=snapshot] {
-    width: 220px;
+    width: 190px;
   }
   h4 {
     @include fancy-font;
@@ -279,10 +279,23 @@ h2 {
       width: 100%;
       height: $blueprint-grid-width * ($blueprint-grid-columns / 2) * 0.75;
     }
-    .desc {
-      padding: 5px;
-      background: #f3f3f3;
-      margin-bottom: 10px;
+  }
+}
+.desc {
+  padding: 5px;
+  background: #f3f3f3;
+  margin-bottom: 10px;
+}
+#snapshots-pane {
+  .snapshot {
+    @include column($blueprint-grid-columns);
+    h3 {
+      @include fancy-font;
+      margin: 0px;
+      padding: 0px;
+    }
+    img {
+      width: 100%;
     }
   }
 }
