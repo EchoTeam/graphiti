@@ -47,7 +47,6 @@ class Dashboard
   def self.remove_graph(slug, uuid)
     redis.zrem "dashboards:#{slug}:graphs", uuid
     redis.srem "graphs:#{uuid}:dashboards", slug
-    redis.zrem "dashboards", slug
   end
 
   def self.graph_ids(slug)
@@ -55,7 +54,8 @@ class Dashboard
   end
 
   def self.graphs(slug)
-    Graph.all(*graph_ids(slug))
+    ids = graph_ids(slug)
+    ids.empty? ? [] : Graph.all(*ids)
   end
 
   def self.with_graph(uuid)
