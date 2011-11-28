@@ -12,7 +12,7 @@ require 'redis/namespace'
 require 'compass'
 require 'typhoeus'
 require 'yajl'
-require 'uuid'
+require 'digest/sha1'
 
 require './lib/s3/request'
 require './lib/s3/signature'

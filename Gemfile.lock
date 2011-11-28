@@ -46,8 +46,6 @@ GEM
     leftright (0.9.1)
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
-    macaddr (1.4.0)
-      systemu (~> 2.2.0)
     metaclass (0.0.1)
     mime-types (1.16)
     minitest (2.6.1)
@@ -101,7 +99,6 @@ GEM
     sinatra-sugar (0.5.1)
       monkey-lib (~> 0.5.0)
       sinatra (~> 1.0)
-    systemu (2.2.0)
     test-unit (2.4.0)
     thin (1.2.11)
       daemons (>= 1.0.9)
@@ -116,8 +113,6 @@ GEM
       kgio (~> 2.4)
       rack
       raindrops (~> 0.6)
-    uuid (2.3.4)
-      macaddr (~> 1.0)
     version_sorter (1.1.0)
     yajl-ruby (1.0.0)
 
@@ -142,5 +137,4 @@ DEPENDENCIES
   thin
   typhoeus
   unicorn
-  uuid
   yajl-ruby

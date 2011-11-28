@@ -2,7 +2,7 @@ class Graph
   include Redised
 
   def self.save(uuid = nil, graph_json)
-    uuid ||= UUID.generate(:compact)[0..10]
+    uuid ||= make_uuid(graph_json)
     redis.hset "graphs:#{uuid}", "title", graph_json[:title]
     redis.hset "graphs:#{uuid}", "json", graph_json[:json]
     redis.hset "graphs:#{uuid}", "updated_at", Time.now.to_i
@@ -52,6 +52,10 @@ class Graph
     graph_ids.flatten.collect do |uuid|
       find(uuid)
     end.compact
+  end
+
+  def self.make_uuid(graph_json)
+    Digest::SHA1.hexdigest(graph_json.inspect + Time.now.to_f.to_s + rand(100).to_s)[0..10]
   end
 
 end
