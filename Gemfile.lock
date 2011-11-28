@@ -129,6 +129,7 @@ DEPENDENCIES
   compass
   haml
   jim
+  minitest
   minitest-display
   rack (= 1.3.5)
   rake

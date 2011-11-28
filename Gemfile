@@ -16,6 +16,7 @@ gem 'yajl-ruby'
 gem 'uuid'
 
 group :test do
+  gem 'minitest'
   gem 'minitest-display'
 end
 
