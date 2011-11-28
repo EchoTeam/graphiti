@@ -41,7 +41,7 @@
           %li.graph-edit
             %h4 Graph
             %button.save.redraw Redraw
-            %form.update{action: '/graphs/:uuid', method: 'put', style: 'display:none'}
+            %form.update{"data-action" => '/graphs/:uuid', method: 'put', style: 'display:none'}
               %input.save{type: 'submit', value: 'Update'}
             %form.save-new{action: '/graphs', method: 'post'}
               %input.save.create{type: 'submit', value: 'Save New'}
@@ -63,9 +63,9 @@
                 %button.save.create{rel: 'create'} Create New
           %li.snapshots
             %h4 Snapshots
-            %form.save-new{action: '/graphs/:uuid/snapshots', method: 'post'}
+            %form.save-new{"data-action" => '/graphs/:uuid/snapshots', method: 'post'}
               %input.save.create{type: 'submit', value: 'Save New'}
-            %form.select{action: '/graphs/:uuid/snapshots', method: 'get'}
+            %form.select{"data-action" => '/graphs/:uuid/snapshots', method: 'get'}
               %select{name: 'snapshot'}
               %input.save{type: 'submit', value: 'View'}
         .clear
@@ -209,6 +209,11 @@
           %li
             %a.edit
               %button Edit
+      .snapshot{style: 'display:none'}
+        %a.view
+          %img{src: '/images/loading.gif'}
+        .desc
+          %h3.title &nbsp;
     #dashboards-empty.empty
       %h3
         You haven't set up any dashboards yet. Create a

@@ -65,9 +65,9 @@ var app = Sammy('body', function() {
       this.graphPreview(JSON.parse(text));
       this.buildDashboardsDropdown(uuid);
       if (uuid) { // this is an already saved graph
-        $('#graph-actions form').attr('action', function(i, action) {
+        $('#graph-actions form').attr('data-action', function(i, action) {
           if (action) {
-            return action.replace(/:uuid/, uuid)
+            $(this).attr('action', action.replace(/:uuid/, uuid));
           }
         }).show();
         $('[name=uuid]').val(uuid);
@@ -388,9 +388,10 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs/:uuid/snapshots', function(ctx) {
-    if (this.params.snapshot) {
-      window.location = this.params.snapshot;
-    }
+    this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
+        .then(function(graph_data) {
+          ctx.buildSnapshotsDropdown(graph_data.snapshots, true);
+        });
   });
 
   this.get('/graphs', function(ctx) {
@@ -524,8 +525,8 @@ var app = Sammy('body', function() {
     this.bindEditorPanes();
     this.bindMetricsList();
 
-    $('select[name="dashboard"]').live('focus', function() {
-      if ($(this).val() == '') {
+    $('select[name="dashboard"]').live('focus, change, click', function() {
+      if ($(this).val().toString() == '') {
         $(this).siblings('.save').attr('disabled', 'disabled');
       } else {
         $(this).siblings('.save').removeAttr('disabled');
