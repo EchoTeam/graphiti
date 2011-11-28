@@ -7,13 +7,14 @@ class Dashboard
     redis.hset key, "title", json[:title]
     redis.hset key, "slug", json[:slug]
     redis.hset key, "updated_at", Time.now.to_i
-    redis.zadd "dashboards", Time.now.to_i, slug
+    redis.zadd "dashboards", Time.now.to_f * 1000, slug
     redis.sadd "graphs:dashboards", slug
     json
   end
 
   def self.find(slug, with_graphs = false)
     dash = redis.hgetall "dashboards:#{slug}"
+    return nil if !dash || dash.empty?
     if with_graphs
       dash['graphs'] = graphs(slug)
     else
@@ -37,10 +38,10 @@ class Dashboard
   end
 
   def self.add_graph(slug, uuid)
-    redis.zadd "dashboards:#{slug}:graphs", Time.now.to_i, uuid
+    redis.zadd "dashboards:#{slug}:graphs", Time.now.to_f * 1000, uuid
     redis.sadd "graphs:#{uuid}:dashboards", slug
     redis.hset "dashboards:#{slug}", "updated_at", Time.now.to_i
-    redis.zadd "dashboards", Time.now.to_i, slug
+    redis.zadd "dashboards", Time.now.to_f * 1000, slug
     {uuid: uuid, slug: slug}
   end
 
