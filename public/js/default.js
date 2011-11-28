@@ -12991,7 +12991,7 @@ var app = Sammy('body', function() {
       var ctx = this;
       this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
           .then(function(graph_data) {
-            var $snapshots = ctx.showPane('snapshots', '<h2>' + graph_data.title + '</h2>');
+            var $snapshots = ctx.showPane('snapshots', '<h2>' + graph_data.title + ' - Snapshots</h2>');
             var snapshots = graph_data.snapshots,
             i = 0, l = snapshots.length, snapshot,
             $snapshot = $('#templates .snapshot').clone();
@@ -13089,7 +13089,12 @@ var app = Sammy('body', function() {
   });
 
   this.get('/graphs/:uuid/snapshots', function(ctx) {
-    this.loadAndRenderSnapshots();
+    if (this.params.snapshot) {
+      window.open(this.params.snapshot, this.snapshotURLToDate(this.params.snapshot));
+      this.redirect('/graphs', this.params.uuid);
+    } else {
+      this.loadAndRenderSnapshots();
+    }
   });
 
   this.get('/graphs', function(ctx) {
