@@ -13112,9 +13112,9 @@ var app = Sammy('body', function() {
       $.ajax({
         type: 'post',
         data: '_method=DELETE',
-        url: '/graphs/'+uuid,
+        url: '/graphs/'+ this.params.uuid,
         success: function(resp){
-          ctx.refresh();
+          ctx.app.refresh();
         }
       });
     }
