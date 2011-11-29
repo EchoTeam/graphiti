@@ -11,7 +11,7 @@ class Metric
     @metrics
   end
 
-  def self.find(match, max = 50)
+  def self.find(match, max = 100)
     match = match.to_s.strip
     matches = []
     all.each do |m|

@@ -13228,14 +13228,17 @@ var app = Sammy('body', function() {
     this.bindEditorPanes();
     this.bindMetricsList();
 
-    $('select[name="dashboard"]').live('focus, change, click', function() {
+    var disableSave = function() {
       if ($(this).val().toString() == '') {
         $(this).siblings('.save').attr('disabled', 'disabled');
       } else {
         $(this).siblings('.save').removeAttr('disabled');
       }
-    });
-
+    };
+    $('select[name="dashboard"]')
+      .live('click', disableSave)
+      .live('focus', disableSave)
+      .live('blur', disableSave);
     $('.dashboard button[rel=create], .dashboard a[rel="cancel"]').live('click', function(e) {
       e.preventDefault();
       ctx.trigger('toggle-dashboard-creation', {target: $(this).parents('.dashboard')});
