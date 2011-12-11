@@ -22,7 +22,7 @@ We started talking to some smart people that were using Graphite in their own wa
 ### Reference/Bibliography
 
 * Graphite - http://graphite.wikidot.com/ (Don't be scared by the word ENTERPRISE.)
-* Graphite documentation: http://readthedocs.org/docs/graphite/en/1.0/index.html See espeically: http://readthedocs.org/docs/graphite/en/1.0/functions.html
+* Graphite documentation: http://readthedocs.org/docs/graphite/en/1.0/index.html See especially: http://readthedocs.org/docs/graphite/en/1.0/functions.html
 * @codahale's Metrics Talk: http://pivotallabs.com/talks/139-metrics-metrics-everywhere 
 * @quirkey's talk about metrics @paperlesspost: http://aq.iriscouch.com/swinger/_design/swinger/index.html#/preso/aq-mdd/display/1
 * Etsy on Statsd + Graphite: http://codeascraft.etsy.com/2011/02/15/measure-anything-measure-everything/
