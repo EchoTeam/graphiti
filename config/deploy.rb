@@ -2,7 +2,7 @@ $:.unshift(File.expand_path('./lib', ENV['rvm_path']))
 require 'rvm/capistrano'
 
 set :application, "graphiti"
-set :deploy_to, "/var/sites/graphiti"
+set :deploy_to, "/opt/app/graphiti"
 set :deploy_via, :remote_cache
 set :scm, :git
 set :repository, "git@github.com:paperlesspost/graphiti.git"
