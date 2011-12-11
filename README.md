@@ -31,7 +31,7 @@ We started talking to some smart people that were using Graphite in their own wa
 
 ## Technology
 
-Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that stores the Graph + Dashboard data in Redis (Snapshots are stored in S3). On top of this REST backend is a Sammy.js (http://sammyjs.org) application that handles the graph generation and manipulation. It also uses an embedded version of the Ace (http://ace.ajax.org/) for the editor interface. It uses Jim (http://github.com/quirkey/jim) to bundle and compress the JavaScript.
+Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that stores the Graph + Dashboard data in Redis (Snapshots are stored in S3). On top of this REST backend is a Sammy.js (http://sammyjs.org) application that handles the graph generation and manipulation. It also uses an embedded version of the Ace (http://ace.ajax.org/) for the editor interface. It uses Jim (http://github.com/quirkey/jim) to bundle and compress the JavaScript. The CSS/SCSS is created with the help of the awesome Compass framework (http://compass-style.org).
 
 ### Dependencies
 
