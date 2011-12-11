@@ -17,7 +17,7 @@ Graphiti allows you to easily access and manipulate the data you've collected in
 
 This application is meant to replace the web application that ships with Graphite. While it's great for getting introduced to the wonders of Graphite graphs, it left a lot to be desired for us, both in terms of style and functionality.
 
-We started talking to some smart people that were using Graphite in their own ways, and realized that the underlying API for graph access is pretty great. We started dreaming big for ways to generate graph links, came up with something useful right away, and hammered at it a bit. We think Graphiti can be improved, so we wanted to open source it.
+We started talking to some smart people that were using Graphite in their own ways, and realized that the underlying API for graph access is pretty great. We started dreaming big for ways to generate graph links, came up with something useful right away, and hammered at it a bit. Aman (@tmm1) shared some Graph generation code they we're using at Github and we built an interface and toolset around it. We think Graphiti can be improved, so we wanted to open source it.
 
 ### Reference/Bibliography
 
@@ -31,52 +31,40 @@ We started talking to some smart people that were using Graphite in their own wa
 
 ## Technology
 
+Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that stores the Graph + Dashboard data in Redis (Snapshots are stored in S3). On top of this REST backend is a Sammy.js (http://sammyjs.org) application that handles the graph generation and manipulation. It also uses an embedded version of the Ace (http://ace.ajax.org/) for the editor interface. It uses Jim (http://github.com/quirkey/jim) to bundle and compress the JavaScript.
+
+### Dependencies
+
+* Ruby 1.9.2
+* Bundler (~>1.0)
+* Graphite (and your data in graphite. The graphite URL API must be accessible from the same location as Graphiti and through the browser).
+* Redis (>2)
+* Unicorn
+* RubyGems and various Gems (see Gemfile)
+* S3 Access (Credentials stored in seperate .yml file)
+
 ## Setup/Installation
 
-##
-
-## Dependencies
-
-* Graphite
-* Redis
-* Unicorn
-* Ruby 1.9.2
-* RubyGems and various Gems (see Gemfile)
-* S3 Access
-
-## Installation
-
 * Clone the repository
-* Make copies of the .yml.example files for s3 and application configuration
-* `bundle install`
-* `cap deploy`
-
-## TODO
-
-* Remove graphiti.pp.local from deploy.rb
-* Maybe make Unicorn optional?
-* TEEEESSSTTTTSSSS
+* Make copies of the config/*.yml.example files for s3 and application configuration.
+* Bundle: `bundle install`
+* Run: `bundle exec unicorn -C config/unicorn.rb -E production -D'
+* Generate the metrics list: `bundle exec rake graphite:metrics` (In order to make searching through your list of metrics fast, Graphiti fetches and caches the full list in Redis. Unfortunately, this involves recursively walking a tree of all the metrics/directories so we put this in a rake task that you can run in the background and set up on a cron.)
 
 ## Credits
 
-Mad peace and shout outs to @tmm1 and the Github crew for very helpful advice on infrastructure and graph construction code.
+Mad peace and shout outs to @tmm1 and the Github crew for very helpful advice and code. 
 
 ## Contributing to Graphiti
 
 * Check out the latest master to make sure the feature hasn’t been implemented or the bug hasn’t been fixed yet
-
 * Check out the issue tracker to make sure someone already hasn’t requested it and/or contributed it
-
 * Fork the project
-
 * Start a feature/bugfix branch
-
 * Commit and push until you are happy with your contribution
-
 * Make sure to add tests for it. This is important so I don’t break it in a future version unintentionally.
-
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so we can cherry-pick around it.
 
 ## Copyright
 
-Copyright © 2011 Paperless Post.  See LICENSE.md for details.
+Copyright © 2011 Paperless Post. See LICENSE.md for details.
