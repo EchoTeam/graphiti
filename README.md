@@ -6,27 +6,28 @@ Graphiti is an alternate JavaScript and Ruby front-end and graph storage applica
 
 ## What 
 
-Graphiti allows you to easily access and manipulate the data you've collected in graphite in a couple of key ways. The focus is on ease of access, ease of recovery and easy of tweaking/manipulation:
+Graphiti allows you to easily access and manipulate the data you've collected in graphite in a couple of key ways. The focus is on ease of access, ease of recovery and ease of tweaking/manipulation:
 
-* *Graphs* 
-* *Dashboards* - collect graphs into 
-* *Snapshots*
-
-### Snapshots
-
-Snapshots are point in time freezeframes of your graphs. This arose when we realized that it would be useful to have access to our graphs from outside of our VPN if we needed to, and that we wanted to be able to refer to specific graphs in campfire logs.
-
-### No Authentication
-
-No authentication is considered a feature of Graphiti. It's behind your VPN, your trusted engineers have access to it, and it's easy enough to recreate graphs (and make redis backups, for that matter), that we don't see the point of logins.
+* *Graphs* - the basic building blocks of graphiti. Graphs are stored as JSON blobs in Redis. They are created/edited through an editor pane where you live edit the JSON and see a reference of your collected metrics and the display options available. Each graph is given a UUID and can be updated or cloned.
+* *Dashboards* - graphs are grouped into arbitrary dashboards which are just named collections with a URL slug for easy reference and retreival. We use dashboards to name personal lists (like "aq"/"mrb") or lists of related information ("key metrics"/"resque"/"rails").
+* *Snapshots* - point in time freezeframes of your graphs. This arose when we realized that it would be useful to have access to our graphs from outside of our VPN if we needed to, and that we wanted to be able to refer to specific graphs in campfire logs.
+* *Auth-less* - No authentication is considered a feature of Graphiti. It's behind your VPN, your trusted engineers have access to it, and it's easy enough to recreate graphs (and make redis backups, for that matter), that we don't see the point of logins.
 
 ## Background
 
-This application is meant to replace the web application that ships with Graphite.  While it's great for getting introduced to the wonders of Graphite graphs, it left a lot to be desired for us, both in terms of style and functionality.
+This application is meant to replace the web application that ships with Graphite. While it's great for getting introduced to the wonders of Graphite graphs, it left a lot to be desired for us, both in terms of style and functionality.
 
-We started talking to some smart people that were using Graphite in their own ways, and realized that the underlying API for graph access is pretty great.  We started dreaming big for ways to generate graph links, came up with something useful right away, and hammered at it a bit.  We think Graphiti can probably be improved, so we wanted to open source it.
+We started talking to some smart people that were using Graphite in their own ways, and realized that the underlying API for graph access is pretty great. We started dreaming big for ways to generate graph links, came up with something useful right away, and hammered at it a bit. We think Graphiti can be improved, so we wanted to open source it.
 
-If you've stumbled across this application and you don't know what Graphite is, you can check it out [here](http://graphite.wikidot.com/).  Don't be scared by the word ENTERPRISE.  If you've stumbled across this application and you know what Graphite is but you don't know why you should be graphing, please refer to [this](http://pivotallabs.com/talks/139-metrics-metrics-everywhere) and [this](http://aq.iriscouch.com/swinger/_design/swinger/index.html#/preso/aq-mdd/display/1).
+### Reference/Bibliography
+
+* Graphite - http://graphite.wikidot.com/ (Don't be scared by the word ENTERPRISE.)
+* Graphite documentation: http://readthedocs.org/docs/graphite/en/1.0/index.html See espeically: http://readthedocs.org/docs/graphite/en/1.0/functions.html
+* @codahale's Metrics Talk: http://pivotallabs.com/talks/139-metrics-metrics-everywhere 
+* @quirkey's talk about metrics @paperlesspost: http://aq.iriscouch.com/swinger/_design/swinger/index.html#/preso/aq-mdd/display/1
+* Etsy on Statsd + Graphite: http://codeascraft.etsy.com/2011/02/15/measure-anything-measure-everything/
+* Our statsd fork: https://github.com/paperlesspost/statsd
+* Github's statsd-ruby fork: https://github.com/github/statsd-ruby
 
 ## Technology
 
