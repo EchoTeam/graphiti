@@ -178,13 +178,13 @@ var app = Sammy('body', function() {
     },
     addGraphMetric: function(metric) {
       var json = this.getEditorJSON();
-      json.targets.push([metric]);
+      json.targets.push([metric, {}]);
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
     replaceGraphMetric: function(metric) {
       var json = this.getEditorJSON();
-      json.targets = [[metric]];
+      json.targets = [[metric, {}]];
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
