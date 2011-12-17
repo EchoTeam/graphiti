@@ -25,19 +25,12 @@ class Metric
 
   private
   def self.get_metrics_list(prefix = "stats.")
-    url = "http://#{Graphiti.settings.graphite_host}/metrics/find?query=#{prefix}&format=completer"
+    url = "http://#{Graphiti.settings.graphite_host}/metrics/index.json"
     puts url
     response = Typhoeus::Request.get(url)
     if response.success?
       json = Yajl::Parser.parse(response.body)
-      json["metrics"].each do |metric|
-        if metric["is_leaf"] == "1"
-          @metrics ||= []
-          @metrics << metric["path"]
-        else
-          get_metrics_list(metric["path"])
-        end
-      end
+      @metrics = json.grep(/^#{Regexp.escape prefix}/)
     else
       puts "Error fetching #{url}. #{response.inspect}"
     end
