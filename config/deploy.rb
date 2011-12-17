@@ -36,7 +36,7 @@ namespace :deploy do
 end
 
 task :production do
-  server 'graphiti.pp.local', :web, :app, :db, :primary => true,
+  server 'graphiti.pp.local', :web, :app, :db, :primary => true
 end
 
 namespace :graphiti do
