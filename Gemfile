@@ -1,5 +1,5 @@
 # A sample Gemfile
-source "http://rubygems.org"
+source :rubygems
 
 gem 'rake'
 gem 'rack', '1.3.5'

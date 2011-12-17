@@ -15,5 +15,5 @@ default_options:
   fgcolor: "#333333"
   majorGridLineColor: "#ADADAD"
   minorGridLineColor: "#E5E5E5"
-default_metrics: 
+default_metrics:
   - "stats.timers.production.rails.controller.total.mean"
