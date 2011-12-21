@@ -86,7 +86,7 @@ class Dashboard
     snapshots
   end
 
-  def self.send_report(slug)
+  def self.send_report(dashboard)
     dashboard = find(slug, true)
     if dashboard
       graphs = snapshot_graphs(slug)
@@ -101,6 +101,12 @@ class Dashboard
       email['html_body'] = html
       email.symbolize_keys!
       Pony.mail(email)
+    end
+  end
+
+  def self.send_reports
+    Dashboard.all.each do |dashboard|
+      send_report(dashboard['slug'])
     end
   end
 
