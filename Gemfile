@@ -13,6 +13,7 @@ gem 'compass'
 gem 'haml'
 gem 'typhoeus'
 gem 'yajl-ruby'
+gem 'pony'
 
 group :test do
   gem 'minitest'

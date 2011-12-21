@@ -28,4 +28,9 @@ namespace :graphiti do
     puts "Got #{list.length} metrics"
   end
 
+  desc 'Send email reports per dashboard. Needs `reports` settings in settings.yml'
+  task :send_reports do
+    Dashboard.send_reports
+  end
+
 end

@@ -18,3 +18,17 @@ default_options:
 default_metrics:
   - "stats.timers.production.rails.controller.total.mean"
 metric_prefix: "stats"
+# These are options that are passed to Pony
+# https://github.com/benprew/pony
+# in `to:` SLUG gets replaced with the slug of the dashboard being sent
+reports:
+  from: "Stampy <stampy@paperlesspost.com>"
+  to: "graphiti+SLUG@paperlesspost.com"
+  via: smtp
+  via_options:
+    address: 'smtp.gmail.com'
+    port: 587
+    authentication: plain
+    enable_starttls_auto: true,
+    user_name: "stampy@paperlesspost.com"
+    password: "PASSWORD"

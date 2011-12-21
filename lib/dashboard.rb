@@ -1,3 +1,5 @@
+require 'pony'
+
 class Dashboard
   include Redised
 
@@ -25,6 +27,7 @@ class Dashboard
 
   def self.all(*slugs)
     slugs = redis.zrevrange "dashboards", 0, -1 if slugs.empty?
+    slugs ||= []
     slugs.flatten.collect do |slug|
       find(slug)
     end.compact
@@ -68,6 +71,42 @@ class Dashboard
       all(redis.sdiff("graphs:dashboards", "graphs:#{uuid}:dashboards"))
     else
       all
+    end
+  end
+
+  def self.snapshot_graphs(slug)
+    dashboard = find(slug, true)
+    snapshots = []
+    if dashboard
+      dashboard['graphs'].each do |graph|
+        url = Graph.snapshot(graph['uuid'])
+        snapshots << [graph['title'], url] if url
+      end
+    end
+    snapshots
+  end
+
+  def self.send_report(slug)
+    dashboard = find(slug, true)
+    if dashboard
+      graphs = snapshot_graphs(slug)
+      timestamp = Time.now.strftime "%a %b %d %I:%M%p"
+      haml = Haml::Engine.new(File.read(File.join(File.dirname(__FILE__), '..', 'views', 'report.haml')))
+      html = haml.render(Object.new, :dashboard => dashboard, :time => timestamp, :graphs => graphs)
+      email = Graphiti.settings.reports.dup
+      email['subject'] = "Graphiti Report for #{dashboard['title']} #{timestamp}"
+      email['to'] = email['to'].gsub(/SLUG/, slug)
+      email['via'] = email['via'].to_sym
+      email['via_options'] = email['via_options'].symbolize_keys! if email['via_options']
+      email['html_body'] = html
+      email.symbolize_keys!
+      Pony.mail(email)
+    end
+  end
+
+  def self.send_reports
+    Dashboard.all.each do |dashboard|
+      send_report(dashboard['slug'])
     end
   end
 
