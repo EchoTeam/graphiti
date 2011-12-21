@@ -93,7 +93,7 @@ class Dashboard
       timestamp = Time.now.strftime "%a %b %d %I:%M%p"
       haml = Haml::Engine.new(File.read(File.join(File.dirname(__FILE__), '..', 'views', 'report.haml')))
       html = haml.render(Object.new, :dashboard => dashboard, :time => timestamp, :graphs => graphs)
-      email = Graphiti.settings.reports
+      email = Graphiti.settings.reports.dup
       email['subject'] = "Graphiti Report for #{dashboard['title']} #{timestamp}"
       email['to'] = email['to'].gsub(/SLUG/, slug)
       email['via'] = email['via'].to_sym
