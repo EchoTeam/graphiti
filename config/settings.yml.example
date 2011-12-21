@@ -17,3 +17,4 @@ default_options:
   minorGridLineColor: "#E5E5E5"
 default_metrics:
   - "stats.timers.production.rails.controller.total.mean"
+metric_prefix: "stats"
