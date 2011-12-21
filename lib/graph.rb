@@ -49,6 +49,7 @@ class Graph
 
   def self.all(*graph_ids)
     graph_ids = redis.zrevrange "graphs", 0, -1 if graph_ids.empty?
+    graph_ids ||= []
     graph_ids.flatten.collect do |uuid|
       find(uuid)
     end.compact

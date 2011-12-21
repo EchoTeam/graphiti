@@ -1,0 +1,7 @@
+%h1== Graphiti Report for #{dashboard['title']} #{time}
+
+%hr/
+- graphs.each do |title, url|
+  %h3= title
+  %img{src: url, alt: title}/
+  %hr/
