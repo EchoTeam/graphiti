@@ -86,7 +86,7 @@ class Dashboard
     snapshots
   end
 
-  def self.send_report(dashboard)
+  def self.send_report(slug)
     dashboard = find(slug, true)
     if dashboard
       graphs = snapshot_graphs(slug)
