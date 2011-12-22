@@ -5,9 +5,11 @@ class Dashboard
 
   def self.save(slug = nil, json)
     slug ||= json[:slug]
+    slug = "#{Time.now.to_f}".delete('.') if slug.nil? || slug.empty?
+    json[:slug] = slug
     key = "dashboards:#{slug}"
     redis.hset key, "title", json[:title]
-    redis.hset key, "slug", json[:slug]
+    redis.hset key, "slug", slug
     redis.hset key, "updated_at", Time.now.to_i
     redis.zadd "dashboards", Time.now.to_f * 1000, slug
     redis.sadd "graphs:dashboards", slug

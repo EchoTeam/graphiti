@@ -40,6 +40,15 @@ class TestDashboard < MiniTest::Unit::TestCase
     assert_equal @dash_json, dash
   end
 
+  def test_saving_dashboard_without_slug
+    dash = Dashboard.save({title: "dash without slug"})
+    assert dash[:slug]
+    dash = Dashboard.save({title: "dash with empty slug", slug: ''})
+    assert dash[:slug]
+    dash = Dashboard.save({title: "dash with nil slug", slug: nil})
+    assert dash[:slug]
+  end
+
   def test_find_dashboard_with_graphs
     assert Dashboard.save(@dash_json)
     assert Dashboard.add_graph(@dash_json[:slug], @graph_uuid)
