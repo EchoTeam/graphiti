@@ -20,7 +20,7 @@ class Graph
     nil
   end
 
-  def self.snapshot(uuid)
+  def self.snapshot(uuid, service, public_directory)
     graph = find(uuid)
     return nil if !graph
     url = graph['url'].gsub(/\#.*$/,'')
@@ -29,8 +29,23 @@ class Graph
     graph_data = response.body
     time = (Time.now.to_f * 1000).to_i
     filename = "/snapshots/#{uuid}/#{time}.png"
-    return false if !S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
-    image_url = S3::Request.url(filename)
+
+    image_url = nil
+    case service
+    when 's3'
+      return false if !S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
+      image_url = S3::Request.url(filename)
+    else
+      images_directory = File.join(public_directory, 'images')
+      fullpath = File.join(images_directory, filename)
+      directory = File.dirname(fullpath)
+      FileUtils.mkdir_p(directory) unless File.exists?(directory)
+      open(fullpath, 'wb') do |file|
+        file << graph_data
+      end
+      image_url = File.join('images', filename) 
+    end
+
     redis.zadd "graphs:#{uuid}:snapshots", time, image_url
     image_url
   end

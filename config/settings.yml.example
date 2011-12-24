@@ -32,3 +32,5 @@ reports:
     enable_starttls_auto: true,
     user_name: "stampy@paperlesspost.com"
     password: "PASSWORD"
+snapshots:
+  service: none

@@ -49,6 +49,12 @@ class Graphiti < Sinatra::Base
     S3::Request.logger = logger
   end
 
+  helpers do
+    def base_url
+      @base_url ||= "#{request.env['rack.url_scheme']}://#{request.env['HTTP_HOST']}"
+    end
+  end
+
   get '/graphs/:uuid.js' do
     json Graph.find(params[:uuid])
   end
@@ -79,7 +85,9 @@ class Graphiti < Sinatra::Base
   end
 
   post '/graphs/:uuid/snapshot' do
-    url = Graph.snapshot(params[:uuid])
+    url = Graph.snapshot(params[:uuid], settings.snapshots['service'], File.join(settings.root, 'public'))
+    # Graph#snapshot can return a path relative to our base url. 
+    url = "#{base_url}/#{url}" if url !~ /^http/
     json :url => url
   end
 
@@ -110,7 +118,7 @@ class Graphiti < Sinatra::Base
   end
 
   post '/snapshot' do
-    filename = Graph.snapshot(params[:uuid])
+    filename = Graph.snapshot(params[:uuid], settings.snapshots['service'], File.join(settings.root, 'public'))
     json :filename => filename
   end
 
