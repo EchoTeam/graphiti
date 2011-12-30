@@ -92,6 +92,7 @@ class Dashboard
     dashboard = find(slug, true)
     if dashboard
       graphs = snapshot_graphs(slug)
+      return false if graphs.empty?
       timestamp = Time.now.strftime "%a %b %d %I:%M%p"
       haml = Haml::Engine.new(File.read(File.join(File.dirname(__FILE__), '..', 'views', 'report.haml')))
       html = haml.render(Object.new, :dashboard => dashboard, :time => timestamp, :graphs => graphs)
