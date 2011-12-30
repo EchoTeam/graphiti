@@ -37,7 +37,7 @@ Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that
 
 * Ruby 1.9.2
 * Bundler (~>1.0)
-* Graphite (and your data in graphite. The graphite URL API must be accessible from the same location as Graphiti and through the browser).
+* Graphite (>=0.9.9) (and your data in graphite. The graphite URL API must be accessible from the same location as Graphiti and through the browser).
 * Redis (>2)
 * Unicorn
 * RubyGems and various Gems (see Gemfile)
