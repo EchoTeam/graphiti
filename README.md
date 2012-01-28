@@ -52,6 +52,25 @@ Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that
 * Generate the metrics list: `bundle exec rake graphiti:metrics` (In order to make searching through your list of metrics fast, Graphiti fetches and caches the full list in Redis. We put this in a rake task that you can run in the background and set up on a cron.)
 * A Capfile and `config/deploy.rb` is provided for reference (though it might work for you).
 
+### The JSON Graph data format
+
+Every graph is stored and parsed as a JSON blob in a specific format that is meant to be readable and flexible.
+
+The basic layout with required sections is:
+
+``` js
+{
+  "options": {
+    "optionName": "value" //, ...
+  },
+  "targets": [
+    [
+      "metricname",
+        {"functionName": ["functionargument", ...]},
+    ]
+    //...
+  ]
+
 ## Credits
 
 Mad peace and shout outs to @tmm1 and the Github crew for very helpful advice and code. 
