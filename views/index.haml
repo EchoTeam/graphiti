@@ -200,7 +200,7 @@
             %button Show
     .graph{style: 'display:none'}
       %a.edit
-        %img{src: '/images/loading.gif'}
+        %img.ggraph{src: '/images/loading.gif'}
       .desc
         %h3.title &nbsp;
         %ul.actions
@@ -235,6 +235,15 @@
     Graphiti = window.Graphiti || {};
     Graphiti.graphite_host = "#{settings.graphite_host}";
     Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
+    setInterval(function(){
+       $('#graphs-pane div.graph img.ggraph').each(function() {
+          var jqt = $(this);
+          var src = jqt.attr('src');
+          src     = src.substr(0,src.indexOf('_timestamp_'));
+          src    += '_timestamp_=' + new Date().getTime() + "000#.png";
+          jqt.attr('src',src);
+      });
+    }, 60000);
 
   - if Graphiti.production?
     %script{src: '/js/default.min.js'}
