@@ -25,7 +25,7 @@ class Metric
 
   private
   def self.get_metrics_list(prefix = Graphiti.settings.metric_prefix)
-    url = "http://#{Graphiti.settings.graphite_host}/metrics/index.json"
+    url = "#{Graphiti.settings.graphite_base_url}/metrics/index.json"
     puts "Getting #{url}"
     response = Typhoeus::Request.get(url)
     if response.success?
