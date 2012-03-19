@@ -233,7 +233,7 @@
 
   :javascript
     Graphiti = window.Graphiti || {};
-    Graphiti.graphite_host = "#{settings.graphite_host}";
+    Graphiti.graphite_base_url = "#{settings.graphite_base_url}";
     Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
 
   - if Graphiti.production?
