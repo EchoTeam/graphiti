@@ -8,7 +8,7 @@ gem 'sinatra-contrib'
 gem 'jim'
 gem 'closure-compiler'
 gem 'redis'
-gem 'redis-namespace'
+gem 'redised'
 gem 'compass'
 gem 'haml'
 gem 'typhoeus'
@@ -16,8 +16,8 @@ gem 'yajl-ruby'
 gem 'pony'
 
 group :test do
-  gem 'minitest'
-  gem 'minitest-display'
+  gem 'minitest', :require => false
+  gem 'minitest-display', :require => false
 end
 
 group :development do
