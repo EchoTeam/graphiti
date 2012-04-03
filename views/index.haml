@@ -26,6 +26,10 @@
           %a{href: '/graphs/new'}
             + New Graph
   #container
+    #view-controls
+      %label{for: 'auto-refresh'}
+        %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.auto_refresh['enabled'], 'data-interval' => Graphiti.settings.auto_refresh['interval']}
+          Refresh every #{Graphiti.settings.auto_refresh['interval']} seconds
     #loading-pane.pane
       %h2 ... Loading ...
     #dashboards-pane.pane{style: 'display:none;'}
@@ -235,15 +239,6 @@
     Graphiti = window.Graphiti || {};
     Graphiti.graphite_base_url = "#{settings.graphite_base_url}";
     Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
-    setInterval(function(){
-       $('#graphs-pane div.graph img.ggraph').each(function() {
-          var jqt = $(this);
-          var src = jqt.attr('src');
-          src     = src.substr(0,src.indexOf('_timestamp_'));
-          src    += '_timestamp_=' + new Date().getTime() + "000#.png";
-          jqt.attr('src',src);
-      });
-    }, 60000);
 
   - if Graphiti.production?
     %script{src: '/js/default.min.js'}
