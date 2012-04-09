@@ -11,7 +11,8 @@
       "jscolor",
       "extensions",
       "graph",
-      "app"
+      "app",
+      "refresh"
     ]
   }
 }
