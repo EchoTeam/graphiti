@@ -3,3 +3,4 @@
 .DS_Store
 config/settings.yml
 config/amazon_s3.yml
+tmp
