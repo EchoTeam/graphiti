@@ -3,8 +3,7 @@ require 'logger'
 
 module S3
   # Our own lightweight S3 uploader that uses typhoeus to make the requests internally
-  class Request < Struct.new(:host, :method, :path, :headers, :body, :content_type)
-    CREDENTIALS = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'config', 'amazon_s3.yml'))
+  class Request < Struct.new(:host, :method, :path, :headers, :body, :content_type, :credentials)
 
     DEFAULTS = {
       :headers => {},
@@ -17,6 +16,13 @@ module S3
     #
     # Using a neat initialization trick for structs from http://www.ruby-forum.com/topic/168962
     def initialize(h)
+      credentials_file = File.join(File.dirname(__FILE__), '..', '..', 'config', 'amazon_s3.yml')
+      if File.exists? credentials_file
+        self.credentials = YAML.load_file(credentials_file)
+      else
+        raise "Could not find S3 configuration file. Create it at path 'config/amazon_s3.yml'."
+      end
+
       h = DEFAULTS.merge(h)
       super *h.values_at(*self.class.members.map {|s| s.to_sym })
     end
@@ -42,8 +48,8 @@ module S3
       self.headers = self.headers.merge(headers)
       self.headers["authorization"] = ::S3::Signature.generate(:host => self.host,
                                                     :request => self,
-                                                    :access_key_id => CREDENTIALS[RACK_ENV]['access_key_id'],
-                                                    :secret_access_key => CREDENTIALS[RACK_ENV]['secret_access_key'])
+                                                    :access_key_id => self.credentials[RACK_ENV]['access_key_id'],
+                                                    :secret_access_key => self.credentials[RACK_ENV]['secret_access_key'])
     end
 
     # The full URL of the request resource
@@ -140,7 +146,7 @@ module S3
       # the bucket pulled from the CREDENTIALS (aka the `amazon_s3.yml`
       # config file)
       def default_bucket
-        CREDENTIALS[RACK_ENV]['bucket']
+        self.credentials[RACK_ENV]['bucket']
       end
 
     end

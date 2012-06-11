@@ -22,6 +22,7 @@ class Graph
     nil
   end
 
+<<<<<<< HEAD
   # Given a URL or a URI, append the current graphite_base_url
   def self.make_url(uri)
     uri = if uri !~ /^\//
@@ -31,6 +32,9 @@ class Graph
   end
 
   def self.snapshot(uuid)
+=======
+  def self.snapshot(uuid, service, public_directory)
+>>>>>>> 0a464eea4e14afc63a0763dfeeba8411ea82c430
     graph = find(uuid)
     return nil if !graph
     url = make_url(graph['url'])
@@ -39,8 +43,23 @@ class Graph
     graph_data = response.body
     time = (Time.now.to_f * 1000).to_i
     filename = "/snapshots/#{uuid}/#{time}.png"
-    return false if !S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
-    image_url = S3::Request.url(filename)
+
+    image_url = nil
+    case service
+    when 's3'
+      return false if !S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
+      image_url = S3::Request.url(filename)
+    else
+      images_directory = File.join(public_directory, 'images')
+      fullpath = File.join(images_directory, filename)
+      directory = File.dirname(fullpath)
+      FileUtils.mkdir_p(directory) unless File.exists?(directory)
+      open(fullpath, 'wb') do |file|
+        file << graph_data
+      end
+      image_url = File.join('images', filename)
+    end
+
     redis.zadd "graphs:#{uuid}:snapshots", time, image_url
     image_url
   end
