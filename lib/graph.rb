@@ -1,3 +1,5 @@
+require 'uri'
+
 class Graph
   include Redised
 
@@ -20,10 +22,18 @@ class Graph
     nil
   end
 
+  # Given a URL or a URI, append the current graphite_base_url
+  def self.make_url(uri)
+    uri = if uri !~ /^\//
+      URI.parse(uri).request_uri
+    end
+    Graphiti.graphite_base_url + uri.gsub(/\#.*$/,'')
+  end
+
   def self.snapshot(uuid)
     graph = find(uuid)
     return nil if !graph
-    url = graph['url'].gsub(/\#.*$/,'')
+    url = make_url(graph['url'])
     response = Typhoeus::Request.get(url, :timeout => 20000)
     return false if !response.success?
     graph_data = response.body
