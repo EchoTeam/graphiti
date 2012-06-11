@@ -155,8 +155,14 @@
                   %label{for: 'check_hideAxes'} Hide Axes
                   %input{type: 'checkbox', id: 'check_hideAxes', name: 'options[hideAxes]'}
                 %p
-                  %label{for: 'check_hideLegend'} Hide Legend
-                  %input{type: 'checkbox', id: 'check_hideLegend', name: 'options[hideLegend]'}
+                  %label Hide Legend
+                  %select{name: 'options[hideLegend]'}
+                    %option
+                    %option{value: 'on'} always hide
+                    %option{value: 'false'} always show
+                %p
+                  %label{for: 'check_drawNullAsZero'} Draw Null as Zero
+                  %input{type: 'checkbox', id: 'check_drawNullAsZero', name: 'options[drawNullAsZero]'}
               .clear
               .options-group
                 %p
