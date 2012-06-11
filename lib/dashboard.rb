@@ -82,7 +82,7 @@ class Dashboard
     if dashboard
       dashboard['graphs'].each do |graph|
         url = Graph.snapshot(graph['uuid'])
-        snapshots << [graph['title'], url] if url
+        snapshots << [graph['uuid'], graph['title'], url] if url
       end
     end
     snapshots

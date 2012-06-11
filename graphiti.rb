@@ -12,11 +12,11 @@ require 'redis/namespace'
 require 'compass'
 require 'typhoeus'
 require 'yajl'
+require 'redised'
 require 'digest/sha1'
 
 require './lib/s3/request'
 require './lib/s3/signature'
-require './lib/redised'
 
 require './lib/metric'
 require './lib/graph'

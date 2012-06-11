@@ -1,7 +1,8 @@
 %h1== Graphiti Report for #{dashboard['title']} #{time}
 
 %hr/
-- graphs.each do |title, url|
-  %h3= title
+- graphs.each do |uuid, title, url|
+  %h3
+    %a{href: "#{Graphiti.settings.graphiti_base_url}/graphs/#{uuid}"}= title
   %img{src: url, alt: title}/
   %hr/

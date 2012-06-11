@@ -26,6 +26,10 @@
           %a{href: '/graphs/new'}
             + New Graph
   #container
+    #view-controls
+      %label{for: 'auto-refresh'}
+        %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.auto_refresh['enabled'], 'data-interval' => Graphiti.settings.auto_refresh['interval']}
+          Refresh every #{Graphiti.settings.auto_refresh['interval']} seconds
     #loading-pane.pane
       %h2 ... Loading ...
     #dashboards-pane.pane{style: 'display:none;'}
@@ -200,7 +204,7 @@
             %button Show
     .graph{style: 'display:none'}
       %a.edit
-        %img{src: '/images/loading.gif'}
+        %img.ggraph{src: '/images/loading.gif'}
       .desc
         %h3.title &nbsp;
         %ul.actions
@@ -233,7 +237,7 @@
 
   :javascript
     Graphiti = window.Graphiti || {};
-    Graphiti.graphite_host = "#{settings.graphite_host}";
+    Graphiti.graphite_base_url = "#{settings.graphite_base_url}";
     Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
 
   - if Graphiti.production?
