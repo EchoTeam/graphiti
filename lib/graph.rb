@@ -22,7 +22,6 @@ class Graph
     nil
   end
 
-<<<<<<< HEAD
   # Given a URL or a URI, append the current graphite_base_url
   def self.make_url(uri)
     uri = if uri !~ /^\//
@@ -31,10 +30,7 @@ class Graph
     Graphiti.graphite_base_url + uri.gsub(/\#.*$/,'')
   end
 
-  def self.snapshot(uuid)
-=======
   def self.snapshot(uuid, service, public_directory)
->>>>>>> 0a464eea4e14afc63a0763dfeeba8411ea82c430
     graph = find(uuid)
     return nil if !graph
     url = make_url(graph['url'])
