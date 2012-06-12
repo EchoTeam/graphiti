@@ -3,7 +3,7 @@ require 'logger'
 
 module S3
   # Our own lightweight S3 uploader that uses typhoeus to make the requests internally
-  class Request < Struct.new(:host, :method, :path, :headers, :body, :content_type, :credentials)
+  class Request < Struct.new(:host, :method, :path, :headers, :body, :content_type)
 
     DEFAULTS = {
       :headers => {},
@@ -11,18 +11,28 @@ module S3
       :content_type => 'application/octet-stream'
     }.freeze
 
+    def self.load_credentials
+      credentials_file = File.join(File.dirname(__FILE__), '..', '..', 'config', 'amazon_s3.yml')
+      if File.exists?(credentials_file)
+        @credentials = YAML.load_file(credentials_file)
+      else
+        raise "Could not find S3 configuration file. Create it at path 'config/amazon_s3.yml'."
+      end
+    end
+
+    def self.credentials
+      @credentials ? load_credentials : @credentials
+    end
+
+    def credentials
+      self.class.credentials
+    end
+
     # S3::Request instances hold the temporary data needed for building the
     # request authorization from S3::Signature
     #
     # Using a neat initialization trick for structs from http://www.ruby-forum.com/topic/168962
     def initialize(h)
-      credentials_file = File.join(File.dirname(__FILE__), '..', '..', 'config', 'amazon_s3.yml')
-      if File.exists? credentials_file
-        self.credentials = YAML.load_file(credentials_file)
-      else
-        raise "Could not find S3 configuration file. Create it at path 'config/amazon_s3.yml'."
-      end
-
       h = DEFAULTS.merge(h)
       super *h.values_at(*self.class.members.map {|s| s.to_sym })
     end
