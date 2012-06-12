@@ -23,6 +23,23 @@ default_options:
 default_metrics:
   - "stats.timers.production.rails.controller.total.mean"
 metric_prefix: "stats"
+# Configure a service for snapshoting graphs. Current options are
+# s3 (amazon s3) and fs (filesystem)
+snapshots: 
+  # for s3 you need to provide `bucket`, `access_key_id`, and `secret_access_key`
+  #
+  # service: s3
+  # bucket: mysnapshots
+  # access_key_id: BLAH
+  # secret_access_key: BLAHBLAH
+
+  # for local filesystem you need to provide a dir to save the images 
+  # and the public route to that dir
+  #
+  # service: fs
+  # dir: public/storage
+  # public_host: http://graphiti.local/storage
+  
 # These are options that are passed to Pony
 # https://github.com/benprew/pony
 # in `to:` SLUG gets replaced with the slug of the dashboard being sent
