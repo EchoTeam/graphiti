@@ -41,12 +41,11 @@ Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that
 * Redis (>2)
 * Unicorn
 * RubyGems and various Gems (see Gemfile)
-* S3 Access (Credentials stored in seperate .yml file)
 
 ## Setup/Installation
 
 * Clone the repository
-* Make copies of the config/*.yml.example files for s3 and application configuration.
+* Make copies of the config/*.yml.example files application configuration.
 * Bundle: `bundle install`
 * Run: `bundle exec unicorn -c config/unicorn.rb -E production -D`
 * Generate the metrics list: `bundle exec rake graphiti:metrics` (In order to make searching through your list of metrics fast, Graphiti fetches and caches the full list in Redis. We put this in a rake task that you can run in the background and set up on a cron.)
