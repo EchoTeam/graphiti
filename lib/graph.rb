@@ -57,6 +57,7 @@ class Graph
 
   # upload graph_data to S3 with filename
   def self.store_on_s3(graph_data, filename)
+    S3::Request.credentials ||= Graphiti.snapshots
     return false if !S3::Request.upload(filename, StringIO.new(graph_data), 'image/png')
     S3::Request.url(filename)
   end

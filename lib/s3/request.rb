@@ -11,17 +11,13 @@ module S3
       :content_type => 'application/octet-stream'
     }.freeze
 
-    def self.load_credentials
-      credentials_file = File.join(File.dirname(__FILE__), '..', '..', 'config', 'amazon_s3.yml')
-      if File.exists?(credentials_file)
-        @credentials = YAML.load_file(credentials_file)
-      else
-        raise "Could not find S3 configuration file. Create it at path 'config/amazon_s3.yml'."
-      end
+
+    def self.credentials=(new_credentials)
+      @credentials = new_credentials
     end
 
     def self.credentials
-      @credentials ? load_credentials : @credentials
+      @credentials
     end
 
     def credentials
@@ -58,8 +54,8 @@ module S3
       self.headers = self.headers.merge(headers)
       self.headers["authorization"] = ::S3::Signature.generate(:host => self.host,
                                                     :request => self,
-                                                    :access_key_id => self.credentials[RACK_ENV]['access_key_id'],
-                                                    :secret_access_key => self.credentials[RACK_ENV]['secret_access_key'])
+                                                    :access_key_id => self.credentials['access_key_id'],
+                                                    :secret_access_key => self.credentials['secret_access_key'])
     end
 
     # The full URL of the request resource
@@ -76,7 +72,7 @@ module S3
       if RACK_ENV == 'test' && !response.mock
         warn "Actually making a request to s3 in a test - you probably dont want to do that"
       end
-      logger.info "-- S3::Request Response success? #{response.success?} response:\n\n#{response.inspect}\n\n"
+      logger.info "-- S3::Request Response success? #{response.success?} response code: #{response.code}"
       if response.success?
         return true
       elsif response.timed_out?
@@ -156,7 +152,7 @@ module S3
       # the bucket pulled from the CREDENTIALS (aka the `amazon_s3.yml`
       # config file)
       def default_bucket
-        self.credentials[RACK_ENV]['bucket']
+        self.credentials['bucket']
       end
 
     end
