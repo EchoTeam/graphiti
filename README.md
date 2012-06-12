@@ -69,6 +69,39 @@ The basic layout with required sections is:
     ]
     //...
   ]
+}
+```
+
+For simple targets, you can leave out the functions and just have something like:
+
+``` js
+{
+  "options": { ... }, // options are also pre-generated from your settings.yml
+                     // and can be controlled in the UI from the options form
+
+  "targets": [
+    "stats.timers.rails.production.controllers.total.*",
+    "stats.timers.rails.staging.controllers.total.mean"
+  ]
+}
+```
+
+Functions are defined as a hash of function names and arguments:
+
+```js
+{
+  "targets": [
+    [
+      "stats.timers.rails.production.controllers.total.*",
+      {
+        "keepLastValue": true, // functions that take no arguments, just need a `true` value
+        "movingAverage": 10, // functions that take a single argument, can just be assigned that value
+        "substr": [6,7] // functions that take multiple arguments can be passed as an array of args
+      } 
+    ]
+  ]
+}
+```
 
 ## Credits
 
