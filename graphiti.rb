@@ -24,7 +24,7 @@ require './lib/dashboard'
 
 class Graphiti < Sinatra::Base
 
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
 
   register Sinatra::Contrib
 
@@ -85,9 +85,7 @@ class Graphiti < Sinatra::Base
   end
 
   post '/graphs/:uuid/snapshot' do
-    url = Graph.snapshot(params[:uuid], settings.snapshots['service'], File.join(settings.root, 'public'))
-    # Graph#snapshot can return a path relative to our base url.
-    url = "#{base_url}/#{url}" if url !~ /^http/
+    url = Graph.snapshot(params[:uuid])
     json :url => url
   end
 
