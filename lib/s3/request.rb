@@ -4,13 +4,25 @@ require 'logger'
 module S3
   # Our own lightweight S3 uploader that uses typhoeus to make the requests internally
   class Request < Struct.new(:host, :method, :path, :headers, :body, :content_type)
-    CREDENTIALS = YAML.load_file(File.join(File.dirname(__FILE__), '..', '..', 'config', 'amazon_s3.yml'))
 
     DEFAULTS = {
       :headers => {},
       :method => :put,
       :content_type => 'application/octet-stream'
     }.freeze
+
+
+    def self.credentials=(new_credentials)
+      @credentials = new_credentials
+    end
+
+    def self.credentials
+      @credentials
+    end
+
+    def credentials
+      self.class.credentials
+    end
 
     # S3::Request instances hold the temporary data needed for building the
     # request authorization from S3::Signature
@@ -42,8 +54,8 @@ module S3
       self.headers = self.headers.merge(headers)
       self.headers["authorization"] = ::S3::Signature.generate(:host => self.host,
                                                     :request => self,
-                                                    :access_key_id => CREDENTIALS[RACK_ENV]['access_key_id'],
-                                                    :secret_access_key => CREDENTIALS[RACK_ENV]['secret_access_key'])
+                                                    :access_key_id => self.credentials['access_key_id'],
+                                                    :secret_access_key => self.credentials['secret_access_key'])
     end
 
     # The full URL of the request resource
@@ -60,7 +72,7 @@ module S3
       if RACK_ENV == 'test' && !response.mock
         warn "Actually making a request to s3 in a test - you probably dont want to do that"
       end
-      logger.info "-- S3::Request Response success? #{response.success?} response:\n\n#{response.inspect}\n\n"
+      logger.info "-- S3::Request Response success? #{response.success?} response code: #{response.code}"
       if response.success?
         return true
       elsif response.timed_out?
@@ -140,7 +152,7 @@ module S3
       # the bucket pulled from the CREDENTIALS (aka the `amazon_s3.yml`
       # config file)
       def default_bucket
-        CREDENTIALS[RACK_ENV]['bucket']
+        self.credentials['bucket']
       end
 
     end

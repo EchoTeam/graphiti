@@ -12,11 +12,11 @@ require 'redis/namespace'
 require 'compass'
 require 'typhoeus'
 require 'yajl'
+require 'redised'
 require 'digest/sha1'
 
 require './lib/s3/request'
 require './lib/s3/signature'
-require './lib/redised'
 
 require './lib/metric'
 require './lib/graph'
@@ -24,7 +24,7 @@ require './lib/dashboard'
 
 class Graphiti < Sinatra::Base
 
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
 
   register Sinatra::Contrib
 
@@ -51,6 +51,12 @@ class Graphiti < Sinatra::Base
 
   before do
     S3::Request.logger = logger
+  end
+
+  helpers do
+    def base_url
+      @base_url ||= "#{request.env['rack.url_scheme']}://#{request.env['HTTP_HOST']}"
+    end
   end
 
   get '/graphs/:uuid.js' do
@@ -114,7 +120,7 @@ class Graphiti < Sinatra::Base
   end
 
   post '/snapshot' do
-    filename = Graph.snapshot(params[:uuid])
+    filename = Graph.snapshot(params[:uuid], settings.snapshots['service'], File.join(settings.root, 'public'))
     json :filename => filename
   end
 

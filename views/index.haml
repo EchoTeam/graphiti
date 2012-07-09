@@ -26,6 +26,10 @@
           %a{href: '/graphs/new'}
             + New Graph
   #container
+    #view-controls
+      %label{for: 'auto-refresh'}
+        %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.auto_refresh['enabled'], 'data-interval' => Graphiti.settings.auto_refresh['interval']}
+          Refresh every #{Graphiti.settings.auto_refresh['interval']} seconds
     #loading-pane.pane
       %h2 ... Loading ...
     #dashboards-pane.pane{style: 'display:none;'}
@@ -151,8 +155,14 @@
                   %label{for: 'check_hideAxes'} Hide Axes
                   %input{type: 'checkbox', id: 'check_hideAxes', name: 'options[hideAxes]'}
                 %p
-                  %label{for: 'check_hideLegend'} Hide Legend
-                  %input{type: 'checkbox', id: 'check_hideLegend', name: 'options[hideLegend]'}
+                  %label Hide Legend
+                  %select{name: 'options[hideLegend]'}
+                    %option
+                    %option{value: 'on'} always hide
+                    %option{value: 'false'} always show
+                %p
+                  %label{for: 'check_drawNullAsZero'} Draw Null as Zero
+                  %input{type: 'checkbox', id: 'check_drawNullAsZero', name: 'options[drawNullAsZero]'}
               .clear
               .options-group
                 %p
@@ -199,6 +209,8 @@
           %a.view
             %button Show
     .graph{style: 'display:none'}
+      %a.edit
+        %img.ggraph{src: '/images/loading.gif'}
       .desc
         %h3.title &nbsp;
         %ul.actions
@@ -233,7 +245,7 @@
 
   :javascript
     Graphiti = window.Graphiti || {};
-    Graphiti.graphite_host = "#{settings.graphite_host}";
+    Graphiti.graphite_base_url = "#{settings.graphite_base_url}";
     Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
 
   - if Graphiti.production?

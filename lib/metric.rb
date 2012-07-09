@@ -25,12 +25,12 @@ class Metric
 
   private
   def self.get_metrics_list(prefix = Graphiti.settings.metric_prefix)
-    url = "http://#{Graphiti.settings.graphite_host}/metrics/index.json"
+    url = "#{Graphiti.settings.graphite_base_url}/metrics/index.json"
     puts "Getting #{url}"
     response = Typhoeus::Request.get(url)
     if response.success?
       json = Yajl::Parser.parse(response.body)
-      @metrics = json.grep(/^#{Regexp.escape prefix}/)
+      @metrics = prefix.nil? ? json : json.grep(/^#{Regexp.escape prefix}/)
     else
       puts "Error fetching #{url}. #{response.inspect}"
     end

@@ -3,3 +3,8 @@
 .DS_Store
 config/settings.yml
 config/amazon_s3.yml
+.bundle/config
+public/images/snapshots
+public/snapshots
+vendor/bundle
+tmp

@@ -41,16 +41,67 @@ Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that
 * Redis (>2)
 * Unicorn
 * RubyGems and various Gems (see Gemfile)
-* S3 Access (Credentials stored in seperate .yml file)
 
 ## Setup/Installation
 
 * Clone the repository
-* Make copies of the config/*.yml.example files for s3 and application configuration.
+* Make copies of the config/*.yml.example files application configuration.
 * Bundle: `bundle install`
 * Run: `bundle exec unicorn -c config/unicorn.rb -E production -D`
 * Generate the metrics list: `bundle exec rake graphiti:metrics` (In order to make searching through your list of metrics fast, Graphiti fetches and caches the full list in Redis. We put this in a rake task that you can run in the background and set up on a cron.)
 * A Capfile and `config/deploy.rb` is provided for reference (though it might work for you).
+
+### The JSON Graph data format
+
+Every graph is stored and parsed as a JSON blob in a specific format that is meant to be readable and flexible.
+
+The basic layout with required sections is:
+
+``` js
+{
+  "options": {
+    "optionName": "value" //, ...
+  },
+  "targets": [
+    [
+      "metricname",
+        {"functionName": ["functionargument", ...]},
+    ]
+    //...
+  ]
+}
+```
+
+For simple targets, you can leave out the functions and just have something like:
+
+``` js
+{
+  "options": { ... }, // options are also pre-generated from your settings.yml
+                     // and can be controlled in the UI from the options form
+
+  "targets": [
+    "stats.timers.rails.production.controllers.total.*",
+    "stats.timers.rails.staging.controllers.total.mean"
+  ]
+}
+```
+
+Functions are defined as a hash of function names and arguments:
+
+```js
+{
+  "targets": [
+    [
+      "stats.timers.rails.production.controllers.total.*",
+      {
+        "keepLastValue": true, // functions that take no arguments, just need a `true` value
+        "movingAverage": 10, // functions that take a single argument, can just be assigned that value
+        "substr": [6,7] // functions that take multiple arguments can be passed as an array of args
+      } 
+    ]
+  ]
+}
+```
 
 ## Credits
 
