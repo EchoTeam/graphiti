@@ -5,8 +5,8 @@
 
   %title Graphiti
 
-  = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
-
+  -# = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
+  = stylesheet('/css/screen.css', media: 'screen, projection')
 
 
 %body.bp
@@ -199,8 +199,6 @@
           %a.view
             %button Show
     .graph{style: 'display:none'}
-      %a.edit
-        %img{src: '/images/loading.gif'}
       .desc
         %h3.title &nbsp;
         %ul.actions
@@ -212,6 +210,8 @@
           %li
             %a.edit
               %button Edit
+      %a.edit
+        %img{src: '/images/loading.gif'}
       .snapshot{style: 'display:none'}
         %a.view{target: 'blank'}
           %img{src: '/images/loading.gif'}

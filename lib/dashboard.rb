@@ -30,6 +30,7 @@ class Dashboard
   def self.all(*slugs)
     slugs = redis.zrevrange "dashboards", 0, -1 if slugs.empty?
     slugs ||= []
+    slugs.sort!
     slugs.flatten.collect do |slug|
       find(slug)
     end.compact

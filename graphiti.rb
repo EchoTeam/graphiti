@@ -45,6 +45,10 @@ class Graphiti < Sinatra::Base
     Metric.redis = settings.redis_url
   end
 
+  use Rack::Auth::Basic, "graphiti" do |username, password|
+    [username, password] == ['jskit', 'rules!']
+  end
+
   before do
     S3::Request.logger = logger
   end
@@ -133,6 +137,7 @@ class Graphiti < Sinatra::Base
 
   get '/stylesheets/:name.css' do
     content_type 'text/css'
+    response['Expires'] = (Time.now + 60*60*24*356*3).httpdate
     scss :"stylesheets/#{params[:name]}"
   end
 
@@ -144,3 +149,4 @@ class Graphiti < Sinatra::Base
   end
 
 end
+# vim: set ts=2 sts=2 sw=2 et:
