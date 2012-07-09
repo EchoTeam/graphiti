@@ -12587,7 +12587,7 @@ Graphiti.Graph.prototype = {
           json = JSON.stringify(value);
           target = [key,"(",json,",",target,")"].join("");
         } else {
-          if (value != true){
+          if (value !== true){
             json = JSON.stringify(value);
             target = "" + key
               + "(" +
@@ -13287,4 +13287,3 @@ Graphiti.setRefresh = function(){
 
 $(Graphiti.setRefresh.bind(Graphiti));
 $("#auto-refresh").change(Graphiti.setRefresh.bind(Graphiti));
-
