@@ -30,7 +30,13 @@ class Metric
     response = Typhoeus::Request.get(url)
     if response.success?
       json = Yajl::Parser.parse(response.body)
-      @metrics = prefix.nil? ? json : json.grep(/^#{Regexp.escape prefix}/)
+      if prefix.nil?
+        @metrics = json 
+      elsif prefix.kind_of?(Array)
+        @metrics = json.grep(/^[#{prefix.map! { |k| Regexp.escape k }.join("|")}]/)
+      else
+        @metrics = json.grep(/^#{Regexp.escape prefix}/)
+      end
     else
       puts "Error fetching #{url}. #{response.inspect}"
     end
