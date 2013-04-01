@@ -263,6 +263,9 @@
         });
         // bind to link clicks that have routes
         $('a').live('click.history-' + this.app.eventNamespace(), function(e) {
+          if (e.isDefaultPrevented() || e.metaKey || e.ctrlKey) {
+            return;
+          }
           var full_path = lp.fullPath(this);
           if (this.hostname == window.location.hostname && app.lookupRoute('get', full_path)) {
             e.preventDefault();

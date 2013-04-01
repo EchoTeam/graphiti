@@ -3,21 +3,21 @@
   %meta{charset: 'utf-8'}
   %meta{'http-equiv' => 'X-UA-Compatible', 'content' => 'IE=edge,chrome=1'}/
 
-  %title Graphiti
+  %title Echo Graphiti
 
-  -# = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
-  = stylesheet('/css/screen.css', media: 'screen, projection')
+  %link{href: 'http://fonts.googleapis.com/css?family=Ubuntu', rel: 'stylesheet', type: 'text/css'}
+  = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
 
 
 %body.bp
   #header
     .menu
       %h1
-        %a{href: '/'} Graphiti
+        %a{href: '/'} ECHO
 
       %ul
         %li
-          %a{href: '/dashboards'}
+          %a{href: '/'}
             Dashboards
         %li
           %a{href: '/graphs'}
@@ -31,7 +31,7 @@
         %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.auto_refresh['enabled'], 'data-interval' => Graphiti.settings.auto_refresh['interval']}
           Refresh every #{Graphiti.settings.auto_refresh['interval']} seconds
     #loading-pane.pane
-      %h2 ... Loading ...
+      #loading-spinner
     #dashboards-pane.pane{style: 'display:none;'}
     #graphs-pane.pane{style: 'display:none;'}
     #snapshots-pane.pane{style: 'display:none;'}
@@ -47,9 +47,9 @@
             %h4 Graph
             %button.save.redraw Redraw
             %form.update{"data-action" => '/graphs/:uuid', method: 'put', style: 'display:none'}
-              %input.save{type: 'submit', value: 'Update'}
+              %input.save.main-action{type: 'submit', value: 'Save'}
             %form.save-new{action: '/graphs', method: 'post'}
-              %input.save.create{type: 'submit', value: 'Save New'}
+              %input.save.create{type: 'submit', value: 'Clone'}
           %li.dashboard
             %h4 Dashboards
             .new-dashboard{style: 'display: none'}
@@ -96,79 +96,18 @@
                   %label Vertical Title
                   %input{type: 'text', name: 'options[vtitle]'}
                 %p
-                  %label Font
-                  %select{name: 'options[fontName]'}
-                    - Graphiti.settings.fonts.each do |font|
-                      %option= font
-                %p
-                  %label Font Size
-                  %select{name: 'options[fontSize]'}
-                    - 6.upto(32) do |i|
-                      %option= i
-                %p
-                  %label.check{for: 'check_fontBold'} Bold
-                  %input{type: 'checkbox', id: 'check_fontBold', name: 'options[fontBold]'}
-                  %label.check{for: 'check_fontItalic'} Italic
-                  %input{type: 'checkbox', id: 'check_fontItalic', name: 'options[fontItalic]'}
-              .options-group
-                %p
-                  %label Line Mode
-                  %select{name: 'options[lineMode]'}
-                    %option slope
-                    %option connected
-                    %option staircase
-                %p
-                  %label Line Thickness
-                  %select{name: 'options[thickness]'}
-                    - 1.upto(10) do |i|
-                      %option= i
-                %p
-                  %label Background Color
-                  %input{type: 'text', class: 'color {hash: true}', name: 'options[bgcolor]'}
-                %p
-                  %label Text Color
-                  %input{type: 'text', class: 'color {hash: true}', name: 'options[fgcolor]'}
-                %p
-                  %label Major Grid Color
-                  %input{type: 'text', class: 'color {hash: true}', name: 'options[majorGridLineColor]'}
-                %p
-                  %label Minor Grid Color
-                  %input{type: 'text', class: 'color {hash: true}', name: 'options[minorGridLineColor]'}
-              .options-group.last
-                %p
-                  %label Y Min
-                  %input{type: 'text', size: 3, name: 'options[yMin]'}
-                %p
-                  %label Y Max
-                  %input{type: 'text', size: 3, name: 'options[yMax]'}
-                %p
-                  %label Area Mode
-                  %select{name: 'options[areaMode]'}
-                    %option
-                    %option stacked
-                    %option first
-                    %option all
-                %p
-                  %label{for: 'check_hideGrid'} Hide Grid
-                  %input{type: 'checkbox', id: 'check_hideGrid', name: 'options[hideGrid]'}
-                %p
-                  %label{for: 'check_hideAxes'} Hide Axes
-                  %input{type: 'checkbox', id: 'check_hideAxes', name: 'options[hideAxes]'}
-                %p
                   %label Hide Legend
                   %select{name: 'options[hideLegend]'}
                     %option
                     %option{value: 'on'} always hide
                     %option{value: 'false'} always show
-                %p
-                  %label{for: 'check_drawNullAsZero'} Draw Null as Zero
-                  %input{type: 'checkbox', id: 'check_drawNullAsZero', name: 'options[drawNullAsZero]'}
+              .options-group.last{ style: 'display:none' }
               .clear
               .options-group
                 %p
-                  %input.save{type: 'submit', value: 'Update'}
+                  %input.save{type: 'submit', value: 'Update JSON'}
         .clear
-      .edit-group{'data-group' => 'metrics'}
+      .edit-group{'data-group' => 'metrics', 'class' => 'edit-metrics-list'}
         .edit-head.closed
           %a Metrics
         .edit-body.closed
@@ -185,14 +124,11 @@
         .clear
       .edit-group{'data-group' => 'editor'}
         .edit-head.open
-          %a Editor
-        .edit-body.open
+          %a JSON
+        .edit-body.open.editor-area
           #editor &nbsp;
         .clear
 
-
-  #footer
-    Graphiti #{Graphiti::VERSION}
 
   #templates{style: 'display:none'}
     .dashboard{style: 'display:none'}
@@ -209,8 +145,6 @@
           %a.view
             %button Show
     .graph{style: 'display:none'}
-      %a.edit
-        %img.ggraph{src: '/images/loading.gif'}
       .desc
         %h3.title &nbsp;
         %ul.actions
@@ -223,7 +157,7 @@
             %a.edit
               %button Edit
       %a.edit
-        %img{src: '/images/loading.gif'}
+        %img.ggraph{src: '/images/loading.gif'}
       .snapshot{style: 'display:none'}
         %a.view{target: 'blank'}
           %img{src: '/images/loading.gif'}
@@ -247,8 +181,10 @@
     Graphiti = window.Graphiti || {};
     Graphiti.graphite_base_url = "#{settings.graphite_base_url}";
     Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
+    Graphiti.images_per_row = 2;
 
   - if Graphiti.production?
+    -# %script{src: '/js/default.min.js'}
     %script{src: '/js/default.min.js'}
   - else
     %script{src: '/js/default.js'}

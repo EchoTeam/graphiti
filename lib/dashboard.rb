@@ -71,7 +71,9 @@ class Dashboard
 
   def self.without_graph(uuid)
     if redis.scard("graphs:dashboards") > 0
-      all(redis.sdiff("graphs:dashboards", "graphs:#{uuid}:dashboards"))
+      redis.sdiff("graphs:dashboards", "graphs:#{uuid}:dashboards").sort.collect do |slug|
+	find(slug)
+      end.compact
     else
       all
     end

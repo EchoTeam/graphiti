@@ -5,10 +5,13 @@ Graphiti.startRefresh = function(seconds){
     $('#graphs-pane div.graph img.ggraph').each(function() {
       var jqt = $(this);
       var src = jqt.attr('src');
-      //src     = src.substr(0,src.indexOf('_timestamp_'));
-      //src    += '_timestamp_=' + new Date().getTime() + "000#.png";
       src.replace(/(^.*_timestamp_=).*/, function (match, _1) { return  _1 +  new Date().getTime() + "000#.png"; })
-      jqt.attr('src',src);
+      jqt.animate({opacity: 0.5}, 2000, function() {
+	 jqt.bind('load', function() {
+	 	jqt.animate({opacity: 1}, 2000);
+	 })
+	 .attr('src', src);
+      });
     });
   }, seconds * 1000);
 };

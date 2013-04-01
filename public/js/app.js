@@ -39,6 +39,8 @@ var app = Sammy('body', function() {
       var ctx = this;
       var editor = this.app.editor = ace.edit("editor");
       editor.setTheme("ace/theme/textmate");
+      editor.renderer.setShowGutter(0);
+      editor.renderer.setShowPrintMargin(0);
       var JSONMode = require("ace/mode/json").Mode;
       var session = editor.getSession();
       session.setMode(new JSONMode());
@@ -226,10 +228,11 @@ var app = Sammy('body', function() {
         }).prependTo($select).attr('selected', 'selected');
       }
     },
-    loadAndRenderGraphs: function(url) {
-      var $graphs = this.showPane('graphs', ' ');
+    loadAndRenderGraphs: function(url, params) {
+      var ctx = this;
       this.load(url, {cache: false})
           .then(function(data) {
+            var $graphs = ctx.showPane('graphs', ' ');
             var title = 'All Graphs', all_graphs;
             if (data.title) {
               all_graphs = false;
@@ -237,7 +240,42 @@ var app = Sammy('body', function() {
             } else {
               all_graphs = true;
             }
-            $graphs.append('<h2>' + title + '</h2>');
+            var params_title = '';
+            if (params.options) {
+              var params_title_parts = [];
+              if (params.options.from) {
+                 params_title_parts.push("from: " + $("<div/>").text(params.options.from).html());
+              }
+              if (params.options.until) {
+                 params_title_parts.push("until: " + $("<div/>").text(params.options.until).html());
+              }
+              if (params_title_parts.length > 0) {
+                params_title = " (" + params_title_parts.join("; ") + ")";
+              }
+            }
+            var intervals = [
+                ["Default", ""],
+                ["Hours", "-1d"],
+                ["Days", "-7d"],
+                ["Weeks", "-1month"],
+                ["Months", "-1year"]];
+            var has_from = params.options && params.options.from;
+            var only_from = has_from && (typeof params.options.until == "undefined");
+            var intervals_html = "<div class='time-interval'><span class='time-interval-title'>Time Interval:</span> <ul>";
+            for (var i = 0; i < intervals.length; i++) {
+                var active_interval = only_from && params.options.from == intervals[i][1] ||
+                                      !has_from && i == 0;
+                intervals_html += '<li>';
+                if (active_interval) {
+                    intervals_html += '<span class="active-time-interval">' + intervals[i][0] + "</span>";
+                } else {
+                    intervals_html += '<span><a href="?' + (intervals[i][1] ? 'from=' + intervals[i][1] : '') + '">' + intervals[i][0] + "</a></span>";
+                }
+                intervals_html += '</li>';
+            }
+            intervals_html += "</ul></div>";
+            $graphs.append('<h2>' + title + params_title + '</h2>');
+            $graphs.append(intervals_html);
             var graphs = data.graphs,
                 i = 0,
                 l = graphs.length,
@@ -249,7 +287,9 @@ var app = Sammy('body', function() {
             }
             for (; i < l; i++) {
               graph = graphs[i];
-              graph_obj = new Graphiti.Graph(JSON.parse(graph.json));
+              graph_params = $.extend(true, JSON.parse(graph.json), params || {});
+              Sammy.log('graph_params: ', graph_params);
+              graph_obj = new Graphiti.Graph(graph_params);
 
               $graph
               .clone()
@@ -260,7 +300,7 @@ var app = Sammy('body', function() {
                 // actually replace the graph image
                 graph_obj.image($(this).find('img'));
                 // add a last class alternatingly to fix the display grid
-                if ((i+1)%2 == 0) {
+                if ((i+1) % Graphiti.images_per_row == 0) {
                   $(this).addClass('last');
                 }
                 // if its all graphs, delete operates on everything
@@ -282,11 +322,10 @@ var app = Sammy('body', function() {
           });
     },
     loadAndRenderDashboards: function() {
-      var $dashboards = this.showPane('dashboards', '<h2>Dashboards</h2>');
       var ctx = this;
-
       this.load('/dashboards.js', {cache: false})
           .then(function(data) {
+            var $dashboards = ctx.showPane('dashboards', '<h2>Dashboards</h2>');
             var dashboards = data.dashboards,
             i = 0, l = dashboards.length, dashboard, alt,
             $dashboard = $('#templates .dashboard').clone();
@@ -424,6 +463,17 @@ var app = Sammy('body', function() {
 
   this.get('/graphs', function(ctx) {
     this.loadAndRenderGraphs('/graphs.js');
+  });
+
+  this.get('/dashboards/:slug', function(ctx) {
+    var options = {};
+    if (this.params.from) {
+      options["from"] = this.params.from;
+    }
+    if (this.params.until) {
+      options["until"] = this.params.until;
+    }
+    this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js', {"options": options});
   });
 
   this.get('/dashboards/:slug', function(ctx) {

@@ -31,6 +31,7 @@ class Graphiti < Sinatra::Base
   config_file 'config/settings.yml'
 
   configure do
+    set :static_cache_control, [:public, {:max_age => 86400*7}]
     set :logging, true
     Compass.configuration do |config|
       config.project_path = settings.root
@@ -143,7 +144,7 @@ class Graphiti < Sinatra::Base
 
   get '/stylesheets/:name.css' do
     content_type 'text/css'
-    response['Expires'] = (Time.now + 60*60*24*356*3).httpdate
+    response['Expires'] = (Time.now + 60*60*24*7).httpdate
     scss :"stylesheets/#{params[:name]}"
   end
 
