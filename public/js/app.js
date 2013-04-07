@@ -255,6 +255,7 @@ var app = Sammy('body', function() {
             }
             var intervals = [
                 ["Default", ""],
+                ["Minutes", "-1h"],
                 ["Hours", "-1d"],
                 ["Days", "-7d"],
                 ["Weeks", "-1month"],
