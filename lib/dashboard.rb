@@ -37,6 +37,10 @@ class Dashboard
   end
 
   def self.destroy(slug)
+    self.graph_ids(slug).each do |graph_id|
+	$stderr.puts "Deleting graph #{graph_id} from slug #{slug}"
+	self.remove_graph slug, graph_id
+    end
     key = "dashboards:#{slug}"
     redis.del key
     redis.zrem "dashboards", slug
