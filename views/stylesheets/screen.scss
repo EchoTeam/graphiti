@@ -12,12 +12,14 @@ body.bp {
   @include blueprint-utilities;
   @include blueprint-debug;
   @include blueprint-interaction;
+  font-family: 'Open Sans', "Helvetica Neue", Arial, sans-serif;
   h1, h2, h3, h4, h5, h6 {
+    font-family: "Varela Round", "Helvetica Neue", Arial, sans-serif;
     color: #333;
   }
 }
 @mixin fancy-font {
-  font-family: "Ubuntu", sans-serif;
+  font-family: "Varela Round", sans-serif;
 }
 #container {
   @include container;
@@ -27,8 +29,9 @@ body.bp {
 #header {
   /*background: #0085C0;*/
   height: 50px;
+  padding: 1em 0;
   h1 {
-    @include fancy-font;
+    float: left;
     padding: 5px 0 0 0;
     margin: 0;
     letter-spacing: 0.3em;
@@ -51,7 +54,6 @@ body.bp {
     overflow: visible;
     li {
       a {
-        @include fancy-font;
         @include border-bottom-radius(5px);
         display:block;
         font-size: 1.3em;
@@ -74,8 +76,9 @@ body.bp {
   }
 }
 #view-controls {
+  float: right;
   text-align: right;
-  margin-bottom:10px;
+  margin-top: 16px;
   margin-right: 2px;
 }
 #editor-pane {
@@ -150,7 +153,6 @@ body.bp {
     width: 190px;
   }
   h4 {
-    @include fancy-font;
     font-size: 1.3em;
     margin-bottom: 5px;
   }
@@ -175,7 +177,6 @@ body.bp {
       top: 55px;
     }
     a {
-      @include fancy-font;
       padding: 4px 8px;
       text-decoration: none;
     }
@@ -300,21 +301,17 @@ body.bp {
 }
 
 h2 {
-  @include fancy-font;
   font-size: 2.4em;
-  /*border-bottom: 1px solid #CCC;*/
 }
 
 #graphs-pane {
   @include column($blueprint-grid-columns, true);
   @include clearfix;
   .graph {
-    @include column(($blueprint-grid-columns / 2));
-    &.last {
-      margin-right: 0;
-    }
+    width: ceil(($blueprint-grid-width + $blueprint-grid-margin) * ($blueprint-grid-columns / 2) - 10);
+    margin: 3px;
+    float: left;
     h3 {
-      @include fancy-font;
       font-size: 1.2em;
       margin: 0px;
       padding: 0px;
@@ -343,14 +340,16 @@ h2 {
   .graph:hover {
     .desc { opacity:1; }
   }
+  h2.graphs-title { float: left; width:50%; }
   .time-interval {
-    margin-top: -45px;
+    float: right;
+    margin-top: 1em;
     text-align: right;
     .time-interval-title { font-weight: bold; }
     ul {
         display: inline-block;
         margin: 0 0 0 5px;
-        padding: 0 0 0.75em 0;
+        padding: 0;
         li {
             display: inline;
             list-style: none;
@@ -364,7 +363,42 @@ h2 {
         font-weight: bold;
     }
   }
+  .graphs-layout {
+    float: right;
+    padding-right: 1em;
+    margin-top: 1em;
+    margin-right: 1em;
+    border-right: 1px dotted #ccc;
+    text-align: right;
+    .graphs-layout-title {font-weight: bold; }
+    ul {
+        display: inline-block;
+        margin: 0 0 0 5px;
+        padding: 0;
+        li {
+            display: inline;
+            list-style: none;
+            padding: 0 10px 0 0;
+        }
+        li:last-child {
+            padding-right: 0;
+        }
+    }
+    .active-graphs-layout {
+        font-weight: bold;
+    }
+  }
 }
+#graphs-pane.layout-list {
+  .graph {
+    @include column($blueprint-grid-columns, true);
+    margin: 3px;
+    img {
+      height: ceil($blueprint-grid-width * ($blueprint-grid-columns / 2) * 0.75);
+    }
+  }
+}
+.breadcrumbs-devider { color: #999; }
 .desc {
   padding: 5px;
   background: #f3f3f3;
@@ -373,7 +407,6 @@ h2 {
   .snapshot {
     @include column($blueprint-grid-columns);
     h3 {
-      @include fancy-font;
       margin: 0px;
       padding: 0px;
     }
@@ -405,12 +438,10 @@ h2 {
       @include clearfix;
     }
     h3 {
-      @include fancy-font;
       float: left;
-      font-size: 1.6em;
+      font-size: 1.3em;
       margin: 0px;
-      padding: 15px 0 15px 0;
-      text-shadow: 0 1px 0 white;
+      padding: 1em 0;
     }
     .meta {
       display: none;
@@ -425,7 +456,6 @@ h2 {
       color: #CCC;
     }
     .graphs-count {
-      @include fancy-font;
       color: #666;
       font-size: 1.8em;
       padding: 0px 8px;
@@ -460,7 +490,7 @@ h2 {
 }
 #loading-pane {
   text-align: center;
-  margin-top: 350px;
+  margin-top: 250px;
 }
 .empty {
   h3 {

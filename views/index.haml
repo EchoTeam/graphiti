@@ -5,7 +5,8 @@
 
   %title Echo Graphiti
 
-  %link{href: 'http://fonts.googleapis.com/css?family=Ubuntu', rel: 'stylesheet', type: 'text/css'}
+  %link{href: 'http://fonts.googleapis.com/css?family=Open+Sans:400,700', rel: 'stylesheet', type: 'text/css'}
+  %link{href: 'http://fonts.googleapis.com/css?family=Varela+Round', rel: 'stylesheet', type: 'text/css'}
   = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
 
 
@@ -15,21 +16,23 @@
       %h1
         %a{href: '/'} ECHO
 
-      %ul
-        %li
-          %a{href: '/'}
-            Dashboards
-        %li
-          %a{href: '/graphs'}
-            Graphs
-        %li
-          %a{href: '/graphs/new'}
-            + New Graph
+      #view-controls
+        %label{for: 'auto-refresh'}
+          %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.auto_refresh['enabled'], 'data-interval' => Graphiti.settings.auto_refresh['interval']}
+            Refresh every #{Graphiti.settings.auto_refresh['interval']} seconds
+
+      -#
+        %ul
+          %li
+            %a{href: '/'}
+              Dashboards
+          %li
+            %a{href: '/graphs'}
+              Graphs
+          %li
+            %a{href: '/graphs/new'}
+              + New Graph
   #container
-    #view-controls
-      %label{for: 'auto-refresh'}
-        %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.auto_refresh['enabled'], 'data-interval' => Graphiti.settings.auto_refresh['interval']}
-          Refresh every #{Graphiti.settings.auto_refresh['interval']} seconds
     #loading-pane.pane
       #loading-spinner
     #dashboards-pane.pane{style: 'display:none;'}

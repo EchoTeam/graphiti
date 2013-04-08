@@ -228,15 +228,21 @@ var app = Sammy('body', function() {
         }).prependTo($select).attr('selected', 'selected');
       }
     },
-    loadAndRenderGraphs: function(url, params) {
+    loadAndRenderGraphs: function(url, params, display_options) {
       var ctx = this;
       this.load(url, {cache: false})
           .then(function(data) {
             var $graphs = ctx.showPane('graphs', ' ');
+            var layout = "grid";
+            if (display_options && display_options.layout) {
+              layout = display_options.layout;
+            }
+            $graphs.removeClass("layout-grid").removeClass("layout-list");
+            $graphs.addClass("layout-" + layout);
             var title = 'All Graphs', all_graphs;
             if (data.title) {
               all_graphs = false;
-              title = data.title;
+              title = '<a href="/">Dashboards</a> <span class="breadcrumbs-devider">/</span> ' + data.title;
             } else {
               all_graphs = true;
             }
@@ -270,13 +276,25 @@ var app = Sammy('body', function() {
                 if (active_interval) {
                     intervals_html += '<span class="active-time-interval">' + intervals[i][0] + "</span>";
                 } else {
-                    intervals_html += '<span><a href="?' + (intervals[i][1] ? 'from=' + intervals[i][1] : '') + '">' + intervals[i][0] + "</a></span>";
+                    intervals_html += '<span><a href="?layout=' + layout + (intervals[i][1] ? '&from=' + intervals[i][1] : '') + '">' + intervals[i][0] + "</a></span>";
                 }
                 intervals_html += '</li>';
             }
             intervals_html += "</ul></div>";
-            $graphs.append('<h2>' + title + params_title + '</h2>');
+            var layouts_html = '<div class="graphs-layout"><span class="graphs-layout-title">Show as:</span> <ul>';
+            var layouts = [["grid", "Grid"], ["list", "List"]];
+            for (var i = 0; i < layouts.length; i++) {
+                if (layouts[i][0] == layout) {
+                  layouts_html += '<li><span class="active-graphs-layout">' + layouts[i][1] + '</span></li>';
+                } else {
+                  layouts_html += '<li><a href="?layout=' + layouts[i][0] + (params.options && params.options.from ? '&from=' + params.options.from: '') + (params.options && params.options.until ? '&until=' + params.options.until: '') + '">' + layouts[i][1] + "</a></li>";
+                }
+            }
+            layouts_html += "</ul></div>";
+            $graphs.append('<h2 class="graphs-title">' + title + params_title + '</h2>');
             $graphs.append(intervals_html);
+            $graphs.append(layouts_html);
+            $graphs.append("<br style='clear:both'>");
             var graphs = data.graphs,
                 i = 0,
                 l = graphs.length,
@@ -289,7 +307,6 @@ var app = Sammy('body', function() {
             for (; i < l; i++) {
               graph = graphs[i];
               graph_params = $.extend(true, JSON.parse(graph.json), params || {});
-              Sammy.log('graph_params: ', graph_params);
               graph_obj = new Graphiti.Graph(graph_params);
 
               $graph
@@ -301,9 +318,9 @@ var app = Sammy('body', function() {
                 // actually replace the graph image
                 graph_obj.image($(this).find('img'));
                 // add a last class alternatingly to fix the display grid
-                if ((i+1) % Graphiti.images_per_row == 0) {
-                  $(this).addClass('last');
-                }
+                //if ((i+1) % Graphiti.images_per_row == 0) {
+                  //$(this).addClass('last');
+                //}
                 // if its all graphs, delete operates on everything
                 if (all_graphs) {
                   $(this)
@@ -468,13 +485,17 @@ var app = Sammy('body', function() {
 
   this.get('/dashboards/:slug', function(ctx) {
     var options = {};
+    var display_options = {};
     if (this.params.from) {
       options["from"] = this.params.from;
     }
     if (this.params.until) {
       options["until"] = this.params.until;
     }
-    this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js', {"options": options});
+    if (this.params.layout) {
+      display_options["layout"] = this.params.layout;
+    }
+    this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js', {"options": options}, display_options);
   });
 
   this.get('/dashboards/:slug', function(ctx) {
