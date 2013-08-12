@@ -105,7 +105,7 @@ class Dashboard
       html = haml.render(Object.new, :dashboard => dashboard, :time => timestamp, :graphs => graphs)
       email = Graphiti.settings.reports.dup
       email['subject'] = "Graphiti Report for #{dashboard['title']} #{timestamp}"
-      email['to'] = email['to'].gsub(/SLUG/, slug)
+      email['to'] = email['to'].gsub(/SLUG/, slug.gsub(/\s/, '.'))
       email['via'] = email['via'].to_sym
       email['via_options'] = email['via_options'].symbolize_keys! if email['via_options']
       email['html_body'] = html

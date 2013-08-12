@@ -151,7 +151,7 @@ class Graphiti < Sinatra::Base
   def default_graph
     {
       :options => settings.default_options,
-      :targets => settings.default_metrics.collect {|m| [m, {}] }
+      :targets => settings.default_metrics.collect {|m| m.is_a?(Array) ? m : [m, {}] }
     }
   end
 
