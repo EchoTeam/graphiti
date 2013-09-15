@@ -139,7 +139,7 @@ var app = Sammy('body', function() {
             }
           });
     },
-    loadAndRenderGraphs: function(url, params, display_options) {
+    loadAndRenderGraphs: function(url, slug, params, display_options) {
       var ctx = this;
       this.load(url, {cache: false})
           .then(function(data) {
@@ -206,43 +206,57 @@ var app = Sammy('body', function() {
             $graphs.append(intervals_html);
             $graphs.append(layouts_html);
             $graphs.append("<br style='clear:both'>");
-            var graphs = data.graphs,
-                i = 0,
-                l = graphs.length,
-                $graph = $('#templates .graph').clone(),
-                graph, graph_obj;
-            if (data.graphs.length == 0) {
+            var graphs = data.graphs;
+            if (graphs.length == 0) {
               $graphs.append($('#graphs-empty'));
               return true;
             }
-            for (; i < l; i++) {
-              graph = graphs[i];
-              graph_params = $.extend(true, JSON.parse(graph.json), params || {});
-              graph_obj = new Graphiti.Graph(graph_params);
+            var dashboard_sections = {"General": []};
+            for (var i = 0; i < graphs.length; i++) {
+              var graph_json = JSON.parse(graphs[i].json || '{}');
+              if (graph_json.presentation && graph_json.presentation.sections && typeof graph_json.presentation.sections == "object") {
+                  var sections = Object.keys(graph_json.presentation.sections),
+                      sections_len = sections.length;
+                  for (var j = 0; j < sections_len; j++) {
+                    if (sections[j] == slug) {
+                      var section_name = graph_json.presentation.sections[sections[j]];
+                      dashboard_sections[section_name] = (dashboard_sections[section_name] || []);
+                      dashboard_sections[section_name].push(graphs[i]);
+                    }
+                  }
+              } else {
+                dashboard_sections["General"].push(graphs[i]);
+              }
+            }
+            Sammy.log("dashboard_sections", dashboard_sections);
+            var dashboard_section_names = Object.keys(dashboard_sections).sort();
+            for (var i = 0; i < dashboard_section_names.length; i++) {
+              $graphs.append('<h3 class="section-name">' + dashboard_section_names[i] + '</h3>');
+              var section_graphs = dashboard_sections[dashboard_section_names[i]];
+              for (var j = 0; j < section_graphs.length; j++) {
+                var graph = section_graphs[j];
+                var graph_params = $.extend(true, JSON.parse(graph.json), params || {});
+                var graph_obj = new Graphiti.Graph(graph_params);
 
-              $graph
-              .clone()
-              .find('.title').text(graph.title || 'Untitled').end()
-              .find('a.edit').attr('href', '/graphs/' + graph.uuid).end()
-              .show()
-              .appendTo($graphs).each(function() {
-                // actually replace the graph image
-                graph_obj.image($(this).find('img'));
-                // if its all graphs, delete operates on everything
-                if (all_graphs) {
-                  $(this)
-                  .find('.delete')
-                  .attr('action', '/graphs/' + graph.uuid);
-                // otherwise it just removes the graphs
-                } else {
-                  $(this)
-                  .find('.delete')
-                  .attr('action', '/graphs/dashboards')
-                  .find('[name=dashboard]').val(data.slug).end()
-                  .find('[name=uuid]').val(graph.uuid).end()
-                  .find('[type=submit]').val('Remove');
-                }
-              });
+                $('#templates .graph').clone()
+                  .find('.title').text(graph.title || 'Untitled').end()
+                  .find('a.edit').attr('href', '/graphs/' + graph.uuid).end()
+                  .show()
+                  .appendTo($graphs).each(function() {
+                    // actually replace the graph image
+                    graph_obj.image($(this).find('img'));
+                    if (all_graphs) {
+                      // if its all graphs, delete operates on everything
+                      $(this).find('.delete').attr('action', '/graphs/' + graph.uuid);
+                    } else {
+                      // otherwise it just removes the graphs
+                      $(this).find('.delete').attr('action', '/graphs/dashboards')
+                        .find('[name=dashboard]').val(data.slug).end()
+                        .find('[name=uuid]').val(graph.uuid).end()
+                        .find('[type=submit]').val('Remove');
+                    }
+                  });
+              }
             }
           });
     },
@@ -327,7 +341,7 @@ var app = Sammy('body', function() {
     if (this.params.layout) {
       display_options["layout"] = this.params.layout;
     }
-    this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js', {"options": options}, display_options);
+    this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js', this.params.slug, {"options": options}, display_options);
   });
 
   this.get('/dashboards', function(ctx) {

@@ -332,6 +332,12 @@ h2 {
     .desc { opacity:1; }
   }
   h2.graphs-title { float: left; width:50%; }
+  h3.section-name {
+    width: 100%;
+    padding: 2em 0 1em;
+    margin: 0;
+    @include clearfix;
+  }
   .time-interval {
     float: right;
     margin-top: 1em;

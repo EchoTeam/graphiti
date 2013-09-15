@@ -29,6 +29,7 @@ Graphiti.Graph = function(graphParams){
   this.options = {};
   this.targets = [];
   this.parsedTargets = [];
+  this.presentation = {};
 
   var defaults = {
     from:     '-6hour',
@@ -52,7 +53,7 @@ Graphiti.Graph = function(graphParams){
     for (; i < l; i++) {
       this.addTarget(graphParams.targets[i]);
     }
-  };
+  }
 
   if(!graphParams.options && !graphParams.targets){
     if(graphParams.charCodeAt){
@@ -64,7 +65,11 @@ Graphiti.Graph = function(graphParams){
         $.extend(this.options, defaults, graphParams);
       };
     }
-  };
+  }
+
+  if (graphParams.presentation) {
+    $.extend(true, this.presentation, graphParams.presentation);
+  }
 }
 
 Graphiti.Graph.prototype = {
@@ -128,7 +133,12 @@ Graphiti.Graph.prototype = {
   },
 
   toJSON: function() {
-    return JSON.stringify({graphite_host: this.graphite_host, options: this.options, targets: this.targets}, null, 2)
+    return JSON.stringify({
+                graphite_host: this.graphite_host,
+                options: this.options,
+                targets: this.targets,
+                presentation: this.presentation
+              }, null, 2);
   },
 
   save: function(uuid, callback) {
