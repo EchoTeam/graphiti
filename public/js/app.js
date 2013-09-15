@@ -231,8 +231,11 @@ var app = Sammy('body', function() {
             Sammy.log("dashboard_sections", dashboard_sections);
             var dashboard_section_names = Object.keys(dashboard_sections).sort();
             for (var i = 0; i < dashboard_section_names.length; i++) {
-              $graphs.append('<h3 class="section-name">' + dashboard_section_names[i] + '</h3>');
               var section_graphs = dashboard_sections[dashboard_section_names[i]];
+              if (!section_graphs.length) {
+                continue;
+              }
+              $graphs.append('<h3 class="section-name">' + dashboard_section_names[i] + '</h3>');
               for (var j = 0; j < section_graphs.length; j++) {
                 var graph = section_graphs[j];
                 var graph_params = $.extend(true, JSON.parse(graph.json), params || {});
