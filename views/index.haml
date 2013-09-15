@@ -56,9 +56,9 @@
                 %button.save.create{rel: 'create'} Create New
         .clear
       .edit-group{'data-group' => 'options'}
-        .edit-head
+        .edit-head.open
           %a Options
-        .edit-body
+        .edit-body.open
           #graph-options
             %form{action: '/graphs/options', method: 'put'}
               .options-group
