@@ -132,13 +132,6 @@ body.bp {
         }
       }
       &.dashboard {
-        border-right: 1px dotted #ccc;
-      }
-      &.snapshots {
-        form {
-          float: left;
-          padding-right: 5px;
-        }
       }
     }
   }
@@ -149,12 +142,10 @@ body.bp {
   /*select, input[type=text] {
     font-size: 12px;
   }*/
-  select[name=snapshot] {
-    width: 190px;
-  }
   h4 {
     font-size: 1.3em;
     margin-bottom: 5px;
+    text-align: center;
   }
 }
 #editor {
@@ -403,18 +394,6 @@ h2 {
   padding: 5px;
   background: #f3f3f3;
 }
-#snapshots-pane {
-  .snapshot {
-    @include column($blueprint-grid-columns);
-    h3 {
-      margin: 0px;
-      padding: 0px;
-    }
-    img {
-      width: 100%;
-    }
-  }
-}
 #dashboards-pane {
   @include column($blueprint-grid-columns, true);
   @include clearfix;
@@ -430,6 +409,7 @@ h2 {
       background: #ccc;
       background: -webkit-linear-gradient(#efefef, #ccc);
       background: -moz-linear-gradient(#efefef, #ccc);
+      ul.actions { display: block; }
     }
     a {
       color: #333;
@@ -451,7 +431,7 @@ h2 {
       top: 14px;
       */
     }
-    ul.actions { position: absolute; top: 12px; right: 0; }
+    ul.actions { position: absolute; top: 12px; right: 0; display: none; }
     .updated-at {
       color: #CCC;
     }

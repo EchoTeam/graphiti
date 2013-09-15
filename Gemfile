@@ -1,24 +1,16 @@
-# A sample Gemfile
-source :rubygems
+source 'https://rubygems.org'
 
-gem 'rake'
-gem 'rack', '1.3.5'
+gem 'rack'
 gem 'sinatra'
 gem 'sinatra-contrib'
+gem 'rubyzip', '< 1.0.0'
 gem 'jim'
 gem 'closure-compiler'
 gem 'redis'
 gem 'redised'
 gem 'compass'
 gem 'haml'
-gem 'typhoeus'
 gem 'yajl-ruby'
-gem 'pony'
-
-group :test do
-  gem 'minitest', :require => false
-  gem 'minitest-display', :require => false
-end
 
 group :development do
   gem 'sinatra-reloader', :require => 'sinatra/reloader'

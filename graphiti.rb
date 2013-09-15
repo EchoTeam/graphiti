@@ -1,24 +1,13 @@
 require 'rubygems'
-require 'bundler'
-Bundler.setup
-
-if !defined?(RACK_ENV)
-  RACK_ENV = ENV['RACK_ENV'] || 'development'
-end
+require 'bundler/setup'
 
 require 'sinatra/base'
 require 'sinatra/contrib'
 require 'redis/namespace'
-require 'compass'
-require 'typhoeus'
-require 'yajl'
 require 'redised'
-require 'digest/sha1'
+require 'compass'
+require 'yajl'
 
-require './lib/s3/request'
-require './lib/s3/signature'
-
-require './lib/metric'
 require './lib/graph'
 require './lib/dashboard'
 
@@ -31,41 +20,28 @@ class Graphiti < Sinatra::Base
   config_file 'config/settings.yml'
 
   configure do
-    set :static_cache_control, [:public, {:max_age => 86400*7}]
+    set :static_cache_control, [:public, {:max_age => 86400}]
     set :logging, true
+    set :method_override, true
     Compass.configuration do |config|
       config.project_path = settings.root
       config.sass_dir = File.join(settings.views, 'stylesheets')
       config.output_style = :compact
     end
-    set :haml, :format => :html5
     set :scss, Compass.sass_engine_options
-    set :method_override, true
-    Graph.redis = settings.redis_url
-    Dashboard.redis = settings.redis_url
-    Metric.redis = settings.redis_url
+    set :haml, :format => :html5
+    Graph.redis = settings.graphiti['redis_url']
+    Dashboard.redis = settings.graphiti['redis_url']
   end
 
-  use Rack::Auth::Basic, "graphiti" do |username, password|
-    [username, password] == ['jskit', 'rules!']
-  end
-
-  before do
-    S3::Request.logger = logger
-  end
-
-  helpers do
-    def base_url
-      @base_url ||= "#{request.env['rack.url_scheme']}://#{request.env['HTTP_HOST']}"
+  if settings.graphiti['web_auth'] then
+    use Rack::Auth::Basic, settings.graphiti['web_auth']['realm'] do |username, password|
+      [username, password] == [settings.graphiti['web_auth']['username'], settings.graphiti['web_auth']['password']]
     end
   end
 
   get '/graphs/:uuid.js' do
     json Graph.find(params[:uuid])
-  end
-
-  get '/metrics.js' do
-    json :metrics => Metric.find(params[:q])
   end
 
   get '/graphs.js' do
@@ -87,11 +63,6 @@ class Graphiti < Sinatra::Base
   post '/graphs' do
     uuid = Graph.save(params[:graph])
     json :uuid => uuid
-  end
-
-  post '/graphs/:uuid/snapshot' do
-    url = Graph.snapshot(params[:uuid])
-    json :url => url
   end
 
   put '/graphs/:uuid' do
@@ -120,18 +91,12 @@ class Graphiti < Sinatra::Base
     Dashboard.destroy(params[:slug])
   end
 
-  post '/snapshot' do
-    filename = Graph.snapshot(params[:uuid], settings.snapshots['service'], File.join(settings.root, 'public'))
-    json :filename => filename
-  end
-
   # Routes that are entirely handled by Sammy/frontend
   # and just need to load the empty index
   %w{
     /graphs/workspace
     /graphs/new
     /graphs/:uuid
-    /graphs/:uuid/snapshots
     /graphs
     /dashboards/:slug
     /dashboards
@@ -150,8 +115,9 @@ class Graphiti < Sinatra::Base
 
   def default_graph
     {
-      :options => settings.default_options,
-      :targets => settings.default_metrics.collect {|m| m.is_a?(Array) ? m : [m, {}] }
+      :graphite_host => settings.graphs['default_graphite_host'],
+      :options => settings.graphs['default_options'],
+      :targets => settings.graphs['default_metrics'].collect {|m| m.is_a?(Array) ? m : [m, {}] }
     }
   end
 

@@ -59,7 +59,7 @@ var app = Sammy('body', function() {
     showEditor: function(text, uuid) {
       this.showPane('editor');
       if (!text) {
-        text = defaultGraph;
+        text = Graphiti.defaultGraph;
       }
       this.setupEditor();
       var text = this.setEditorJSON(text);
@@ -73,11 +73,11 @@ var app = Sammy('body', function() {
           }
         }).show();
         $('[name=uuid]').val(uuid);
-        $('#graph-actions').find('.update, .dashboard, .snapshots').show();
+        $('#graph-actions').find('.update, .dashboard').show();
       } else {
-        $('#graph-actions').find('.update, .dashboard, .snapshots').hide();
+        // TODO: replace Clone with Save
+        $('#graph-actions').find('.update, .dashboard').hide();
       }
-      this.toggleEditorPanesByPreference();
     },
     getEditorJSON: function() {
       return JSON.parse(this.app.editor.getSession().getValue());
@@ -103,90 +103,15 @@ var app = Sammy('body', function() {
       var opts = options.options ? options.options : options,
           key, $form = $('#graph-options form');
       for (key in opts) {
-        if (opts[key] != '') {
-          $form.find('[name="options[' + key + ']"]').val(opts[key]);
+        var key_value = opts[key].toString();
+        if (key_value !== '') {
+          $form.find('[name="options[' + key + ']"]').val(key_value);
         }
       }
     },
     saveOptions: function(params) {
       var json = this.getEditorJSON();
       json.options = params;
-      this.graphPreview(json);
-      this.setEditorJSON(json);
-    },
-    buildMetricsList: function($list, metrics) {
-      var $li = $list.find('li:first').clone();
-      $list.html('');
-      var i = 0, l = metrics.length;
-      for (; i < l; i++) {
-        Sammy.log(metrics[i]);
-        $li.clone()
-        .attr('id', "metric_list_metric_" + i)
-        .find('strong').text(metrics[i])
-        .end()
-        .appendTo($list).show();
-      }
-    },
-    bindMetricsList: function() {
-      var ctx = this;
-      var $list = $('#metrics-list ul')
-      var throttle;
-      $('#metrics-menu')
-        .find('input[type="search"]').live('keyup', function() {
-          var val = $(this).val();
-          if (throttle) {
-            clearTimeout(throttle);
-          }
-          throttle = setTimeout(function() {
-            ctx.searchMetricsList(val);
-          }, 200);
-        });
-      $list.delegate('li a', 'click', function(e) {
-        e.preventDefault();
-        var action = $(this).attr('rel'),
-            metric = $(this).siblings('strong').text();
-        Sammy.log('clicked', action, metric);
-        ctx[action + "GraphMetric"](metric);
-      }).addClass('.bound');
-    },
-
-    searchMetricsList: function(search) {
-      var ctx = this;
-      var $list = $('#metrics-list ul');
-      var $loading = $('#metrics-list .loading');
-      var $empty = $('#metrics-list .empty');
-      var url = '/metrics.js';
-      url += '?q=' + search;
-      if (ctx.app.searching) return;
-      if (search.length > 4) {
-        ctx.app.searching = true;
-        $empty.hide();
-        $loading.show();
-        return this.load(url).then(function(metrics) {
-          var metrics = metrics.metrics;
-          $loading.hide();
-          if (metrics.length > 0) {
-            $list.show();
-            ctx.buildMetricsList($list, metrics);
-          } else {
-            $empty.show();
-          }
-          ctx.app.searching = false;
-        });
-      } else {
-        $empty.show();
-        $list.hide();
-      }
-    },
-    addGraphMetric: function(metric) {
-      var json = this.getEditorJSON();
-      json.targets.push([metric, {}]);
-      this.graphPreview(json);
-      this.setEditorJSON(json);
-    },
-    replaceGraphMetric: function(metric) {
-      var json = this.getEditorJSON();
-      json.targets = [[metric, {}]];
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
@@ -213,20 +138,6 @@ var app = Sammy('body', function() {
               }).appendTo($select);
             }
           });
-    },
-    buildSnapshotsDropdown: function(urls, clear) {
-      var $select = $('select[name="snapshot"]');
-      if (clear) { $select.html(''); }
-      var i = 0,
-          l = urls.length, url, date;
-      for (; i < l; i++) {
-        url = urls[i];
-        date = this.snapshotURLToDate(url);
-        $('<option />', {
-          value: url,
-          text: date
-        }).prependTo($select).attr('selected', 'selected');
-      }
     },
     loadAndRenderGraphs: function(url, params, display_options) {
       var ctx = this;
@@ -317,10 +228,6 @@ var app = Sammy('body', function() {
               .appendTo($graphs).each(function() {
                 // actually replace the graph image
                 graph_obj.image($(this).find('img'));
-                // add a last class alternatingly to fix the display grid
-                //if ((i+1) % Graphiti.images_per_row == 0) {
-                  //$(this).addClass('last');
-                //}
                 // if its all graphs, delete operates on everything
                 if (all_graphs) {
                   $(this)
@@ -342,91 +249,26 @@ var app = Sammy('body', function() {
     loadAndRenderDashboards: function() {
       var ctx = this;
       this.load('/dashboards.js', {cache: false})
-          .then(function(data) {
-            var $dashboards = ctx.showPane('dashboards', '<h2>Dashboards</h2>');
-            var dashboards = data.dashboards,
-            i = 0, l = dashboards.length, dashboard, alt,
-            $dashboard = $('#templates .dashboard').clone();
+        .then(function(data) {
+          var $dashboards = ctx.showPane('dashboards', '<h2>Dashboards</h2>');
+          var dashboards = data.dashboards,
+          i = 0, l = dashboards.length, dashboard, alt,
+          $dashboard = $('#templates .dashboard').clone();
 
-            if (dashboards.length == 0) {
-              $dashboards.append($('#dashboards-empty'));
-            } else {
-              for (; i < l;i++) {
-                dashboard = dashboards[i];
-                alt = ((i+1)%2 == 0) ? 'alt' : '';
-                $dashboard.clone()
-                  .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
-                  .find('.title').text(dashboard.title).end()
-                  .find('.graphs-count').text(dashboard.graphs.length).end()
-                  .find('.updated-at').text(ctx.timestamp(dashboard.updated_at)).end()
-                  .find('form.delete').attr('action','/dashboards/'+dashboard.slug).end()
-                  .addClass(alt)
-                  .show()
-                  .appendTo($dashboards);
-              }
-            }
-
-          });
-    },
-
-    loadAndRenderSnapshots: function() {
-      var ctx = this;
-      this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
-          .then(function(graph_data) {
-            var $snapshots = ctx.showPane('snapshots', '<h2>' + graph_data.title + ' - Snapshots</h2>');
-            var snapshots = graph_data.snapshots,
-            i = 0, l = snapshots.length, snapshot,
-            $snapshot = $('#templates .snapshot').clone();
-            for (; i < l; i++) {
-              snapshot = snapshots[i];
-              $snapshot.clone()
-              .find('a.view').attr('href', snapshot).end()
-              .find('img').attr('src', snapshot).end()
-              .find('h3.title').text(ctx.snapshotURLToDate(snapshot)).end()
-              .show()
-              .appendTo($snapshots);
-            }
-          });
-    },
-
-    snapshotURLToDate: function(url) {
-      var date;
-      try {
-        date = new Date(parseInt(url.match(/\/(\d+)\.png/)[1], 10)).toString();
-      } catch (e) { }
-      return date;
-    },
-
-    bindEditorPanes: function() {
-      var ctx = this;
-      $('#editor-pane')
-      .delegate('.edit-group .edit-head', 'click', function(e) {
-        e.preventDefault();
-        var $group = $(this).add($(this).siblings('.edit-body'))
-        var group_name = $group.parents('.edit-group').attr('data-group');
-        if ($group.is('.closed')) {
-          $group.removeClass('closed').addClass('open');
-          ctx.session('groups:' + group_name, true);
-        } else {
-          $group.addClass('closed').removeClass('open');
-          ctx.session('groups:' + group_name, false);
-        }
-      });
-    },
-
-    toggleEditorPanesByPreference: function() {
-      var ctx = this;
-      $('#editor-pane .edit-group').each(function() {
-        var $group = $(this), group_name = $group.attr('data-group'),
-            $parts = $group.find('.edit-head, .edit-body');
-        ctx.session('groups:' + group_name, function(open) {
-          if (open) {
-            $parts.removeClass('closed').addClass('open');
+          if (dashboards.length == 0) {
+            $dashboards.append($('#dashboards-empty'));
           } else {
-            $parts.removeClass('open').addClass('closed');
+            for (; i < l;i++) {
+              dashboard = dashboards[i];
+              $dashboard.clone()
+                .find('a.view').attr('href', '/dashboards/' + dashboard.slug).end()
+                .find('.title').text(dashboard.title).end()
+                .find('form.delete').attr('action','/dashboards/'+dashboard.slug).end()
+                .show()
+                .appendTo($dashboards);
+            }
           }
         });
-      });
     },
 
     confirmDelete: function(type) {
@@ -465,18 +307,8 @@ var app = Sammy('body', function() {
   this.get('/graphs/:uuid', function(ctx) {
     this.load('/graphs/' + this.params.uuid + '.js', {cache: false})
         .then(function(graph_data) {
-          ctx.buildSnapshotsDropdown(graph_data.snapshots, true);
           ctx.showEditor(graph_data.json, ctx.params.uuid);
         });
-  });
-
-  this.get('/graphs/:uuid/snapshots', function(ctx) {
-    if (this.params.snapshot) {
-      window.open(this.params.snapshot, this.snapshotURLToDate(this.params.snapshot));
-      this.redirect('/graphs', this.params.uuid);
-    } else {
-      this.loadAndRenderSnapshots();
-    }
   });
 
   this.get('/graphs', function(ctx) {
@@ -496,10 +328,6 @@ var app = Sammy('body', function() {
       display_options["layout"] = this.params.layout;
     }
     this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js', {"options": options}, display_options);
-  });
-
-  this.get('/dashboards/:slug', function(ctx) {
-    this.loadAndRenderGraphs('/dashboards/' + this.params.slug + '.js');
   });
 
   this.get('/dashboards', function(ctx) {
@@ -566,18 +394,6 @@ var app = Sammy('body', function() {
     this.saveOptions(this.params.options);
   });
 
-  this.post('/graphs/:uuid/snapshots', function(ctx) {
-    ctx.showSaving();
-    var graph = new Graphiti.Graph(this.getEditorJSON());
-    graph.snapshot(this.params.uuid, function(url) {
-      ctx.hideSaving();
-      Sammy.log('snapshotted', url);
-      if (url) {
-        ctx.buildSnapshotsDropdown([url]);
-      }
-    });
-  });
-
   this.put('/graphs/:uuid', function(ctx) {
     ctx.showSaving();
     var graph = new Graphiti.Graph(this.getEditorJSON());
@@ -621,9 +437,6 @@ var app = Sammy('body', function() {
 
   this.bind('run', function() {
     var ctx = this;
-
-    this.bindEditorPanes();
-    this.bindMetricsList();
 
     var disableSave = function() {
       if ($(this).val().toString() == '') {

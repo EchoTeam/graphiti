@@ -10,7 +10,6 @@ Graphiti allows you to easily access and manipulate the data you've collected in
 
 * *Graphs* - the basic building blocks of graphiti. Graphs are stored as JSON blobs in Redis. They are created/edited through an editor pane where you live edit the JSON and see a reference of your collected metrics and the display options available. Each graph is given a UUID and can be updated or cloned.
 * *Dashboards* - graphs are grouped into arbitrary dashboards which are just named collections with a URL slug for easy reference and retreival. We use dashboards to name personal lists (like "aq"/"mrb") or lists of related information ("key metrics"/"resque"/"rails").
-* *Snapshots* - point in time freezeframes of your graphs. This arose when we realized that it would be useful to have access to our graphs from outside of our VPN if we needed to, and that we wanted to be able to refer to specific graphs in campfire logs.
 * *Auth-less* - No authentication is considered a feature of Graphiti. It's behind your VPN, your trusted engineers have access to it, and it's easy enough to recreate graphs (and make redis backups, for that matter), that we don't see the point of logins.
 
 ## Background
@@ -31,7 +30,7 @@ We started talking to some smart people that were using Graphite in their own wa
 
 ## Technology
 
-Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that stores the Graph + Dashboard data in Redis (Snapshots are stored in S3). On top of this REST backend is a Sammy.js (http://sammyjs.org) application that handles the graph generation and manipulation. It also uses an embedded version of the Ace (http://ace.ajax.org/) for the editor interface. It uses Jim (http://github.com/quirkey/jim) to bundle and compress the JavaScript. The CSS/SCSS is created with the help of the awesome Compass framework (http://compass-style.org).
+Graphiti is a very simple ruby 1.9.2/Sinatra (http://sinatrarb.com) backend that stores the Graph + Dashboard data in Redis. On top of this REST backend is a Sammy.js (http://sammyjs.org) application that handles the graph generation and manipulation. It also uses an embedded version of the Ace (http://ace.ajax.org/) for the editor interface. It uses Jim (http://github.com/quirkey/jim) to bundle and compress the JavaScript. The CSS/SCSS is created with the help of the awesome Compass framework (http://compass-style.org).
 
 ### Dependencies
 

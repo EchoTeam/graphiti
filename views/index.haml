@@ -1,7 +1,6 @@
 !!!
 %head
   %meta{charset: 'utf-8'}
-  %meta{'http-equiv' => 'X-UA-Compatible', 'content' => 'IE=edge,chrome=1'}/
 
   %title Echo Graphiti
 
@@ -9,35 +8,21 @@
   %link{href: 'http://fonts.googleapis.com/css?family=Varela+Round', rel: 'stylesheet', type: 'text/css'}
   = stylesheet('/stylesheets/screen.css', media: 'screen, projection')
 
-
 %body.bp
   #header
     .menu
       %h1
         %a{href: '/'} ECHO
-
       #view-controls
         %label{for: 'auto-refresh'}
-          %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.auto_refresh['enabled'], 'data-interval' => Graphiti.settings.auto_refresh['interval']}
-            Refresh every #{Graphiti.settings.auto_refresh['interval']} seconds
+          %input#auto-refresh{:name => 'auto-refresh', :type => 'checkbox', :checked => Graphiti.settings.graphs['auto_refresh']['enabled'], 'data-interval' => Graphiti.settings.graphs['auto_refresh']['interval']}
+            Refresh graphs every #{Graphiti.settings.graphs['auto_refresh']['interval']} seconds.
 
-      -#
-        %ul
-          %li
-            %a{href: '/'}
-              Dashboards
-          %li
-            %a{href: '/graphs'}
-              Graphs
-          %li
-            %a{href: '/graphs/new'}
-              + New Graph
   #container
     #loading-pane.pane
       #loading-spinner
     #dashboards-pane.pane{style: 'display:none;'}
     #graphs-pane.pane{style: 'display:none;'}
-    #snapshots-pane.pane{style: 'display:none;'}
     #editor-pane.pane{style: 'display:none;'}
       #graph-preview
         %img{src: '/images/loading.gif'}
@@ -69,20 +54,11 @@
                 %select{name: 'dashboard'}
                 %input.save{type: 'submit', value: 'Save', disabled: 'disabled'}
                 %button.save.create{rel: 'create'} Create New
-          %li.snapshots
-            %h4 Snapshots
-            %form.save-new{"data-action" => '/graphs/:uuid/snapshots', method: 'post'}
-              %input.save.create{type: 'submit', value: 'Save New'}
-            %form.select{"data-action" => '/graphs/:uuid/snapshots', method: 'get'}
-              %select{name: 'snapshot'}
-              %input.save.create{type: 'submit', value: 'View'}
-            %form.select{"data-action" => '/graphs/:uuid/snapshots', method: 'get'}
-              %input.save{type: 'submit', value: 'View All'}
         .clear
       .edit-group{'data-group' => 'options'}
-        .edit-head.closed
+        .edit-head
           %a Options
-        .edit-body.closed
+        .edit-body
           #graph-options
             %form{action: '/graphs/options', method: 'put'}
               .options-group
@@ -101,29 +77,14 @@
                 %p
                   %label Hide Legend
                   %select{name: 'options[hideLegend]'}
-                    %option
-                    %option{value: 'on'} always hide
+                    %option{value: ''} decide automatically
+                    %option{value: 'true'} always hide
                     %option{value: 'false'} always show
               .options-group.last{ style: 'display:none' }
               .clear
               .options-group
                 %p
                   %input.save{type: 'submit', value: 'Update JSON'}
-        .clear
-      .edit-group{'data-group' => 'metrics', 'class' => 'edit-metrics-list'}
-        .edit-head.closed
-          %a Metrics
-        .edit-body.closed
-          #metrics-menu
-            %input.search{type: 'search', name: 'metrics-filter', placeholder: 'Search'}
-          #metrics-list
-            .empty No metrics found. Search for metrics above.
-            .loading{style: 'display:none;'} ... Loading ...
-            %ul{style: 'display:none;'}
-              %li{style: 'display:none;'}
-                %a{rel: 'add'} Add
-                %a{rel: 'replace'} Replace
-                %strong &nbsp;
         .clear
       .edit-group{'data-group' => 'editor'}
         .edit-head.open
@@ -137,16 +98,10 @@
     .dashboard{style: 'display:none'}
       %a.view
         %h3.title &nbsp;
-        .meta
-          %span.updated-at
-          %strong.graphs-count
       %ul.actions
         %li
           %form.delete{method: 'delete', action: '/dashboards/'}
             %input{type: 'submit', value: 'Delete'}
-        %li
-          %a.view
-            %button Show
     .graph{style: 'display:none'}
       .desc
         %h3.title &nbsp;
@@ -161,11 +116,6 @@
               %button Edit
       %a.edit
         %img.ggraph{src: '/images/loading.gif'}
-      .snapshot{style: 'display:none'}
-        %a.view{target: 'blank'}
-          %img{src: '/images/loading.gif'}
-        .desc
-          %h3.title &nbsp;
     #dashboards-empty.empty
       %h3
         You haven't set up any dashboards yet. Create a
@@ -176,18 +126,12 @@
         You haven't set up any graphs yet. Create a
         %a{href: '/graphs/new'} new graph.
 
+  :javascript
+    Graphiti = window.Graphiti || {};
+    Graphiti.default_graphite_host = "#{settings.graphs['default_graphite_host']}";
+    Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
+
   %script{src: '/js/libs/ace/ace.js'}
   %script{src: '/js/libs/ace/mode-json.js'}
   %script{src: '/js/libs/ace/theme-textmate.js'}
-
-  :javascript
-    Graphiti = window.Graphiti || {};
-    Graphiti.graphite_base_url = "#{settings.graphite_base_url}";
-    Graphiti.defaultGraph = #{Yajl::Encoder.encode(default_graph)};
-    Graphiti.images_per_row = 2;
-
-  - if Graphiti.production?
-    -# %script{src: '/js/default.min.js'}
-    %script{src: '/js/default.min.js'}
-  - else
-    %script{src: '/js/default.js'}
+  %script{src: '/js/default.js'}

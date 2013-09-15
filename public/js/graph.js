@@ -11,7 +11,7 @@ var graph = new Graphiti.Graph('stats.beers.consumed');
 var graph = new Graphiti.Graph(['stats.beers.consumed',{drawAsInfinite:true}]);
 
 // Pass an Object with options or target attribues:
-var graph = new Graphiti.Graph({options:{width:1000}, targets:['stats']})
+var graph = new Graphiti.Graph({graphite: 'http://graphite.example.com', options:{width:1000}, targets:['stats']})
 
 // Add attribues to the object
 graph.addTarget('stats.times.stumbled);
@@ -24,7 +24,8 @@ graph.buildURL();
 
 Graphiti = window.Graphiti || {};
 
-Graphiti.Graph = function(targetsAndOptions){
+Graphiti.Graph = function(graphParams){
+  this.graphite_host = Graphiti.default_graphite_host;
   this.options = {};
   this.targets = [];
   this.parsedTargets = [];
@@ -36,35 +37,37 @@ Graphiti.Graph = function(targetsAndOptions){
     vtitle:   ""
   };
 
-  if (targetsAndOptions.options){
-    $.extend(true, this.options, defaults, targetsAndOptions.options);
+  if (graphParams.graphite_host) {
+    this.graphite_host = graphParams.graphite_host;
+  }
+
+  if (graphParams.options){
+    $.extend(true, this.options, defaults, graphParams.options);
   } else {
     $.extend(true, this.options, defaults);
   }
 
-  if (targetsAndOptions.targets){
-    var i = 0, l = targetsAndOptions.targets.length;
+  if (graphParams.targets){
+    var i = 0, l = graphParams.targets.length;
     for (; i < l; i++) {
-      this.addTarget(targetsAndOptions.targets[i]);
+      this.addTarget(graphParams.targets[i]);
     }
   };
 
-  if(!targetsAndOptions.options && !targetsAndOptions.targets){
-    if(targetsAndOptions.charCodeAt){
-      this.addTarget(targetsAndOptions);
+  if(!graphParams.options && !graphParams.targets){
+    if(graphParams.charCodeAt){
+      this.addTarget(graphParams);
     } else {
-      if(targetsAndOptions instanceof Array){
-        this.addTarget(targetsAndOptions);
+      if(graphParams instanceof Array){
+        this.addTarget(graphParams);
       } else {
-        $.extend(this.options, defaults, targetsAndOptions);
+        $.extend(this.options, defaults, graphParams);
       };
     }
   };
 }
 
 Graphiti.Graph.prototype = {
-  urlBase: (function() { return Graphiti.graphite_base_url + "/render/?"; })(),
-
   updateOptions: function(options) {
     $.extend(true, this.options, options || {});
   },
@@ -103,7 +106,6 @@ Graphiti.Graph.prototype = {
   },
 
   buildURL: function(){
-    var url = this.urlBase;
     var parts = [];
     $.each(this.options, function(key,value){
       parts.push(key + "=" + encodeURIComponent(value));
@@ -112,7 +114,7 @@ Graphiti.Graph.prototype = {
       parts.push("target=" + encodeURIComponent(target));
     });
     parts.push('_timestamp_=' + new Date().getTime());
-    return url + parts.join('&') + '#.png';
+    return "http://" + this.graphite_host + "/render/?" + parts.join('&');
   },
 
   image: function($image) {
@@ -126,7 +128,7 @@ Graphiti.Graph.prototype = {
   },
 
   toJSON: function() {
-    return JSON.stringify({options: this.options, targets: this.targets}, null, 2)
+    return JSON.stringify({graphite_host: this.graphite_host, options: this.options, targets: this.targets}, null, 2)
   },
 
   save: function(uuid, callback) {
@@ -134,7 +136,6 @@ Graphiti.Graph.prototype = {
     var data = {
       graph: {
         title: this.options.title || 'Untitled',
-        url: this.buildURL(),
         json: this.toJSON()
       }
     };
@@ -155,17 +156,6 @@ Graphiti.Graph.prototype = {
       data: data,
       type: 'post',
       success: callback
-    });
-  },
-
-  snapshot: function(uuid, callback) {
-    $.ajax({
-      type: 'post',
-      dataType: 'json',
-      url: '/graphs/' + uuid + '/snapshot',
-      success: function(json) {
-        callback(json.url);
-      }
     });
   }
 };

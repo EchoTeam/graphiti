@@ -34,5 +34,5 @@ var spinnerOpts = {
 var spinnerTarget = document.getElementById('loading-spinner');
 var spinner;
 if (spinnerTarget) {
-	spinner = new Spinner(spinnerOpts).spin(spinnerTarget);
+  spinner = new Spinner(spinnerOpts).spin(spinnerTarget);
 }
