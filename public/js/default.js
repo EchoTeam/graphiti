@@ -13122,7 +13122,7 @@ var app = Sammy('body', function() {
     },
     saveOptions: function(params) {
       var json = this.getEditorJSON();
-      json.options = params;
+      json.options = $.extend(true, json.options, params || {});
       this.graphPreview(json);
       this.setEditorJSON(json);
     },
