@@ -228,7 +228,6 @@ var app = Sammy('body', function() {
                 dashboard_sections["General"].push(graphs[i]);
               }
             }
-            Sammy.log("dashboard_sections", dashboard_sections);
             var dashboard_section_names = Object.keys(dashboard_sections).sort();
             for (var i = 0; i < dashboard_section_names.length; i++) {
               var section_graphs = dashboard_sections[dashboard_section_names[i]];
