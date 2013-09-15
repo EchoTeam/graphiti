@@ -13237,19 +13237,23 @@ var app = Sammy('body', function() {
               var graph_json = JSON.parse(graphs[i].json || '{}');
               if (graph_json.presentation && graph_json.presentation.sections && typeof graph_json.presentation.sections == "object") {
                   var sections = Object.keys(graph_json.presentation.sections),
-                      sections_len = sections.length;
+                      sections_len = sections.length,
+                      found_matching_section = false;
                   for (var j = 0; j < sections_len; j++) {
                     if (sections[j] == slug) {
                       var section_name = graph_json.presentation.sections[sections[j]];
                       dashboard_sections[section_name] = (dashboard_sections[section_name] || []);
                       dashboard_sections[section_name].push(graphs[i]);
+                      found_matching_section = true;
                     }
+                  }
+                  if (!found_matching_section) {
+                    dashboard_sections["General"].push(graphs[i]);
                   }
               } else {
                 dashboard_sections["General"].push(graphs[i]);
               }
             }
-            Sammy.log("dashboard_sections", dashboard_sections);
             var dashboard_section_names = Object.keys(dashboard_sections).sort();
             for (var i = 0; i < dashboard_section_names.length; i++) {
               var section_graphs = dashboard_sections[dashboard_section_names[i]];
