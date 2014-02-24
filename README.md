@@ -1,3 +1,11 @@
+# Notes from Echo
+
+Echo augmented Graphiti by adding the following features:
+- one can now see a dashboard's graphs in the list or columns format
+- added possibility to specify time interval for all graphs on a page
+- graphs on a dashboards page can now be groupped into sections
+- a graph can now specify which graphite host has its data by specifying "graphite_host" option what makes it possible to show graphs from several graphite hosts on a single dashboard page
+
 # Graphiti
 
 Graphiti is an alternate JavaScript and Ruby front-end and graph storage application for the Graphite Real-time graphing engine.
